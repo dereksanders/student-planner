@@ -37,9 +37,32 @@ public class Term {
 
 	public static ResultSet getTerms() throws SqliteWrapperException {
 
-		ResultSet terms = Main.sqlite.query("select * from term");
+		ResultSet terms = Main.sqlite
+				.query("select * from term order by start_date");
 
 		return terms;
+	}
+
+	public static ArrayList<TermDescription> populateTerms()
+			throws SqliteWrapperException, SQLException {
+
+		ResultSet terms = getTerms();
+
+		ArrayList<TermDescription> termDescriptions = new ArrayList<>();
+
+		while (terms.next()) {
+
+			long startDay = terms.getLong(Term.Lookup.START_DATE.index);
+
+			LocalDate start = LocalDate.ofEpochDay(startDay);
+
+			TermDescription currentTerm = new TermDescription(
+					terms.getString(Term.Lookup.NAME.index), start);
+
+			termDescriptions.add(currentTerm);
+		}
+
+		return termDescriptions;
 	}
 
 	public static int getNumTerms()
@@ -108,7 +131,7 @@ public class Term {
 		return termIsValid;
 	}
 
-	public TermDescription getTermInProgress()
+	public static TermDescription getTermInProgress()
 			throws SqliteWrapperException, SQLException {
 
 		long currentDate = LocalDate.now().toEpochDay();

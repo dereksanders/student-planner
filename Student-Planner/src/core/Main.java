@@ -28,6 +28,7 @@ public class Main extends Application {
 	public static String coursesViewPath = "/views/Courses.fxml";
 	public static String mainViewPath = "/views/Main.fxml";
 
+	public static Profile active;
 	public static SqliteWrapper sqlite;
 
 	private static String logPath = "history.log";

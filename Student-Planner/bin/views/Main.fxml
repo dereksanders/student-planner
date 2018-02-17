@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -64,24 +67,40 @@
          <center>
             <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
                <tabs>
-                  <Tab text="Schedule">
+                  <Tab closable="false" text="Schedule">
                     <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                      <AnchorPane fx:id="schedulePane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <CheckBox fx:id="showCurrentWeek" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Show Current Week" />
+                              <DatePicker fx:id="scheduleSelectDate" layoutX="14.0" layoutY="39.0" />
+                              <ScrollPane layoutX="14.0" layoutY="74.0" prefHeight="405.0" prefWidth="548.0">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
+                                </content>
+                              </ScrollPane>
+                           </children></AnchorPane>
                     </content>
                   </Tab>
-                  <Tab text="Calendar">
+                  <Tab closable="false" text="Calendar">
                     <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                      <AnchorPane fx:id="calendarPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <ScrollPane layoutX="14.0" layoutY="14.0" prefHeight="463.0" prefWidth="546.0">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
+                                </content>
+                              </ScrollPane>
+                           </children></AnchorPane>
                     </content>
                   </Tab>
-                  <Tab text="Grades">
+                  <Tab closable="false" text="Grades">
                      <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                        <AnchorPane fx:id="gradesPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                      </content>
                   </Tab>
-                  <Tab text="Plots">
+                  <Tab closable="false" text="Plots">
                      <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                        <AnchorPane fx:id="plotsPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                      </content>
                   </Tab>
                </tabs>
@@ -91,7 +110,7 @@
             <HBox minHeight="46.0" prefWidth="226.0" spacing="10.0" BorderPane.alignment="CENTER">
                <children>
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Selected:" />
-                  <ChoiceBox prefWidth="150.0" />
+                  <ChoiceBox fx:id="selectTerm" prefWidth="150.0" />
                </children>
                <padding>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

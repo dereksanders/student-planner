@@ -1,9 +1,7 @@
 package views;
 
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 
 import core.Course;
@@ -37,22 +35,7 @@ public class CoursesController {
 	@FXML
 	public void initialize() throws SqliteWrapperException, SQLException {
 
-		// Populate choices for startTerm & endTerm
-		ResultSet terms = Main.sqlite.query("select * from term");
-
-		ArrayList<TermDescription> termDescriptions = new ArrayList<>();
-
-		while (terms.next()) {
-
-			long startDay = terms.getLong(Term.Lookup.START_DATE.index);
-
-			LocalDate start = LocalDate.ofEpochDay(startDay);
-
-			TermDescription currentTerm = new TermDescription(
-					terms.getString(Term.Lookup.NAME.index), start);
-
-			termDescriptions.add(currentTerm);
-		}
+		ArrayList<TermDescription> termDescriptions = Term.populateTerms();
 
 		startTerm.setItems(FXCollections.observableArrayList(termDescriptions));
 		endTerm.setItems(FXCollections.observableArrayList(termDescriptions));
