@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import sqlite.SqliteWrapperException;
 
@@ -107,10 +106,6 @@ public class Course {
 				errorMessages.add("Name cannot be empty");
 			}
 
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("Cannot add course");
-
 			String errorText = "";
 
 			for (int i = 0; i < errorMessages.size(); i++) {
@@ -123,8 +118,7 @@ public class Course {
 				}
 			}
 
-			alert.setContentText(errorText);
-			alert.showAndWait();
+			Main.showAlert(AlertType.ERROR, "Cannot add course", errorText);
 		}
 
 		return courseIsValid;

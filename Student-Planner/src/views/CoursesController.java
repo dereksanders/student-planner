@@ -15,7 +15,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
@@ -82,11 +81,8 @@ public class CoursesController {
 
 			courseCodeIsValid = false;
 
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("Cannot add course");
-			alert.setContentText("Course code must be an integer");
-			alert.showAndWait();
+			Main.showAlert(AlertType.ERROR, "Cannot add course",
+					"Course code must be an integer");
 		}
 
 		if (courseCodeIsValid) {

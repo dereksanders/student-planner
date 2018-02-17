@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import sqlite.SqliteWrapperException;
 
@@ -91,10 +90,6 @@ public class Term {
 				errorMessages.add("Name cannot be empty");
 			}
 
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("Cannot add term");
-
 			String errorText = "";
 
 			for (int i = 0; i < errorMessages.size(); i++) {
@@ -107,8 +102,7 @@ public class Term {
 				}
 			}
 
-			alert.setContentText(errorText);
-			alert.showAndWait();
+			Main.showAlert(AlertType.ERROR, "Cannot add term", errorText);
 		}
 
 		return termIsValid;

@@ -28,22 +28,12 @@ public class WelcomeController {
 	@FXML
 	public void createProfile() throws SqliteWrapperException, IOException {
 
-		Main.dbNamePrefix = nameField.getText();
+		Main.initializeDb(nameField.getText());
 
-		try {
+		showTermsView();
+	}
 
-			Main.sqlite.createDb(Main.formDbName());
-
-		} catch (SqliteWrapperException e) {
-
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("Cannot create profile");
-			alert.setContentText("Profile with that name already exists");
-			alert.showAndWait();
-		}
-
-		Main.sqlite.executeFromFile(Main.schemaPath);
+	private void showTermsView() throws IOException {
 
 		Parent terms = FXMLLoader
 				.load(this.getClass().getResource("/views/Terms.fxml"));
@@ -52,7 +42,7 @@ public class WelcomeController {
 	}
 
 	@FXML
-	public void loadProfile() {
+	public void loadProfile() throws IOException {
 
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Load Profile");
@@ -78,6 +68,9 @@ public class WelcomeController {
 			e.printStackTrace();
 		}
 
-		// Set scene to Main view
+		Parent main = FXMLLoader
+				.load(this.getClass().getResource("/views/Main.fxml"));
+		Scene mainScene = new Scene(main, 1280, 960);
+		Main.window.setScene(mainScene);
 	}
 }

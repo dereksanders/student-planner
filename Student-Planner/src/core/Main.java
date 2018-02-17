@@ -6,11 +6,15 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import sqlite.SqliteWrapper;
 import sqlite.SqliteWrapperException;
 import utility.IOManager;
+import utility.Log;
+import utility.Logger;
 
 public class Main extends Application {
 
@@ -18,14 +22,14 @@ public class Main extends Application {
 
 	public static SqliteWrapper sqlite;
 
+	private static String logPath = "history.log";
 	private static String configPath = "planner.cfg";
 	private static String dbDirectory = "dbs/";
 
 	private static String dbName = "";
 
 	// This is the user-defined 'name' of the db, but the full name of the db
-	// will
-	// include its version and extension.
+	// will include its version and extension.
 	public static String dbNamePrefix = "";
 
 	private static String dbExtension = ".db";
@@ -41,6 +45,8 @@ public class Main extends Application {
 
 	public static void main(String[] args)
 			throws SqliteWrapperException, InitializationException {
+
+		Logger.initialize(logPath);
 
 		configure();
 
@@ -144,12 +150,15 @@ public class Main extends Application {
 
 		} else {
 
-			System.out.println("Config file doesn't exist. Creating one..");
-
-			String defaultConfig = "dbDirectory,dbs/" + "\n" + "dbName,";
-
-			IOManager.writeFile(defaultConfig, configPath);
+			writeDefaultConfig();
 		}
+	}
+
+	private static void writeDefaultConfig() {
+
+		String defaultConfig = "dbDirectory,dbs/" + "\n" + "dbName,";
+
+		IOManager.writeFile(defaultConfig, configPath);
 	}
 
 	private static String formDbPath() {
@@ -194,8 +203,6 @@ public class Main extends Application {
 	public static void loadProfile(File chosen)
 			throws InitializationException, SqliteWrapperException {
 
-		// FIXME: deal with db directory
-
 		String filename = chosen.getName();
 
 		String[] filenameComponents = filename.split("\\.");
@@ -236,8 +243,51 @@ public class Main extends Application {
 
 			}
 
-			Main.sqlite.connectToDb(formDbName());
+			dbName = formDbName();
+			dbDirectory = chosen.getParent();
+
+			Main.sqlite.connectToDb(dbName);
+
+			writeCurrentConfig();
 		}
+	}
+
+	private static void writeCurrentConfig() {
+
+		String defaultConfig = "dbDirectory," + dbDirectory + "\n" + "dbName,"
+				+ dbName;
+
+		IOManager.writeFile(defaultConfig, configPath);
+	}
+
+	public static void initializeDb(String name) throws SqliteWrapperException {
+
+		dbNamePrefix = name;
+
+		try {
+
+			sqlite.createDb(formDbName());
+
+		} catch (SqliteWrapperException e) {
+
+			showAlert(AlertType.ERROR, "Cannot create profile",
+					"Profile with that name already exists");
+
+		}
+
+		sqlite.executeFromFile(schemaPath);
+	}
+
+	public static void showAlert(AlertType type, String issue, String reason) {
+
+		Logger.post(new Log("showAlert", issue + ":" + "\n" + reason,
+				Log.Severity.INFO));
+
+		Alert alert = new Alert(type);
+		alert.setTitle(type.toString());
+		alert.setHeaderText(issue);
+		alert.setContentText(reason);
+		alert.showAndWait();
 	}
 
 	private static boolean isValidVersion(String dbVersion) {
