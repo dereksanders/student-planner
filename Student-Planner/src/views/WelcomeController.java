@@ -2,14 +2,12 @@ package views;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 
 import core.InitializationException;
 import core.Main;
+import core.Term;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
@@ -28,49 +26,47 @@ public class WelcomeController {
 	@FXML
 	public void createProfile() throws SqliteWrapperException, IOException {
 
-		Main.initializeDb(nameField.getText());
-
-		showTermsView();
-	}
-
-	private void showTermsView() throws IOException {
-
-		Parent terms = FXMLLoader
-				.load(this.getClass().getResource("/views/Terms.fxml"));
-		Scene addTerms = new Scene(terms, 1280, 960);
-		Main.window.setScene(addTerms);
+		if (Main.initializeDb(nameField.getText())) {
+			Main.showTermsView();
+		}
 	}
 
 	@FXML
-	public void loadProfile() throws IOException {
+	public void loadProfile()
+			throws IOException, SqliteWrapperException, SQLException {
 
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Load Profile");
+		boolean loadSuccessful = false;
 
-		File chosen = fileChooser.showOpenDialog(Main.window);
+		while (!loadSuccessful) {
 
-		try {
+			try {
 
-			Main.loadProfile(chosen);
+				File chosen = fileChooser.showOpenDialog(Main.window);
+				Main.loadProfile(chosen);
+				loadSuccessful = true;
 
-		} catch (InitializationException e) {
+			} catch (InitializationException e) {
 
-			e.printStackTrace();
+				e.printStackTrace();
 
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("Cannot load profile");
-			alert.setContentText("Invalid file");
-			alert.showAndWait();
+				Main.showAlert(AlertType.ERROR, "Cannot load profile",
+						"Invalid file");
 
-		} catch (SqliteWrapperException e) {
+			} catch (SqliteWrapperException e) {
 
-			e.printStackTrace();
+				e.printStackTrace();
+			}
 		}
 
-		Parent main = FXMLLoader
-				.load(this.getClass().getResource("/views/Main.fxml"));
-		Scene mainScene = new Scene(main, 1280, 960);
-		Main.window.setScene(mainScene);
+		if (Term.getNumTerms() > 0) {
+
+			Main.showMainView();
+
+		} else {
+
+			Main.showTermsView();
+		}
 	}
 }

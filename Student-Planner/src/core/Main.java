@@ -1,6 +1,7 @@
 package core;
 
 import java.io.File;
+import java.io.IOException;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -19,6 +20,13 @@ import utility.Logger;
 public class Main extends Application {
 
 	public static Stage window;
+	public static int prefWidth = 1024;
+	public static int prefHeight = 768;
+
+	public static String welcomeViewPath = "/views/Welcome.fxml";
+	public static String termsViewPath = "/views/Terms.fxml";
+	public static String coursesViewPath = "/views/Courses.fxml";
+	public static String mainViewPath = "/views/Main.fxml";
 
 	public static SqliteWrapper sqlite;
 
@@ -103,14 +111,10 @@ public class Main extends Application {
 
 		Parent root = FXMLLoader
 				.load(Main.class.getClass().getResource("/views/Welcome.fxml"));
+		Scene startup = new Scene(root, prefWidth, prefHeight);
 
-		Scene startup = new Scene(root, 1280, 960);
-
-		startup.getStylesheets().add(Main.class.getClass()
-				.getResource("/views/welcome.css").toExternalForm());
 		window.setScene(startup);
 		window.setTitle(title);
-
 		window.getIcons()
 				.add(new Image(Main.class.getResourceAsStream("/icon.png")));
 		window.show();
@@ -258,13 +262,16 @@ public class Main extends Application {
 		IOManager.writeFile(currentConfig, configPath);
 	}
 
-	public static void initializeDb(String name) throws SqliteWrapperException {
+	public static boolean initializeDb(String name)
+			throws SqliteWrapperException {
 
+		boolean isInitialized = false;
 		dbNamePrefix = name;
 
 		try {
 
 			sqlite.createDb(formDbName());
+			isInitialized = true;
 
 		} catch (SqliteWrapperException e) {
 
@@ -273,7 +280,11 @@ public class Main extends Application {
 
 		}
 
-		sqlite.executeFromFile(schemaPath);
+		if (isInitialized) {
+			sqlite.executeFromFile(schemaPath);
+		}
+
+		return isInitialized;
 	}
 
 	public static void showAlert(AlertType type, String issue, String reason) {
@@ -286,6 +297,34 @@ public class Main extends Application {
 		alert.setHeaderText(issue);
 		alert.setContentText(reason);
 		alert.showAndWait();
+	}
+
+	public static void showTermsView() throws IOException {
+
+		loadView(termsViewPath);
+	}
+
+	public static void showCoursesView() throws IOException {
+
+		loadView(coursesViewPath);
+	}
+
+	public static void showMainView() throws IOException {
+
+		loadView(mainViewPath);
+	}
+
+	private static void loadView(String path) throws IOException {
+
+		Parent parent = FXMLLoader
+				.load(Main.class.getClass().getResource(path));
+		Scene view = new Scene(parent, window.getScene().getWidth(),
+				window.getScene().getHeight());
+
+		view.getStylesheets().add(Main.class.getClass()
+				.getResource("/views/welcome.css").toExternalForm());
+
+		window.setScene(view);
 	}
 
 	private static boolean isValidVersion(String dbVersion) {

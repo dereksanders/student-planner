@@ -6,9 +6,6 @@ import java.sql.SQLException;
 import core.Main;
 import core.Term;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.DatePicker;
@@ -48,10 +45,7 @@ public class TermsController {
 
 		if (Term.getNumTerms() > 0) {
 
-			Parent courses = FXMLLoader
-					.load(this.getClass().getResource("/views/Courses.fxml"));
-			Scene addCourses = new Scene(courses, 1280, 960);
-			Main.window.setScene(addCourses);
+			Main.showCoursesView();
 
 		} else {
 
