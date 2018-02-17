@@ -12,7 +12,7 @@ public class Logger {
 		logFile = path;
 
 		if (!Files.exists(Paths.get(logFile))) {
-			IOManager.writeFile("", logFile);
+			IOManager.writeFile("{ \"logs\":[", logFile);
 		}
 	}
 

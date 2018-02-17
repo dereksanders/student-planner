@@ -9,7 +9,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.DatePicker;
@@ -56,11 +55,8 @@ public class TermsController {
 
 		} else {
 
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("Cannot proceed");
-			alert.setContentText("You must add at least one term to continue");
-			alert.showAndWait();
+			Main.showAlert(AlertType.ERROR, "Cannot proceed",
+					"You must add at least one term to continue");
 		}
 	}
 }

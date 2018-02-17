@@ -247,17 +247,15 @@ public class Main extends Application {
 			dbDirectory = chosen.getParent();
 
 			Main.sqlite.connectToDb(dbName);
-
-			writeCurrentConfig();
 		}
 	}
 
-	private static void writeCurrentConfig() {
+	public static void writeCurrentConfig() {
 
-		String defaultConfig = "dbDirectory," + dbDirectory + "\n" + "dbName,"
+		String currentConfig = "dbDirectory," + dbDirectory + "\n" + "dbName,"
 				+ dbName;
 
-		IOManager.writeFile(defaultConfig, configPath);
+		IOManager.writeFile(currentConfig, configPath);
 	}
 
 	public static void initializeDb(String name) throws SqliteWrapperException {

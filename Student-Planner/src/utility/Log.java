@@ -21,7 +21,10 @@ public class Log {
 	}
 
 	public String toString() {
-		String desc = LocalDateTime.now() + "\n" + function + "\n" + action + "\n\n";
+		String desc = "\n\t{\n\t\t" + "\"time\":" + "\"" + LocalDateTime.now()
+				+ "\"" + "\n\t\t" + "\"severity\":" + "\"" + severity + "\""
+				+ "\n\t\t" + "\"function\":" + "\"" + function + "\"" + "\n\t\t"
+				+ "\"action\":" + "\"" + action + "\"" + "\n\t}";
 		return desc;
 	}
 }

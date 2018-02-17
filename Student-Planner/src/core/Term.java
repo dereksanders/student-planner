@@ -94,7 +94,7 @@ public class Term {
 
 			for (int i = 0; i < errorMessages.size(); i++) {
 
-				errorText += i + ". " + errorMessages.get(i);
+				errorText += (i + 1) + ". " + errorMessages.get(i);
 
 				if (i < errorMessages.size() - 1) {
 
