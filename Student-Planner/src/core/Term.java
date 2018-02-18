@@ -3,6 +3,7 @@ package core;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 import javafx.scene.control.Alert.AlertType;
@@ -151,5 +152,20 @@ public class Term {
 		}
 
 		return inProgress;
+	}
+
+	public static int getLastDayOfWeek() {
+
+		return 5;
+	}
+
+	public static LocalTime getEarliestMeetingStart(TermDescription term) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static LocalTime getLatestEnd(TermDescription term) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
