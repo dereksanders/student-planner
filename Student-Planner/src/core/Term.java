@@ -237,4 +237,15 @@ public class Term {
 
 		return latest;
 	}
+
+	public static int getNumMeetings()
+			throws SqliteWrapperException, SQLException {
+
+		ResultSet countMeetings = Main.sqlite
+				.query("select count(*) from meeting_date");
+
+		int numMeetings = countMeetings.getInt(1);
+
+		return numMeetings;
+	}
 }

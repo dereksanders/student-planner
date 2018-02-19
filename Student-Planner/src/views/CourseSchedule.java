@@ -51,18 +51,27 @@ public class CourseSchedule implements Observer {
 		// for each day
 		this.canvas.setWidth(75 + (100 * maxDay) + (2 * paddingLeft));
 
-		LocalTime earliestStart = Term.getEarliestMeetingStart(term);
-		LocalTime latestEnd = Term.getLatestMeetingEnd(term);
+		// If no Meetings exist, then display 9 am - 5 pm.
+		LocalTime scheduleStart = LocalTime.of(9, 0);
+		LocalTime scheduleEnd = LocalTime.of(17, 0);
 
-		LocalTime earliestStartRounded = roundToNearestHalfHour(earliestStart);
-		LocalTime latestEndRounded = roundToNearestHalfHour(latestEnd);
+		if (Term.getNumMeetings() > 0) {
+
+			LocalTime earliestStart = Term.getEarliestMeetingStart(term);
+			LocalTime latestEnd = Term.getLatestMeetingEnd(term);
+
+			LocalTime earliestStartRounded = roundToNearestHalfHour(
+					earliestStart);
+			LocalTime latestEndRounded = roundToNearestHalfHour(latestEnd);
+
+			scheduleStart = earliestStartRounded;
+			scheduleEnd = latestEndRounded;
+		}
 
 		// The height of the canvas will be the height of the day labels + 1px
 		// for each minute displayed.
-		this.canvas.setHeight(
-				50 + getMinutesBetween(earliestStartRounded, latestEndRounded)
-						+ (2 * paddingTop));
-
+		this.canvas.setHeight(50 + getMinutesBetween(scheduleStart, scheduleEnd)
+				+ (2 * paddingTop));
 	}
 
 	private LocalTime roundToNearestHalfHour(LocalTime time) {
