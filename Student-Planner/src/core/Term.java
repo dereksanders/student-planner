@@ -3,7 +3,9 @@ package core;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 
 import javafx.scene.control.Alert.AlertType;
@@ -154,18 +156,85 @@ public class Term {
 		return inProgress;
 	}
 
-	public static int getLastDayOfWeek() {
+	public static int getLastDayOfWeek()
+			throws SqliteWrapperException, SQLException {
 
-		return 5;
+		// Days are numbered from 1 (Monday) to 7 (Sunday)
+		int maxDay = 1;
+
+		ResultSet meetingSets = Main.sqlite.query("select * from meeting_set");
+
+		while (meetingSets.next()) {
+
+			int setID = meetingSets.getInt(MeetingSet.Lookup.ID.index);
+
+			// Get a meeting from this set (all meetings from a set would occur
+			// on the same weekday)
+			//
+			// We can assume that all MeetingSets will have at least on Meeting.
+			ResultSet meeting = Main.sqlite.query(
+					"select * from meeting_date where set_id = " + setID);
+
+			meeting.next();
+
+			long julianDay = meeting.getLong(Meeting.Lookup.DATE.index);
+
+			int meetingDayOfWeek = LocalDate.ofEpochDay(julianDay)
+					.getDayOfWeek().getValue();
+
+			if (meetingDayOfWeek > maxDay) {
+				maxDay = meetingDayOfWeek;
+			}
+		}
+
+		return maxDay;
 	}
 
-	public static LocalTime getEarliestMeetingStart(TermDescription term) {
-		// TODO Auto-generated method stub
-		return null;
+	public static LocalTime getEarliestMeetingStart(TermDescription term)
+			throws SQLException, SqliteWrapperException {
+
+		LocalTime earliest = LocalTime.of(23, 59);
+		ResultSet meetingSets = Main.sqlite.query("select * from meeting_set");
+
+		while (meetingSets.next()) {
+
+			long epochSecond = meetingSets
+					.getLong(MeetingSet.Lookup.START_TIME.index);
+
+			LocalTime start = LocalDateTime
+					.ofEpochSecond(epochSecond, 0, ZoneOffset.UTC)
+					.toLocalTime();
+
+			if (start.isBefore(earliest)) {
+
+				earliest = start;
+			}
+		}
+
+		return earliest;
 	}
 
-	public static LocalTime getLatestEnd(TermDescription term) {
-		// TODO Auto-generated method stub
-		return null;
+	public static LocalTime getLatestMeetingEnd(TermDescription term)
+			throws SqliteWrapperException, SQLException {
+
+		LocalTime latest = LocalTime.of(0, 0);
+		ResultSet meetingSets = Main.sqlite.query("select * from meeting_set");
+
+		while (meetingSets.next()) {
+
+			long epochSecond = meetingSets
+					.getLong(MeetingSet.Lookup.END_TIME.index);
+
+			LocalTime end = LocalDateTime
+					.ofEpochSecond(epochSecond, 0, ZoneOffset.UTC)
+					.toLocalTime();
+
+			if (end.isAfter(latest)) {
+
+				latest = end;
+			}
+		}
+
+		return latest;
 	}
 }
