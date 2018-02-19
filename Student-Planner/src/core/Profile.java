@@ -7,11 +7,11 @@ import sqlite.SqliteWrapper;
 public class Profile extends Observable {
 
 	public String name;
-	public SqliteWrapper sqlite;
+	public SqliteWrapper db;
 
-	public Profile(String name, SqliteWrapper sqlite) {
+	public Profile(String name, SqliteWrapper db) {
 
 		this.name = name;
-		this.sqlite = sqlite;
+		this.db = db;
 	}
 }

@@ -168,8 +168,9 @@ public class SqliteWrapper {
 
 		try {
 
-			System.out.println(statement);
-			this.sql.execute(statement);
+			if (!this.sql.execute(statement)) {
+				System.out.println("Create table success: " + statement);
+			}
 
 		} catch (SQLException e) {
 
@@ -181,7 +182,6 @@ public class SqliteWrapper {
 	public void executeFromFile(String path) throws SqliteWrapperException {
 
 		// Execute each command in the db schema one at a time.
-
 		String[] lines = IOManager.loadFile(path);
 		String schema = "";
 		for (String s : lines) {
@@ -216,8 +216,8 @@ public class SqliteWrapper {
 
 		} catch (SQLException e) {
 
-			new SqliteWrapperException("SQL error " + e.getErrorCode()
-					+ " + occurred:\n" + e.getMessage());
+			throw new SqliteWrapperException("SQL error " + e.getErrorCode()
+					+ " occurred:\n" + e.getMessage());
 		}
 
 		System.out.println(results);
@@ -245,6 +245,7 @@ public class SqliteWrapper {
 
 		if (!connectionExists()) {
 
+			System.out.println("NO DB CONNECTION EXISTS!!!");
 			throw new SqliteWrapperException("No database connection exists.");
 		}
 	}

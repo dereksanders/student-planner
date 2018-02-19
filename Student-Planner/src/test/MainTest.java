@@ -2,6 +2,8 @@ package test;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -22,26 +24,29 @@ public class MainTest {
 	}
 
 	@Test(expected = InitializationException.class)
-	public void loadNonExistantDb() throws SqliteWrapperException, InitializationException {
+	public void loadNonExistantDb() throws SqliteWrapperException,
+			InitializationException, IOException {
 
 		String testName = "loadNonExistantDb";
 
 		Main.restoreDefaults();
 
-		IOManager.writeFile("dbDirectory," + testDbDirectory + testName + "/" + "\n" + "dbName,nonExistantDb",
-				"planner.cfg");
+		IOManager.writeFile("dbDirectory," + testDbDirectory + testName + "/"
+				+ "\n" + "dbName,nonExistantDb", "planner.cfg");
 
 		Main.main(null);
 	}
 
 	@Test
-	public void createNewDb() throws SqliteWrapperException, InitializationException {
+	public void createNewDb() throws SqliteWrapperException,
+			InitializationException, IOException {
 
 		String testName = "createNewDb";
 
 		Main.restoreDefaults();
 
-		IOManager.writeFile("dbDirectory," + testDbDirectory + testName + "/", "planner.cfg");
+		IOManager.writeFile("dbDirectory," + testDbDirectory + testName + "/",
+				"planner.cfg");
 
 		Main.main(null);
 

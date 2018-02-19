@@ -29,11 +29,10 @@ public class Main extends Application {
 	public static String mainViewPath = "/views/Main.fxml";
 
 	public static Profile active;
-	public static SqliteWrapper sqlite;
 
 	private static String logPath = "history.log";
 	private static String configPath = "planner.cfg";
-	private static String dbDirectory = "dbs/";
+	private static String dbDirectory = "dbs";
 
 	private static String dbName = "";
 
@@ -52,8 +51,8 @@ public class Main extends Application {
 	// dbDirectory.
 	public static String schemaPath = formSchemaPath();
 
-	public static void main(String[] args)
-			throws SqliteWrapperException, InitializationException {
+	public static void main(String[] args) throws SqliteWrapperException,
+			InitializationException, IOException {
 
 		Logger.initialize(logPath);
 
@@ -71,9 +70,9 @@ public class Main extends Application {
 			IOManager.createDirectory(dbDirectory);
 		}
 
-		sqlite = new SqliteWrapper(dbDirectory);
-
 		if (!dbName.isEmpty()) {
+
+			dbNamePrefix = extractPrefix(dbName);
 
 			String dbPath = formDbPath();
 
@@ -89,20 +88,26 @@ public class Main extends Application {
 				}
 
 				// Load existing db
-				sqlite.connectToDb(dbName);
+				active = new Profile(dbNamePrefix,
+						new SqliteWrapper(dbDirectory));
 
-				// Set scene to main view
+				active.db.connectToDb(dbName);
 
 			} else {
 
 				throw new InitializationException(
 						"Database not found in path: " + dbPath);
 			}
-
-		} else {
-
-			launch(args);
 		}
+
+		launch(args);
+	}
+
+	private static String extractPrefix(String dbName) {
+
+		String[] components = dbName.split("\\.");
+
+		return components[0];
 	}
 
 	@Override
@@ -110,9 +115,23 @@ public class Main extends Application {
 
 		Main.window = window;
 
-		Parent root = FXMLLoader
-				.load(Main.class.getClass().getResource("/views/Welcome.fxml"));
-		Scene startup = new Scene(root, prefWidth, prefHeight);
+		Parent root = null;
+		Scene startup = null;
+
+		if (dbName.isEmpty()) {
+
+			root = FXMLLoader
+					.load(Main.class.getClass().getResource(welcomeViewPath));
+
+			startup = new Scene(root, prefWidth, prefHeight);
+
+		} else {
+
+			root = FXMLLoader
+					.load(Main.class.getClass().getResource(mainViewPath));
+
+			startup = new Scene(root, prefWidth, prefHeight);
+		}
 
 		window.setScene(startup);
 		window.setTitle(title);
@@ -135,7 +154,7 @@ public class Main extends Application {
 
 				switch (keyValPair[0]) {
 				case "dbDirectory":
-					if (keyValPair.length > 0) {
+					if (keyValPair.length > 1) {
 						System.out.println(
 								"Updating db directory & schema path.");
 						dbDirectory = keyValPair[1];
@@ -143,7 +162,7 @@ public class Main extends Application {
 					}
 					break;
 				case "dbName":
-					if (keyValPair.length > 0) {
+					if (keyValPair.length > 1) {
 						System.out.println("Updating db name.");
 						dbName = keyValPair[1];
 					}
@@ -161,14 +180,14 @@ public class Main extends Application {
 
 	private static void writeDefaultConfig() {
 
-		String defaultConfig = "dbDirectory,dbs/" + "\n" + "dbName,";
+		String defaultConfig = "dbDirectory,dbs" + "\n" + "dbName,";
 
 		IOManager.writeFile(defaultConfig, configPath);
 	}
 
 	private static String formDbPath() {
 
-		return dbDirectory + dbNamePrefix + versionExtension + dbVersion
+		return dbDirectory + "/" + dbNamePrefix + versionExtension + dbVersion
 				+ dbExtension;
 	}
 
@@ -179,13 +198,22 @@ public class Main extends Application {
 
 	private static String formSchemaPath() {
 
-		return dbDirectory + "schema" + versionExtension + currentVersion
+		return dbDirectory + "/" + "schema" + versionExtension + currentVersion
 				+ ".sql";
 	}
 
 	private static String extractVersion(String dbName) {
 
-		return "01";
+		System.out.println(dbName);
+
+		String[] components = dbName.split("\\.");
+
+		for (String s : components) {
+
+			System.out.println(s);
+		}
+
+		return components[1].substring(1, components[1].length());
 	}
 
 	private static void writeSchema() {
@@ -251,7 +279,8 @@ public class Main extends Application {
 			dbName = formDbName();
 			dbDirectory = chosen.getParent();
 
-			Main.sqlite.connectToDb(dbName);
+			active = new Profile(dbName, new SqliteWrapper(dbDirectory));
+			active.db.connectToDb(dbName);
 		}
 	}
 
@@ -268,21 +297,23 @@ public class Main extends Application {
 
 		boolean isInitialized = false;
 		dbNamePrefix = name;
+		dbName = formDbName();
+
+		active = new Profile(dbNamePrefix, new SqliteWrapper(dbDirectory));
 
 		try {
 
-			sqlite.createDb(formDbName());
+			active.db.createDb(dbName);
 			isInitialized = true;
 
 		} catch (SqliteWrapperException e) {
 
 			showAlert(AlertType.ERROR, "Cannot create profile",
 					"Profile with that name already exists");
-
 		}
 
 		if (isInitialized) {
-			sqlite.executeFromFile(schemaPath);
+			active.db.executeFromFile(schemaPath);
 		}
 
 		return isInitialized;
@@ -319,6 +350,7 @@ public class Main extends Application {
 
 		Parent parent = FXMLLoader
 				.load(Main.class.getClass().getResource(path));
+
 		Scene view = new Scene(parent, window.getScene().getWidth(),
 				window.getScene().getHeight());
 

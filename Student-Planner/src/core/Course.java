@@ -28,7 +28,7 @@ public class Course {
 		if (courseIsValid(startTermStartDate, endTermStartDate, deptID, code,
 				name, color)) {
 
-			Main.sqlite.execute(
+			Main.active.db.execute(
 					"insert into course(start_term_start_date, end_term_start_date, "
 							+ "dept_id, code, name, grade, grade_is_automatic, color) "
 							+ "values(" + startTermStartDate + ", "
@@ -40,7 +40,7 @@ public class Course {
 
 	public static ResultSet getCourses() throws SqliteWrapperException {
 
-		ResultSet courses = Main.sqlite.query("select * from course");
+		ResultSet courses = Main.active.db.query("select * from course");
 
 		return courses;
 	}
@@ -48,7 +48,7 @@ public class Course {
 	public static int getNumCourses()
 			throws SqliteWrapperException, SQLException {
 
-		ResultSet countCoursesQuery = Main.sqlite
+		ResultSet countCoursesQuery = Main.active.db
 				.query("select count(*) from course");
 
 		int countCourses = countCoursesQuery.getInt(1);

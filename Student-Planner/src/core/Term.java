@@ -30,7 +30,7 @@ public class Term {
 
 		if (termIsValid(startDate, endDate, name, color)) {
 
-			Main.sqlite.execute(
+			Main.active.db.execute(
 					"insert into term(start_date, end_date, name, grade, grade_is_automatic, color) "
 							+ "values(" + startDate + ", " + endDate + ", "
 							+ "\'" + name + "\'" + ", 0, 1, " + "\'" + color
@@ -40,7 +40,7 @@ public class Term {
 
 	public static ResultSet getTerms() throws SqliteWrapperException {
 
-		ResultSet terms = Main.sqlite
+		ResultSet terms = Main.active.db
 				.query("select * from term order by start_date");
 
 		return terms;
@@ -71,10 +71,15 @@ public class Term {
 	public static int getNumTerms()
 			throws SqliteWrapperException, SQLException {
 
-		ResultSet countTermsQuery = Main.sqlite
+		ResultSet countTermsQuery = Main.active.db
 				.query("select count(*) from term");
 
-		int countTerms = countTermsQuery.getInt(1);
+		int countTerms = 0;
+
+		// Note that at least one Term should always exist.
+		if (countTermsQuery.next()) {
+			countTerms = countTermsQuery.getInt(1);
+		}
 
 		return countTerms;
 	}
@@ -141,7 +146,7 @@ public class Term {
 
 		TermDescription inProgress = null;
 
-		ResultSet termInProgressQuery = Main.sqlite
+		ResultSet termInProgressQuery = Main.active.db
 				.query("select * from term where start_date <= " + currentDate
 						+ " and end_date >= " + currentDate);
 
@@ -162,7 +167,8 @@ public class Term {
 		// Days are numbered from 1 (Monday) to 7 (Sunday)
 		int maxDay = 1;
 
-		ResultSet meetingSets = Main.sqlite.query("select * from meeting_set");
+		ResultSet meetingSets = Main.active.db
+				.query("select * from meeting_set");
 
 		while (meetingSets.next()) {
 
@@ -172,7 +178,7 @@ public class Term {
 			// on the same weekday)
 			//
 			// We can assume that all MeetingSets will have at least on Meeting.
-			ResultSet meeting = Main.sqlite.query(
+			ResultSet meeting = Main.active.db.query(
 					"select * from meeting_date where set_id = " + setID);
 
 			meeting.next();
@@ -194,7 +200,8 @@ public class Term {
 			throws SQLException, SqliteWrapperException {
 
 		LocalTime earliest = LocalTime.of(23, 59);
-		ResultSet meetingSets = Main.sqlite.query("select * from meeting_set");
+		ResultSet meetingSets = Main.active.db
+				.query("select * from meeting_set");
 
 		while (meetingSets.next()) {
 
@@ -218,7 +225,8 @@ public class Term {
 			throws SqliteWrapperException, SQLException {
 
 		LocalTime latest = LocalTime.of(0, 0);
-		ResultSet meetingSets = Main.sqlite.query("select * from meeting_set");
+		ResultSet meetingSets = Main.active.db
+				.query("select * from meeting_set");
 
 		while (meetingSets.next()) {
 
@@ -241,10 +249,21 @@ public class Term {
 	public static int getNumMeetings()
 			throws SqliteWrapperException, SQLException {
 
-		ResultSet countMeetings = Main.sqlite
+		ResultSet tables = Main.active.db.query("SELECT * FROM sqlite_master");
+
+		while (tables.next()) {
+
+			System.out.println(tables.getString(2));
+		}
+
+		ResultSet countMeetings = Main.active.db
 				.query("select count(*) from meeting_date");
 
-		int numMeetings = countMeetings.getInt(1);
+		int numMeetings = 0;
+
+		if (countMeetings.next()) {
+			numMeetings = countMeetings.getInt(1);
+		}
 
 		return numMeetings;
 	}
