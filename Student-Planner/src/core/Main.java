@@ -20,8 +20,8 @@ import utility.Logger;
 public class Main extends Application {
 
 	public static Stage window;
-	public static int prefWidth = 1024;
-	public static int prefHeight = 768;
+	public static int prefWidth = 1000;
+	public static int prefHeight = 800;
 
 	public static String welcomeViewPath = "/views/Welcome.fxml";
 	public static String termsViewPath = "/views/Terms.fxml";

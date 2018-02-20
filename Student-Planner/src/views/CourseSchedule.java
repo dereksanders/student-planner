@@ -35,7 +35,7 @@ public class CourseSchedule implements Observer {
 	private void drawSchedule(GraphicsContext gc)
 			throws SqliteWrapperException, SQLException {
 
-		int paddingTop = 10;
+		int paddingTop = 20;
 		int paddingLeft = 10;
 
 		// Determine the width of the schedule by determining if Saturday or
@@ -72,6 +72,48 @@ public class CourseSchedule implements Observer {
 		// for each minute displayed.
 		this.canvas.setHeight(50 + getMinutesBetween(scheduleStart, scheduleEnd)
 				+ (2 * paddingTop));
+
+		for (int i = 1; i <= maxDay; i++) {
+
+			if (i == 1) {
+				this.gc.fillText(intToDay(i), paddingLeft + 50, paddingTop);
+			} else {
+				this.gc.fillText(intToDay(i),
+						(i - 1) * 100 + (paddingLeft + 50), paddingTop);
+			}
+		}
+	}
+
+	private String intToDay(int dayAsInt) {
+
+		String day = "";
+
+		switch (dayAsInt) {
+
+		case 1:
+			day = "Monday";
+			break;
+		case 2:
+			day = "Tuesday";
+			break;
+		case 3:
+			day = "Wednesday";
+			break;
+		case 4:
+			day = "Thursday";
+			break;
+		case 5:
+			day = "Friday";
+			break;
+		case 6:
+			day = "Saturday";
+			break;
+		case 7:
+			day = "Sunday";
+			break;
+		}
+
+		return day;
 	}
 
 	private LocalTime roundToNearestHalfHour(LocalTime time) {

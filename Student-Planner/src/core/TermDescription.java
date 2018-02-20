@@ -22,4 +22,19 @@ public class TermDescription {
 
 		return this.name + " (" + start.getYear() + ")";
 	}
+
+	@Override
+	public boolean equals(Object o) {
+
+		if (o instanceof TermDescription) {
+
+			if (name.equals(((TermDescription) o).name)
+					&& start.equals(((TermDescription) o).start)) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

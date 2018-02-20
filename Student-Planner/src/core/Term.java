@@ -267,4 +267,20 @@ public class Term {
 
 		return numMeetings;
 	}
+
+	public static String getColor(TermDescription term)
+			throws SqliteWrapperException, SQLException {
+
+		String color = "";
+
+		ResultSet getTerm = Main.active.db.query(
+				"select * from term where start_date = " + term.getStartDay());
+
+		if (getTerm.next()) {
+
+			color = getTerm.getString(Term.Lookup.COLOR.index);
+		}
+
+		return color;
+	}
 }

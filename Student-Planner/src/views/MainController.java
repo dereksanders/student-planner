@@ -11,10 +11,15 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.HBox;
 import sqlite.SqliteWrapperException;
 
 public class MainController {
+
+	private TermDescription termInProgress;
+	private TermDescription selectedTerm;
 
 	@FXML
 	private ChoiceBox<TermDescription> selectTerm;
@@ -24,6 +29,12 @@ public class MainController {
 	private CheckBox selectCurrentWeek;
 	@FXML
 	private DatePicker scheduleSelectDate;
+	@FXML
+	private HBox inProgressBox;
+	@FXML
+	private HBox selectedBox;
+	@FXML
+	private Label inProgress;
 
 	@FXML
 	public void initialize() throws SqliteWrapperException, SQLException {
@@ -38,15 +49,29 @@ public class MainController {
 
 		// By default, select the term in progress if it exists, otherwise the
 		// most recent term (which should be the last term in the list).
-		TermDescription inProgress = Term.getTermInProgress();
-		if (inProgress != null) {
-			selectTerm.setValue(inProgress);
+		termInProgress = Term.getTermInProgress();
+		if (termInProgress != null) {
+
+			inProgressBox.setStyle(
+					"-fx-background-color: " + Term.getColor(termInProgress));
+
+			updateSelectedTerm(termInProgress);
+
 		} else {
-			selectTerm.setValue(terms.get(terms.size() - 1));
+
+			updateSelectedTerm(terms.get(terms.size() - 1));
 		}
 
 		CourseSchedule cs = new CourseSchedule(selectTerm.getValue());
 
 		scheduleScroll.setContent(cs.getCanvas());
+	}
+
+	private void updateSelectedTerm(TermDescription term)
+			throws SqliteWrapperException, SQLException {
+
+		selectTerm.setValue(term);
+		selectedTerm = term;
+		selectedBox.setStyle("-fx-background-color: " + Term.getColor(term));
 	}
 }
