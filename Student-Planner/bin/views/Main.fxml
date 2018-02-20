@@ -38,7 +38,7 @@
    <left>
       <VBox prefHeight="544.0" prefWidth="226.0" BorderPane.alignment="CENTER">
          <children>
-            <HBox fx:id="inProgressBox" minHeight="46.0" prefWidth="226.0">
+            <HBox fx:id="inProgressBox" maxHeight="46.0" minHeight="46.0">
                <children>
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="In-Progress: " />
                   <Label fx:id="inProgress" />
@@ -109,7 +109,7 @@
             </TabPane>
          </center>
          <top>
-            <HBox fx:id="selectedBox" minHeight="46.0" prefWidth="226.0" spacing="10.0" BorderPane.alignment="CENTER">
+            <HBox fx:id="selectedBox" maxHeight="46.0" minHeight="46.0" spacing="10.0" BorderPane.alignment="CENTER">
                <children>
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Selected:" />
                   <ChoiceBox fx:id="selectTerm" prefWidth="150.0" />

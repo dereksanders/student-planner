@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import core.Main;
 import core.Term;
 import core.TermDescription;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -65,6 +67,22 @@ public class MainController {
 		CourseSchedule cs = new CourseSchedule(selectTerm.getValue());
 
 		scheduleScroll.setContent(cs.getCanvas());
+
+		selectTerm.valueProperty()
+				.addListener(new ChangeListener<TermDescription>() {
+
+					@Override
+					public void changed(
+							ObservableValue<? extends TermDescription> observable,
+							TermDescription oldTerm, TermDescription newTerm) {
+
+						try {
+							updateSelectedTerm(newTerm);
+						} catch (SqliteWrapperException | SQLException e) {
+							e.printStackTrace();
+						}
+					}
+				});
 	}
 
 	private void updateSelectedTerm(TermDescription term)
