@@ -1,6 +1,7 @@
 package views;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import core.Main;
@@ -15,6 +16,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import sqlite.SqliteWrapperException;
 
@@ -24,11 +26,13 @@ public class MainController {
 	private TermDescription selectedTerm;
 
 	@FXML
+	private AnchorPane schedulePane;
+	@FXML
 	private ChoiceBox<TermDescription> selectTerm;
 	@FXML
 	private ScrollPane scheduleScroll;
 	@FXML
-	private CheckBox selectCurrentWeek;
+	private CheckBox showCurrentWeek;
 	@FXML
 	private DatePicker scheduleSelectDate;
 	@FXML
@@ -64,6 +68,9 @@ public class MainController {
 			updateSelectedTerm(terms.get(terms.size() - 1));
 		}
 
+		showCurrentWeek.setSelected(true);
+		scheduleSelectDate.setValue(LocalDate.now());
+
 		CourseSchedule cs = new CourseSchedule(selectTerm.getValue());
 
 		scheduleScroll.setContent(cs.getCanvas());
@@ -91,5 +98,7 @@ public class MainController {
 		selectTerm.setValue(term);
 		selectedTerm = term;
 		selectedBox.setStyle("-fx-background-color: " + Term.getColor(term));
+
+		scheduleSelectDate.setValue(term.start);
 	}
 }

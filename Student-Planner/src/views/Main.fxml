@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" stylesheets="@welcome.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.MainController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1024.0" stylesheets="@welcome.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.MainController">
    <top>
       <VBox prefHeight="33.0" prefWidth="800.0" BorderPane.alignment="CENTER">
          <children>
@@ -75,7 +75,7 @@
                            <children>
                               <CheckBox fx:id="showCurrentWeek" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Show Current Week" />
                               <DatePicker fx:id="scheduleSelectDate" layoutX="14.0" layoutY="39.0" />
-                              <ScrollPane fx:id="scheduleScroll" layoutX="14.0" layoutY="74.0" prefHeight="480.0" prefWidth="649.0">
+                              <ScrollPane fx:id="scheduleScroll" layoutX="14.0" layoutY="74.0" prefHeight="577.0" prefWidth="770.0">
                                 <content>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
                                 </content>

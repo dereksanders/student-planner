@@ -5,7 +5,7 @@ import java.time.LocalDate;
 public class TermDescription {
 
 	private String name;
-	private LocalDate start;
+	public LocalDate start;
 
 	public TermDescription(String name, LocalDate start) {
 
