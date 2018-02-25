@@ -2,6 +2,7 @@ package core;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -29,6 +30,7 @@ public class Main extends Application {
 	public static String mainViewPath = "/views/Main.fxml";
 
 	public static Profile active;
+	public static TaskScheduler clock;
 
 	private static String logPath = "history.log";
 	private static String configPath = "planner.cfg";
@@ -53,6 +55,8 @@ public class Main extends Application {
 
 	public static void main(String[] args) throws SqliteWrapperException,
 			InitializationException, IOException {
+
+		clock = TaskScheduler.getInstance(LocalDateTime.now());
 
 		Logger.initialize(logPath);
 
@@ -132,6 +136,10 @@ public class Main extends Application {
 
 			startup = new Scene(root, prefWidth, prefHeight);
 		}
+
+		window.setOnCloseRequest(event -> {
+			clock.update.cancel();
+		});
 
 		window.setScene(startup);
 		window.setTitle(title);

@@ -3,8 +3,11 @@ package views;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 import core.Main;
+import core.Profile;
 import core.Term;
 import core.TermDescription;
 import javafx.beans.value.ChangeListener;
@@ -20,7 +23,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import sqlite.SqliteWrapperException;
 
-public class MainController {
+public class MainController implements Observer {
+
+	private Observable profile;
 
 	private TermDescription termInProgress;
 	private TermDescription selectedTerm;
@@ -50,6 +55,9 @@ public class MainController {
 		// either loaded a profile or successfully created a new one.
 		Main.writeCurrentConfig();
 
+		this.profile = Main.active;
+		this.profile.addObserver(this);
+
 		ArrayList<TermDescription> terms = Term.populateTerms();
 		selectTerm.setItems(FXCollections.observableArrayList(terms));
 
@@ -62,14 +70,23 @@ public class MainController {
 					"-fx-background-color: " + Term.getColor(termInProgress));
 
 			updateSelectedTerm(termInProgress);
+			updateSelectedDate(LocalDate.now());
+			showCurrentWeek.setSelected(true);
 
 		} else {
 
-			updateSelectedTerm(terms.get(terms.size() - 1));
-		}
+			// If there is no Term containing the current date, then disable
+			// 'Show Current Week'.
+			showCurrentWeek.setVisible(false);
+			showCurrentWeek.setManaged(false);
 
-		showCurrentWeek.setSelected(true);
-		scheduleSelectDate.setValue(LocalDate.now());
+			selectedTerm = terms.get(terms.size() - 1);
+
+			updateSelectedTerm(selectedTerm);
+
+			scheduleSelectDate.setValue(selectedTerm.start);
+			showCurrentWeek.setSelected(false);
+		}
 
 		CourseSchedule cs = new CourseSchedule(selectTerm.getValue());
 
@@ -90,6 +107,36 @@ public class MainController {
 						}
 					}
 				});
+	}
+
+	private void updateSelectedDate(LocalDate selected) {
+
+		Main.active.setSelectedDate(selected);
+		scheduleSelectDate.setValue(selected);
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+
+		if (o instanceof Profile) {
+			try {
+				updateTerms();
+			} catch (SqliteWrapperException | SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void updateTerms() throws SqliteWrapperException, SQLException {
+
+		// By default, select the term in progress if it exists, otherwise the
+		// most recent term (which should be the last term in the list).
+		termInProgress = Main.active.termInProgress;
+		if (termInProgress != null) {
+
+			inProgressBox.setStyle(
+					"-fx-background-color: " + Term.getColor(termInProgress));
+		}
 	}
 
 	private void updateSelectedTerm(TermDescription term)
