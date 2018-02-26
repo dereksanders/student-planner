@@ -14,6 +14,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
@@ -22,12 +23,12 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import sqlite.SqliteWrapperException;
+import utility.DateTimeUtil;
 
 public class MainController implements Observer {
 
 	private Observable profile;
 
-	private TermDescription termInProgress;
 	private TermDescription selectedTerm;
 
 	@FXML
@@ -47,6 +48,8 @@ public class MainController implements Observer {
 	@FXML
 	private Label inProgress;
 
+	private static final String EMPTY_TERM_COLOR = "#eeeeee";
+
 	@FXML
 	public void initialize() throws SqliteWrapperException, SQLException {
 
@@ -63,15 +66,13 @@ public class MainController implements Observer {
 
 		// By default, select the term in progress if it exists, otherwise the
 		// most recent term (which should be the last term in the list).
-		termInProgress = Term.getTermInProgress();
-		if (termInProgress != null) {
+		Main.active.termInProgress = Term.getTermInProgress();
+		if (Main.active.termInProgress != null) {
 
-			inProgressBox.setStyle(
-					"-fx-background-color: " + Term.getColor(termInProgress));
+			inProgressBox.setStyle("-fx-background-color: "
+					+ Term.getColor(Main.active.termInProgress));
 
-			updateSelectedTerm(termInProgress);
 			updateSelectedDate(LocalDate.now());
-			showCurrentWeek.setSelected(true);
 
 		} else {
 
@@ -82,9 +83,8 @@ public class MainController implements Observer {
 
 			selectedTerm = terms.get(terms.size() - 1);
 
-			updateSelectedTerm(selectedTerm);
+			updateSelectedDate(selectedTerm.start);
 
-			scheduleSelectDate.setValue(selectedTerm.start);
 			showCurrentWeek.setSelected(false);
 		}
 
@@ -101,7 +101,29 @@ public class MainController implements Observer {
 							TermDescription oldTerm, TermDescription newTerm) {
 
 						try {
-							updateSelectedTerm(newTerm);
+							if (newTerm.equals(Main.active.termInProgress)) {
+								updateSelectedDate(LocalDate.now());
+							} else {
+								// FIXME: Perhaps if a Term from the past is
+								// selected, the end date should be selected.
+								updateSelectedDate(newTerm.start);
+							}
+
+						} catch (SqliteWrapperException | SQLException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+
+		showCurrentWeek.selectedProperty()
+				.addListener(new ChangeListener<Boolean>() {
+					@Override
+					public void changed(
+							ObservableValue<? extends Boolean> observable,
+							Boolean oldVal, Boolean newVal) {
+
+						try {
+							updateShowCurrentWeek(newVal);
 						} catch (SqliteWrapperException | SQLException e) {
 							e.printStackTrace();
 						}
@@ -109,10 +131,40 @@ public class MainController implements Observer {
 				});
 	}
 
-	private void updateSelectedDate(LocalDate selected) {
+	private void updateShowCurrentWeek(boolean showCurrentWeek)
+			throws SqliteWrapperException, SQLException {
 
-		Main.active.setSelectedDate(selected);
-		scheduleSelectDate.setValue(selected);
+		if (showCurrentWeek) {
+
+			if (Main.active.termInProgress != null) {
+				updateSelectedDate(LocalDate.now());
+			}
+		}
+	}
+
+	private void updateSelectedDate(LocalDate selected)
+			throws SqliteWrapperException, SQLException {
+
+		TermDescription containsDate = Term.findTerm(selected);
+
+		if (containsDate != null) {
+
+			Main.active.setSelectedDate(selected);
+			scheduleSelectDate.setValue(selected);
+
+			if (DateTimeUtil.isSameWeek(selected, LocalDate.now())) {
+				showCurrentWeek.setSelected(true);
+			} else {
+				showCurrentWeek.setSelected(false);
+			}
+
+			updateSelectedTerm(containsDate);
+
+		} else {
+
+			Main.showAlert(AlertType.ERROR, "Cannot select date",
+					"This date does not belong to any Term.");
+		}
 	}
 
 	@Override
@@ -120,22 +172,33 @@ public class MainController implements Observer {
 
 		if (o instanceof Profile) {
 			try {
-				updateTerms();
+				updateTermInProgress();
 			} catch (SqliteWrapperException | SQLException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-	private void updateTerms() throws SqliteWrapperException, SQLException {
+	private void updateTermInProgress()
+			throws SqliteWrapperException, SQLException {
 
-		// By default, select the term in progress if it exists, otherwise the
-		// most recent term (which should be the last term in the list).
-		termInProgress = Main.active.termInProgress;
-		if (termInProgress != null) {
+		if (Main.active.termInProgress != null) {
 
-			inProgressBox.setStyle(
-					"-fx-background-color: " + Term.getColor(termInProgress));
+			inProgressBox.setStyle("-fx-background-color: "
+					+ Term.getColor(Main.active.termInProgress));
+
+			// If there is now a Term in progress when there wasn't before, then
+			// we need to enable the showCurrentWeek checkbox which should be
+			// disabled when there is no Term in progress.
+			if (!showCurrentWeek.isVisible()) {
+
+				showCurrentWeek.setVisible(true);
+				showCurrentWeek.setManaged(true);
+			}
+
+		} else {
+
+			inProgressBox.setStyle("-fx-background-color: " + EMPTY_TERM_COLOR);
 		}
 	}
 
@@ -145,7 +208,5 @@ public class MainController implements Observer {
 		selectTerm.setValue(term);
 		selectedTerm = term;
 		selectedBox.setStyle("-fx-background-color: " + Term.getColor(term));
-
-		scheduleSelectDate.setValue(term.start);
 	}
 }

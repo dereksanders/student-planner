@@ -30,7 +30,7 @@ public class Profile extends Observable {
 
 	public void update() throws SqliteWrapperException, SQLException {
 
-		termInProgress = Term.getTermInProgress();
+		this.termInProgress = Term.getTermInProgress();
 
 		setChanged();
 		notifyObservers();

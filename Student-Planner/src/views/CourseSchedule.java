@@ -36,14 +36,16 @@ public class CourseSchedule implements Observer {
 
 	private static final int DAY_WIDTH = 100;
 	private static final int TIME_LABEL_WIDTH = 75;
-
 	private static final int DAY_LABEL_HEIGHT = 20;
+	private static final double PIXELS_PER_MINUTE = 1.2;
 
 	private static final int PADDING_LEFT = 20;
 	private static final int PADDING_RIGHT = 20;
 	private static final int PADDING_BOTTOM = 20;
 	private static final int PADDING_TOP = 20;
 
+	private static final String DAY_LABEL_COLOR = "#000000";
+	private static final String TIME_LABEL_COLOR = "#000000";
 	private static final String BORDER_COLOR = "#cccccc";
 	private static final String EMPTY_DAY_COLOR = "#eeeeee";
 
@@ -62,6 +64,9 @@ public class CourseSchedule implements Observer {
 	private void drawSchedule(GraphicsContext gc)
 			throws SqliteWrapperException, SQLException {
 
+		this.gc.clearRect(0, 0, this.canvas.getWidth(),
+				this.canvas.getHeight());
+
 		calcCanvasSize();
 
 		drawDayLabels();
@@ -73,14 +78,17 @@ public class CourseSchedule implements Observer {
 
 	private void drawDayLabels() {
 
+		setFill(DAY_LABEL_COLOR);
+
 		for (int i = 1; i <= maxDay; i++) {
 
 			if (i == 1) {
-				this.gc.fillText(DateTimeUtil.intToDay(i), PADDING_LEFT + 25,
-						PADDING_TOP);
+				this.gc.fillText(DateTimeUtil.intToDay(i),
+						PADDING_LEFT + TIME_LABEL_WIDTH, PADDING_TOP);
 			} else {
 				this.gc.fillText(DateTimeUtil.intToDay(i),
-						(i - 1) * 100 + (PADDING_LEFT + 25), PADDING_TOP);
+						(i - 1) * DAY_WIDTH + PADDING_LEFT + TIME_LABEL_WIDTH,
+						PADDING_TOP);
 			}
 		}
 	}
@@ -91,46 +99,57 @@ public class CourseSchedule implements Observer {
 
 			if (i == 1) {
 
-				setBorderFill();
+				setFill(BORDER_COLOR);
 
-				this.gc.fillRect(PADDING_LEFT, PADDING_TOP + DAY_LABEL_HEIGHT,
-						DAY_WIDTH, this.dayHeight);
+				this.gc.fillRect(PADDING_LEFT + TIME_LABEL_WIDTH,
+						PADDING_TOP + DAY_LABEL_HEIGHT, DAY_WIDTH,
+						this.dayHeight);
 
-				setEmptyDayFill();
+				setFill(EMPTY_DAY_COLOR);
 
-				this.gc.fillRect(PADDING_LEFT + 1,
+				this.gc.fillRect(PADDING_LEFT + TIME_LABEL_WIDTH + 1,
 						PADDING_TOP + DAY_LABEL_HEIGHT + 1, DAY_WIDTH - 2,
 						this.dayHeight - 2);
 
 			} else {
 
-				setBorderFill();
+				setFill(BORDER_COLOR);
 
-				this.gc.fillRect(PADDING_LEFT + (DAY_WIDTH * (i - 1)),
+				this.gc.fillRect(
+						PADDING_LEFT + TIME_LABEL_WIDTH + (DAY_WIDTH * (i - 1)),
 						PADDING_TOP + DAY_LABEL_HEIGHT, DAY_WIDTH,
 						this.dayHeight);
 
-				setEmptyDayFill();
+				setFill(EMPTY_DAY_COLOR);
 
-				this.gc.fillRect(PADDING_LEFT + (DAY_WIDTH * (i - 1)),
+				this.gc.fillRect(
+						PADDING_LEFT + TIME_LABEL_WIDTH + (DAY_WIDTH * (i - 1)),
 						PADDING_TOP + DAY_LABEL_HEIGHT + 1, DAY_WIDTH - 1,
 						this.dayHeight - 2);
 			}
 		}
 	}
 
-	private void setBorderFill() {
+	private void setFill(String color) {
 
-		this.gc.setFill(Paint.valueOf(BORDER_COLOR));
-	}
-
-	private void setEmptyDayFill() {
-
-		this.gc.setFill(Paint.valueOf(EMPTY_DAY_COLOR));
+		this.gc.setFill(Paint.valueOf(color));
 	}
 
 	private void drawTimeLabels() {
 
+		setFill(TIME_LABEL_COLOR);
+
+		for (int i = 0; i < this.dayHeight; i += 30) {
+
+			if (i == 0) {
+				this.gc.fillText(this.scheduleStart.toString(), PADDING_LEFT,
+						PADDING_TOP + DAY_LABEL_HEIGHT);
+			} else {
+				this.gc.fillText(this.scheduleStart.plusMinutes(i).toString(),
+						PADDING_LEFT, PADDING_TOP + DAY_LABEL_HEIGHT
+								+ (i * PIXELS_PER_MINUTE));
+			}
+		}
 	}
 
 	private void calcCanvasSize() throws SqliteWrapperException, SQLException {
@@ -179,8 +198,8 @@ public class CourseSchedule implements Observer {
 			this.scheduleEnd = latestEndRounded;
 		}
 
-		this.dayHeight = DateTimeUtil.getMinutesBetween(this.scheduleStart,
-				this.scheduleEnd);
+		this.dayHeight = (int) (DateTimeUtil.getMinutesBetween(
+				this.scheduleStart, this.scheduleEnd) * PIXELS_PER_MINUTE);
 
 		// The height of the canvas will be the height of the day labels + 1px
 		// for each minute displayed.

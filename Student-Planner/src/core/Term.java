@@ -139,6 +139,28 @@ public class Term {
 		return termIsValid;
 	}
 
+	public static TermDescription findTerm(LocalDate date)
+			throws SqliteWrapperException, SQLException {
+
+		TermDescription found = null;
+
+		long julianDate = date.toEpochDay();
+
+		ResultSet findTermQuery = Main.active.db
+				.query("select * from term where start_date <= " + julianDate
+						+ " and end_date >= " + julianDate);
+
+		if (findTermQuery.next()) {
+
+			found = new TermDescription(
+					findTermQuery.getString(Term.Lookup.NAME.index),
+					LocalDate.ofEpochDay(findTermQuery
+							.getLong(Term.Lookup.START_DATE.index)));
+		}
+
+		return found;
+	}
+
 	public static TermDescription getTermInProgress()
 			throws SqliteWrapperException, SQLException {
 

@@ -1,5 +1,6 @@
 package utility;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class DateTimeUtil {
@@ -34,6 +35,22 @@ public class DateTimeUtil {
 		}
 
 		return day;
+	}
+
+	public static boolean isSameWeek(LocalDate date1, LocalDate date2) {
+
+		if (getStartOfWeek(date1).equals(getStartOfWeek(date2))) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public static LocalDate getStartOfWeek(LocalDate date) {
+
+		int dayOfWeek = date.getDayOfWeek().getValue();
+
+		return date.minusDays(dayOfWeek - 1);
 	}
 
 	public static LocalTime roundToNextHalfHour(LocalTime time) {
