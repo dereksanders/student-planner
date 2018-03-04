@@ -10,6 +10,8 @@ import sqlite.SqliteWrapperException;
 public class Profile extends Observable {
 
 	public String name;
+
+	// Database access
 	public SqliteWrapper db;
 
 	public TermDescription termInProgress;

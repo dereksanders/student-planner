@@ -56,7 +56,7 @@ public class MainController implements Observer {
 		// Whenever we get to this view, we want to open the current profile
 		// when we next start the planner as getting here indicates that we have
 		// either loaded a profile or successfully created a new one.
-		Main.writeCurrentConfig();
+		Main.config.write();
 
 		this.profile = Main.active;
 		this.profile.addObserver(this);

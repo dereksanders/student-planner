@@ -5,19 +5,21 @@ import java.nio.file.Paths;
 
 public class Logger {
 
-	private static String logFile;
+	private String path;
 
-	public static void initialize(String path) {
+	public static final String DEFAULT_PATH = "history.log";
 
-		logFile = path;
+	public Logger(String path) {
 
-		if (!Files.exists(Paths.get(logFile))) {
-			IOManager.writeFile("{ \"logs\":[", logFile);
+		this.path = path;
+
+		if (!Files.exists(Paths.get(this.path))) {
+			IOManager.writeFile("{ \"logs\":[", this.path);
 		}
 	}
 
-	public static void post(Log log) {
+	public void post(Log log) {
 
-		IOManager.appendToFile(log.toString(), logFile);
+		IOManager.appendToFile(log.toString(), this.path);
 	}
 }

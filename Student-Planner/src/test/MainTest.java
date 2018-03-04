@@ -18,7 +18,7 @@ public class MainTest {
 	private static String testDbDirectory = "testDbDirectory/";
 
 	@BeforeClass
-	public static void init() {
+	public static void init() throws IOException {
 
 		IOManager.createDirectory(testDbDirectory);
 	}

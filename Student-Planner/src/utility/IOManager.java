@@ -57,7 +57,8 @@ public class IOManager {
 
 		try {
 
-			Files.write(Paths.get("./" + filename), text.getBytes(), StandardOpenOption.APPEND);
+			Files.write(Paths.get("./" + filename), text.getBytes(),
+					StandardOpenOption.APPEND);
 
 		} catch (IOException e) {
 
@@ -115,12 +116,14 @@ public class IOManager {
 	}
 
 	/**
-	 * Creates the directory.
+	 * Creates the directory. If the directory already exists, no action is
+	 * taken.
 	 *
 	 * @param directory
 	 *            the directory
+	 * @throws IOException
 	 */
-	public static void createDirectory(String directory) {
+	public static void createDirectory(String directory) throws IOException {
 		if (!fileExists(directory)) {
 			try {
 				Files.createDirectory(Paths.get(directory));
@@ -128,7 +131,23 @@ public class IOManager {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		} else if (!isDirectory(directory)) {
+			// A non-directory file exists with the same name as the desired
+			// directory.
+			throw new IOException(
+					"Non-directory file exists with same name as directory.");
 		}
+	}
+
+	public static boolean isDirectory(String path) {
+
+		boolean isDirectory = false;
+
+		if (Files.isDirectory(Paths.get(path))) {
+			isDirectory = true;
+		}
+
+		return isDirectory;
 	}
 
 	/**
@@ -332,8 +351,11 @@ public class IOManager {
 	 */
 	private static File[] findAllFiles(File dir) {
 
-		if (!dir.exists()) {
+		try {
 			createDirectory(dir.getPath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		File[] files = dir.listFiles(new FileFilter() {
@@ -357,8 +379,11 @@ public class IOManager {
 	 */
 	private static File[] findAllFiles(File dir, String extension) {
 
-		if (!dir.exists()) {
+		try {
 			createDirectory(dir.getPath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		File[] files = dir.listFiles(new FileFilter() {

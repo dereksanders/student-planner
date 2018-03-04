@@ -45,7 +45,7 @@ public class TermsController {
 
 		if (Term.getNumTerms() > 0) {
 
-			Main.showCoursesView();
+			Main.viewController.showCoursesView();
 
 		} else {
 

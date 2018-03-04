@@ -2,6 +2,7 @@ package test;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -20,7 +21,7 @@ public class SqliteWrapperTest {
 	private static String dbName = "test";
 
 	@BeforeClass
-	public static void init() {
+	public static void init() throws IOException {
 
 		IOManager.createDirectory(testDbDirectory);
 		sqlite = new SqliteWrapper(testDbDirectory);

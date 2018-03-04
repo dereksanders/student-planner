@@ -17,6 +17,7 @@ import sqlite.SqliteWrapperException;
 import utility.IOManager;
 import utility.Log;
 import utility.Logger;
+import views.ViewController;
 
 public class Main extends Application {
 
@@ -24,66 +25,40 @@ public class Main extends Application {
 	public static int prefWidth = 1024;
 	public static int prefHeight = 768;
 
-	public static String welcomeViewPath = "/views/Welcome.fxml";
-	public static String termsViewPath = "/views/Terms.fxml";
-	public static String coursesViewPath = "/views/Courses.fxml";
-	public static String mainViewPath = "/views/Main.fxml";
-
-	public static Profile active;
 	public static TaskScheduler clock;
+	public static Profile active;
+	public static Logger logger;
+	public static Config config;
+	public static ViewController viewController;
 
-	private static String logPath = "history.log";
-	private static String configPath = "planner.cfg";
-	private static String dbDirectory = "dbs";
-
-	private static String dbName = "";
+	public static String dbNamePrefix = "";
+	private static String dbExtension = ".db";
+	protected static String versionExtension = ".v";
+	protected static String currentVersion = "01";
+	private static String dbVersion = currentVersion;
 
 	// This is the user-defined 'name' of the db, but the full name of the db
 	// will include its version and extension.
-	public static String dbNamePrefix = "";
-
-	private static String dbExtension = ".db";
-	private static String versionExtension = ".v";
-	private static String currentVersion = "01";
-	private static String dbVersion = currentVersion;
 
 	private static String title = "Student Planner v" + currentVersion;
-
-	// schemaPath is dependent upon dbDirectory, so always set schemaPath after
-	// dbDirectory.
-	public static String schemaPath = formSchemaPath();
 
 	public static void main(String[] args) throws SqliteWrapperException,
 			InitializationException, IOException {
 
 		clock = TaskScheduler.getInstance(LocalDateTime.now());
+		logger = new Logger(Logger.DEFAULT_PATH);
+		config = new Config(Config.DEFAULT_PATH);
 
-		Logger.initialize(logPath);
+		if (!config.getDbName().isEmpty()) {
 
-		configure();
-
-		if (!IOManager.fileExists(schemaPath)) {
-
-			System.out.println("Schema file doesn't exist. Creating one..");
-
-			writeSchema();
-		}
-
-		if (!IOManager.fileExists(dbDirectory)) {
-
-			IOManager.createDirectory(dbDirectory);
-		}
-
-		if (!dbName.isEmpty()) {
-
-			dbNamePrefix = extractPrefix(dbName);
+			dbNamePrefix = extractPrefix(config.getDbName());
 
 			String dbPath = formDbPath();
 
 			if (IOManager.fileExists(dbPath)) {
 
 				// Db migration logic.
-				dbVersion = extractVersion(dbName);
+				dbVersion = extractVersion(config.getDbName());
 
 				if (!dbVersion.equals(currentVersion)) {
 
@@ -93,9 +68,9 @@ public class Main extends Application {
 
 				// Load existing db
 				active = new Profile(dbNamePrefix,
-						new SqliteWrapper(dbDirectory));
+						new SqliteWrapper(config.getDbDirectory()));
 
-				active.db.connectToDb(dbName);
+				active.db.connectToDb(config.getDbName());
 
 			} else {
 
@@ -122,17 +97,17 @@ public class Main extends Application {
 		Parent root = null;
 		Scene startup = null;
 
-		if (dbName.isEmpty()) {
+		if (config.getDbName().isEmpty()) {
 
-			root = FXMLLoader
-					.load(Main.class.getClass().getResource(welcomeViewPath));
+			root = FXMLLoader.load(Main.class.getClass()
+					.getResource(ViewController.welcomeViewPath));
 
 			startup = new Scene(root, prefWidth, prefHeight);
 
 		} else {
 
-			root = FXMLLoader
-					.load(Main.class.getClass().getResource(mainViewPath));
+			root = FXMLLoader.load(Main.class.getClass()
+					.getResource(ViewController.mainViewPath));
 
 			startup = new Scene(root, prefWidth, prefHeight);
 		}
@@ -148,66 +123,15 @@ public class Main extends Application {
 		window.show();
 	}
 
-	private static void configure() {
-
-		if (IOManager.fileExists(configPath)) {
-
-			System.out.println("Config file exists. Loading it..");
-
-			String[] config = IOManager.loadFile(configPath);
-
-			for (String c : config) {
-
-				String[] keyValPair = c.split(",");
-
-				switch (keyValPair[0]) {
-				case "dbDirectory":
-					if (keyValPair.length > 1) {
-						System.out.println(
-								"Updating db directory & schema path.");
-						dbDirectory = keyValPair[1];
-						schemaPath = formSchemaPath();
-					}
-					break;
-				case "dbName":
-					if (keyValPair.length > 1) {
-						System.out.println("Updating db name.");
-						dbName = keyValPair[1];
-					}
-					break;
-				default:
-					break;
-				}
-			}
-
-		} else {
-
-			writeDefaultConfig();
-		}
-	}
-
-	private static void writeDefaultConfig() {
-
-		String defaultConfig = "dbDirectory,dbs" + "\n" + "dbName,";
-
-		IOManager.writeFile(defaultConfig, configPath);
-	}
-
 	private static String formDbPath() {
 
-		return dbDirectory + "/" + dbNamePrefix + versionExtension + dbVersion
-				+ dbExtension;
+		return config.getDbDirectory() + "/" + dbNamePrefix + versionExtension
+				+ dbVersion + dbExtension;
 	}
 
 	public static String formDbName() {
 
 		return dbNamePrefix + versionExtension + dbVersion + dbExtension;
-	}
-
-	private static String formSchemaPath() {
-
-		return dbDirectory + "/" + "schema" + versionExtension + currentVersion
-				+ ".sql";
 	}
 
 	private static String extractVersion(String dbName) {
@@ -222,23 +146,6 @@ public class Main extends Application {
 		}
 
 		return components[1].substring(1, components[1].length());
-	}
-
-	private static void writeSchema() {
-		// TODO Auto-generated method stub
-
-	}
-
-	public static void restoreDefaults() {
-
-		configPath = "planner.cfg";
-		dbDirectory = "dbs/";
-		dbNamePrefix = "";
-		dbExtension = ".db";
-		versionExtension = ".v";
-		currentVersion = "01";
-		dbVersion = currentVersion;
-		schemaPath = formSchemaPath();
 	}
 
 	public static void loadProfile(File chosen)
@@ -284,20 +191,14 @@ public class Main extends Application {
 
 			}
 
-			dbName = formDbName();
-			dbDirectory = chosen.getParent();
+			config.setDbName(formDbName());
+			config.setDbDirectory(chosen.getParent());
 
-			active = new Profile(dbName, new SqliteWrapper(dbDirectory));
-			active.db.connectToDb(dbName);
+			active = new Profile(dbNamePrefix,
+					new SqliteWrapper(config.getDbDirectory()));
+
+			active.db.connectToDb(config.getDbName());
 		}
-	}
-
-	public static void writeCurrentConfig() {
-
-		String currentConfig = "dbDirectory," + dbDirectory + "\n" + "dbName,"
-				+ dbName;
-
-		IOManager.writeFile(currentConfig, configPath);
 	}
 
 	public static boolean initializeDb(String name)
@@ -305,13 +206,14 @@ public class Main extends Application {
 
 		boolean isInitialized = false;
 		dbNamePrefix = name;
-		dbName = formDbName();
+		config.setDbName(formDbName());
 
-		active = new Profile(dbNamePrefix, new SqliteWrapper(dbDirectory));
+		active = new Profile(dbNamePrefix,
+				new SqliteWrapper(config.getDbDirectory()));
 
 		try {
 
-			active.db.createDb(dbName);
+			active.db.createDb(config.getDbName());
 			isInitialized = true;
 
 		} catch (SqliteWrapperException e) {
@@ -321,7 +223,7 @@ public class Main extends Application {
 		}
 
 		if (isInitialized) {
-			active.db.executeFromFile(schemaPath);
+			active.db.executeFromFile(config.getSchemaPath());
 		}
 
 		return isInitialized;
@@ -329,7 +231,7 @@ public class Main extends Application {
 
 	public static void showAlert(AlertType type, String issue, String reason) {
 
-		Logger.post(new Log("showAlert", issue + ":" + "\n" + reason,
+		logger.post(new Log("showAlert", issue + ":" + "\n" + reason,
 				Log.Severity.INFO));
 
 		Alert alert = new Alert(type);
@@ -337,35 +239,6 @@ public class Main extends Application {
 		alert.setHeaderText(issue);
 		alert.setContentText(reason);
 		alert.showAndWait();
-	}
-
-	public static void showTermsView() throws IOException {
-
-		loadView(termsViewPath);
-	}
-
-	public static void showCoursesView() throws IOException {
-
-		loadView(coursesViewPath);
-	}
-
-	public static void showMainView() throws IOException {
-
-		loadView(mainViewPath);
-	}
-
-	private static void loadView(String path) throws IOException {
-
-		Parent parent = FXMLLoader
-				.load(Main.class.getClass().getResource(path));
-
-		Scene view = new Scene(parent, window.getScene().getWidth(),
-				window.getScene().getHeight());
-
-		view.getStylesheets().add(Main.class.getClass()
-				.getResource("/views/welcome.css").toExternalForm());
-
-		window.setScene(view);
 	}
 
 	private static boolean isValidVersion(String dbVersion) {

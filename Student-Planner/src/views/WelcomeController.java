@@ -27,7 +27,7 @@ public class WelcomeController {
 	public void createProfile() throws SqliteWrapperException, IOException {
 
 		if (Main.initializeDb(nameField.getText())) {
-			Main.showTermsView();
+			Main.viewController.showTermsView();
 		}
 	}
 
@@ -62,11 +62,11 @@ public class WelcomeController {
 
 		if (Term.getNumTerms() > 0) {
 
-			Main.showMainView();
+			Main.viewController.showMainView();
 
 		} else {
 
-			Main.showTermsView();
+			Main.viewController.showTermsView();
 		}
 	}
 }

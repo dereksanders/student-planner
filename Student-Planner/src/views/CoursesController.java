@@ -77,6 +77,6 @@ public class CoursesController {
 	public void next()
 			throws SqliteWrapperException, SQLException, IOException {
 
-		Main.showMainView();
+		Main.viewController.showMainView();
 	}
 }
