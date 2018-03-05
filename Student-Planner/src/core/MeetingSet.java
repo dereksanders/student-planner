@@ -3,9 +3,7 @@ package core;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 
 import sqlite.SqliteWrapperException;
@@ -68,18 +66,13 @@ public class MeetingSet {
 					Term.findTerm(LocalDate.ofEpochDay(findMeetingSet.getLong(
 							MeetingSet.Lookup.COURSE_END_TERM_START_DATE.index))));
 
-			long epochSecondStart = findMeetingSet
+			long secondStart = findMeetingSet
 					.getLong(MeetingSet.Lookup.START_TIME.index);
-			long epochSecondEnd = findMeetingSet
+			long secondEnd = findMeetingSet
 					.getLong(MeetingSet.Lookup.END_TIME.index);
 
-			LocalTime startTime = LocalDateTime
-					.ofEpochSecond(epochSecondStart, 0, ZoneOffset.UTC)
-					.toLocalTime();
-
-			LocalTime endTime = LocalDateTime
-					.ofEpochSecond(epochSecondEnd, 0, ZoneOffset.UTC)
-					.toLocalTime();
+			LocalTime startTime = LocalTime.ofSecondOfDay(secondStart);
+			LocalTime endTime = LocalTime.ofSecondOfDay(secondEnd);
 
 			found = new MeetingSetDescription(
 					findMeetingSet.getInt(MeetingSet.Lookup.ID.index), term,

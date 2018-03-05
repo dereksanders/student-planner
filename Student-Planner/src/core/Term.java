@@ -3,9 +3,7 @@ package core;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 
 import javafx.scene.control.Alert.AlertType;
@@ -227,12 +225,10 @@ public class Term {
 
 		while (meetingSets.next()) {
 
-			long epochSecond = meetingSets
+			long startSecond = meetingSets
 					.getLong(MeetingSet.Lookup.START_TIME.index);
 
-			LocalTime start = LocalDateTime
-					.ofEpochSecond(epochSecond, 0, ZoneOffset.UTC)
-					.toLocalTime();
+			LocalTime start = LocalTime.ofSecondOfDay(startSecond);
 
 			if (start.isBefore(earliest)) {
 
@@ -252,12 +248,10 @@ public class Term {
 
 		while (meetingSets.next()) {
 
-			long epochSecond = meetingSets
+			long endSecond = meetingSets
 					.getLong(MeetingSet.Lookup.END_TIME.index);
 
-			LocalTime end = LocalDateTime
-					.ofEpochSecond(epochSecond, 0, ZoneOffset.UTC)
-					.toLocalTime();
+			LocalTime end = LocalTime.ofSecondOfDay(endSecond);
 
 			if (end.isAfter(latest)) {
 
