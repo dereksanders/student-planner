@@ -2,16 +2,22 @@ package views;
 
 import java.sql.SQLException;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
+import core.Course;
 import core.Main;
+import core.Meeting;
+import core.MeetingBlock;
+import core.MeetingDescription;
 import core.Profile;
 import core.Term;
 import core.TermDescription;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
 import sqlite.SqliteWrapperException;
 import utility.DateTimeUtil;
 
@@ -29,6 +35,8 @@ public class CourseSchedule implements Observer {
 	private LocalTime scheduleEnd = DEFAULT_SCHEDULE_END;
 	private int dayHeight = DateTimeUtil.getMinutesBetween(scheduleStart,
 			scheduleEnd);
+
+	private ArrayList<MeetingBlock> meetingBlocks;
 
 	private static final int DEFAULT_MAX_DAY = 7;
 	private static final LocalTime DEFAULT_SCHEDULE_START = LocalTime.of(9, 0);
@@ -58,6 +66,7 @@ public class CourseSchedule implements Observer {
 		this.term = term;
 		this.canvas = new Canvas();
 		this.gc = this.canvas.getGraphicsContext2D();
+		this.meetingBlocks = new ArrayList<>();
 		drawSchedule(this.gc);
 	}
 
@@ -74,6 +83,53 @@ public class CourseSchedule implements Observer {
 		drawDays();
 
 		drawTimeLabels();
+
+		drawMeetings();
+	}
+
+	private void drawMeetings() throws SqliteWrapperException, SQLException {
+
+		this.meetingBlocks.clear();
+
+		ArrayList<MeetingDescription> meetingsThisWeek = Meeting
+				.getMeetingsWeekOf(Main.active.selectedDate);
+
+		for (MeetingDescription meeting : meetingsThisWeek) {
+
+			this.meetingBlocks.add(createMeetingBlockFrom(meeting));
+		}
+
+		for (MeetingBlock mb : this.meetingBlocks) {
+
+			drawMeeting(mb);
+		}
+	}
+
+	private MeetingBlock createMeetingBlockFrom(MeetingDescription meeting)
+			throws SqliteWrapperException, SQLException {
+
+		int dayOfWeek = meeting.date.getDayOfWeek().getValue();
+		LocalTime start = meeting.set.start;
+
+		double xOffset = getDayXPosition(dayOfWeek);
+		double yOffset = DateTimeUtil.getMinutesBetween(scheduleStart, start)
+				* PIXELS_PER_MINUTE;
+		double height = DateTimeUtil.getMinutesBetween(start, meeting.set.end)
+				* PIXELS_PER_MINUTE;
+
+		// FIXME: Issue #6
+		Rectangle rect = new Rectangle(xOffset, yOffset, DAY_WIDTH, height);
+		rect.setFill(Paint.valueOf(Course.getColor(meeting.set.course)));
+
+		return new MeetingBlock(meeting, rect);
+	}
+
+	private void drawMeeting(MeetingBlock mb) {
+
+		setFill(mb.rect.getFill());
+
+		this.gc.fillRect(mb.rect.getX(), mb.rect.getY(), mb.rect.getWidth(),
+				mb.rect.getHeight());
 	}
 
 	private void drawDayLabels() {
@@ -82,15 +138,14 @@ public class CourseSchedule implements Observer {
 
 		for (int i = 1; i <= maxDay; i++) {
 
-			if (i == 1) {
-				this.gc.fillText(DateTimeUtil.intToDay(i),
-						PADDING_LEFT + TIME_LABEL_WIDTH, PADDING_TOP);
-			} else {
-				this.gc.fillText(DateTimeUtil.intToDay(i),
-						(i - 1) * DAY_WIDTH + PADDING_LEFT + TIME_LABEL_WIDTH,
-						PADDING_TOP);
-			}
+			this.gc.fillText(DateTimeUtil.intToDay(i), getDayXPosition(i),
+					PADDING_TOP);
 		}
+	}
+
+	private int getDayXPosition(int day) {
+
+		return ((day - 1) * DAY_WIDTH) + PADDING_LEFT + TIME_LABEL_WIDTH;
 	}
 
 	private void drawDays() {
@@ -133,6 +188,11 @@ public class CourseSchedule implements Observer {
 	private void setFill(String color) {
 
 		this.gc.setFill(Paint.valueOf(color));
+	}
+
+	private void setFill(Paint paint) {
+
+		this.gc.setFill(paint);
 	}
 
 	private void drawTimeLabels() {

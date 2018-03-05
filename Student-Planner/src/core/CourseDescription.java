@@ -2,10 +2,10 @@ package core;
 
 public class CourseDescription {
 
-	private String dept;
-	private int code;
-	private TermDescription startTerm;
-	private TermDescription endTerm;
+	public String dept;
+	public int code;
+	public TermDescription startTerm;
+	public TermDescription endTerm;
 
 	public CourseDescription(String dept, int code, TermDescription startTerm,
 			TermDescription endTerm) {

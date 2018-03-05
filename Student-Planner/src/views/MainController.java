@@ -129,6 +129,14 @@ public class MainController implements Observer {
 						}
 					}
 				});
+
+		// Add arbitrary MeetingSet
+		ArrayList<LocalDate> dates = new ArrayList<>();
+		dates.add(LocalDate.now());
+
+		// MeetingSet.addMeetingSet(1, Main.active.termInProgress,
+		// Course.getCourse(Main.active.termInProgress),
+		// LocalTime.of(10, 0), LocalTime.of(11, 0), dates);
 	}
 
 	private void updateShowCurrentWeek(boolean showCurrentWeek)

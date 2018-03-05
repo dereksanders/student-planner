@@ -45,6 +45,24 @@ public class Course {
 		return courses;
 	}
 
+	public static CourseDescription getCourse(TermDescription term)
+			throws SqliteWrapperException, SQLException {
+
+		CourseDescription found = null;
+
+		ResultSet courses = Main.active.db
+				.query("select * from course where start_term_start_date = "
+						+ term.getStartDay());
+
+		if (courses.next()) {
+			found = new CourseDescription(
+					courses.getString(Course.Lookup.DEPT_ID.index),
+					courses.getInt(Course.Lookup.CODE.index), term, term);
+		}
+
+		return found;
+	}
+
 	public static int getNumCourses()
 			throws SqliteWrapperException, SQLException {
 
@@ -122,5 +140,25 @@ public class Course {
 		}
 
 		return courseIsValid;
+	}
+
+	public static String getColor(CourseDescription course)
+			throws SqliteWrapperException, SQLException {
+
+		String color = "";
+
+		ResultSet getCourse = Main.active.db
+				.query("select * from course where start_term_start_date = "
+						+ course.startTerm.start.toEpochDay()
+						+ " and end_term_start_date = "
+						+ course.endTerm.start.toEpochDay() + " and dept_id = "
+						+ course.dept + " and code = " + course.code);
+
+		if (getCourse.next()) {
+
+			color = getCourse.getString(Course.Lookup.COLOR.index);
+		}
+
+		return color;
 	}
 }
