@@ -7,15 +7,16 @@ import utility.IOManager;
 public class Config {
 
 	private String path;
-	private String dbName = "";
+
+	private DbFilename dbFilename;
 	private String dbDirectory = "dbs";
 	private String schemaPath = formSchemaPath();
 
 	public static final String DEFAULT_PATH = "planner.cfg";
 
-	public Config(String path) throws InitializationException {
+	public Config() throws InitializationException {
 
-		this.path = path;
+		this.path = Config.DEFAULT_PATH;
 
 		if (IOManager.fileExists(this.path)) {
 
@@ -56,7 +57,7 @@ public class Config {
 			case "dbName":
 				if (keyValPair.length > 1) {
 					System.out.println("Updating db name.");
-					this.dbName = keyValPair[1];
+					this.dbFilename = new DbFilename(keyValPair[1]);
 				}
 				break;
 			default:
@@ -68,31 +69,36 @@ public class Config {
 	public void write() {
 
 		String config = "dbDirectory," + this.dbDirectory + "\n" + "dbName,"
-				+ this.dbName;
+				+ this.dbFilename;
 
 		IOManager.writeFile(config, this.path);
 	}
 
+	public String getDbPath() {
+
+		return this.dbDirectory + "/" + this.dbFilename;
+	}
+
 	private String formSchemaPath() {
 
-		return this.dbDirectory + "/" + "schema" + Main.versionExtension
-				+ Main.currentVersion + ".sql";
+		return this.dbDirectory + "/" + "schema" + ".v" + Main.CURRENT_VERSION
+				+ ".sql";
 	}
 
 	private void writeSchema() {
 
 	}
 
-	public void setDbName(String dbName) {
-		this.dbName = dbName;
-	}
-
 	public void setDbDirectory(String dbDirectory) {
 		this.dbDirectory = dbDirectory;
 	}
 
-	public String getDbName() {
-		return dbName;
+	public void setDbFilename(DbFilename dbFilename) {
+		this.dbFilename = dbFilename;
+	}
+
+	public DbFilename getDbFilename() {
+		return dbFilename;
 	}
 
 	public String getDbDirectory() {

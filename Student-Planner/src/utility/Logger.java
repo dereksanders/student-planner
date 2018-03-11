@@ -9,9 +9,9 @@ public class Logger {
 
 	public static final String DEFAULT_PATH = "history.log";
 
-	public Logger(String path) {
+	public Logger() {
 
-		this.path = path;
+		this.path = DEFAULT_PATH;
 
 		if (!Files.exists(Paths.get(this.path))) {
 			IOManager.writeFile("{ \"logs\":[", this.path);

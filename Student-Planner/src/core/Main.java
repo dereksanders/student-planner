@@ -31,62 +31,51 @@ public class Main extends Application {
 	public static Config config;
 	public static ViewController viewController;
 
-	public static String dbNamePrefix = "";
-	private static String dbExtension = ".db";
-	protected static String versionExtension = ".v";
-	protected static String currentVersion = "01";
-	private static String dbVersion = currentVersion;
+	public static final int CURRENT_VERSION = 1;
 
 	// This is the user-defined 'name' of the db, but the full name of the db
 	// will include its version and extension.
 
-	private static String title = "Student Planner v" + currentVersion;
+	private static String title = "Student Planner v" + CURRENT_VERSION;
 
 	public static void main(String[] args) throws SqliteWrapperException,
 			InitializationException, IOException {
 
 		clock = TaskScheduler.getInstance(LocalDateTime.now());
-		logger = new Logger(Logger.DEFAULT_PATH);
-		config = new Config(Config.DEFAULT_PATH);
+		logger = new Logger();
+		config = new Config();
 
-		if (!config.getDbName().isEmpty()) {
+		if (config.getDbFilename() != null) {
 
-			dbNamePrefix = extractPrefix(config.getDbName());
+			if (IOManager.fileExists(config.getDbPath())) {
 
-			String dbPath = formDbPath();
+				if (config.getDbFilename().getVersion() != CURRENT_VERSION) {
 
-			if (IOManager.fileExists(dbPath)) {
-
-				// Db migration logic.
-				dbVersion = extractVersion(config.getDbName());
-
-				if (!dbVersion.equals(currentVersion)) {
-
-					throw new InitializationException(
-							"Database has incompatible version.");
+					migrateDb();
 				}
 
 				// Load existing db
-				active = new Profile(dbNamePrefix,
+				active = new Profile(config.getDbFilename().getNamePrefix(),
 						new SqliteWrapper(config.getDbDirectory()));
 
-				active.db.connectToDb(config.getDbName());
+				active.db.connectToDb(config.getDbFilename().toString());
 
 			} else {
 
 				throw new InitializationException(
-						"Database not found in path: " + dbPath);
+						"Database not found in path: " + config.getDbPath());
 			}
 		}
 
 		launch(args);
 	}
 
-	private static String extractPrefix(String dbName) {
+	private static void migrateDb() throws InitializationException {
 
-		String[] components = dbName.split("\\.");
+		if (config.getDbFilename().getVersion() != CURRENT_VERSION) {
 
-		return components[0];
+			throw new InitializationException("Db has incompatible version.");
+		}
 	}
 
 	@Override
@@ -97,7 +86,7 @@ public class Main extends Application {
 		Parent root = null;
 		Scene startup = null;
 
-		if (config.getDbName().isEmpty()) {
+		if (config.getDbFilename() == null) {
 
 			root = FXMLLoader.load(Main.class.getClass()
 					.getResource(ViewController.welcomeViewPath));
@@ -123,97 +112,32 @@ public class Main extends Application {
 		window.show();
 	}
 
-	private static String formDbPath() {
-
-		return config.getDbDirectory() + "/" + dbNamePrefix + versionExtension
-				+ dbVersion + dbExtension;
-	}
-
-	public static String formDbName() {
-
-		return dbNamePrefix + versionExtension + dbVersion + dbExtension;
-	}
-
-	private static String extractVersion(String dbName) {
-
-		System.out.println(dbName);
-
-		String[] components = dbName.split("\\.");
-
-		for (String s : components) {
-
-			System.out.println(s);
-		}
-
-		return components[1].substring(1, components[1].length());
-	}
-
 	public static void loadProfile(File chosen)
 			throws InitializationException, SqliteWrapperException {
 
-		String filename = chosen.getName();
+		DbFilename filename = new DbFilename(chosen.getName());
+		config.setDbFilename(filename);
+		config.setDbDirectory(chosen.getParent());
 
-		String[] filenameComponents = filename.split("\\.");
+		active = new Profile(config.getDbFilename().getNamePrefix(),
+				new SqliteWrapper(config.getDbDirectory()));
 
-		System.out.println(filename);
-
-		for (String s : filenameComponents) {
-
-			System.out.println(s);
-		}
-
-		if (filenameComponents.length != 3) {
-
-			throw new InitializationException("Invalid file format.");
-
-		} else {
-
-			dbNamePrefix = filenameComponents[0];
-
-			if (filenameComponents[1].charAt(0) != 'v'
-					|| filenameComponents[1].length() != 3) {
-
-				throw new InitializationException("Invalid file format.");
-
-			} else {
-
-				dbVersion = filenameComponents[1].substring(1);
-
-				if (!isValidVersion(dbVersion)) {
-
-					throw new InitializationException("Invalid db version.");
-				}
-			}
-
-			if (!filenameComponents[2].equals(dbExtension.substring(1))) {
-
-				throw new InitializationException("Invalid db extension.");
-
-			}
-
-			config.setDbName(formDbName());
-			config.setDbDirectory(chosen.getParent());
-
-			active = new Profile(dbNamePrefix,
-					new SqliteWrapper(config.getDbDirectory()));
-
-			active.db.connectToDb(config.getDbName());
-		}
+		active.db.connectToDb(config.getDbFilename().toString());
 	}
 
 	public static boolean initializeDb(String name)
 			throws SqliteWrapperException {
 
 		boolean isInitialized = false;
-		dbNamePrefix = name;
-		config.setDbName(formDbName());
 
-		active = new Profile(dbNamePrefix,
+		config.setDbFilename(new DbFilename(name));
+
+		active = new Profile(config.getDbFilename().getNamePrefix(),
 				new SqliteWrapper(config.getDbDirectory()));
 
 		try {
 
-			active.db.createDb(config.getDbName());
+			active.db.createDb(config.getDbFilename().toString());
 			isInitialized = true;
 
 		} catch (SqliteWrapperException e) {
@@ -239,17 +163,5 @@ public class Main extends Application {
 		alert.setHeaderText(issue);
 		alert.setContentText(reason);
 		alert.showAndWait();
-	}
-
-	private static boolean isValidVersion(String dbVersion) {
-
-		if (dbVersion.equals("01")) {
-
-			return true;
-
-		} else {
-
-			return false;
-		}
 	}
 }
