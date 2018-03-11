@@ -28,6 +28,8 @@ public class MeetingSet {
 			CourseDescription course, LocalTime start, LocalTime end,
 			ArrayList<LocalDate> dates) throws SqliteWrapperException {
 
+		System.out.println(course);
+
 		Main.active.db.execute(
 				"insert into meeting_set(id, term_start_date, start_time, end_time, course_start_term_start_date, course_end_term_start_date, course_dept_id, course_code, name, type, location) "
 						+ "values(" + id + ", " + term.start.toEpochDay() + ", "

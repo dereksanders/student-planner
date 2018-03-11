@@ -23,7 +23,7 @@ public class Course {
 
 	public static void addCourse(long startTermStartDate, long endTermStartDate,
 			String deptID, int code, String name, String color)
-			throws SqliteWrapperException {
+			throws SqliteWrapperException, SQLException {
 
 		if (courseIsValid(startTermStartDate, endTermStartDate, deptID, code,
 				name, color)) {
@@ -35,6 +35,21 @@ public class Course {
 							+ endTermStartDate + ", " + "\'" + deptID + "\'"
 							+ ", " + code + ", " + "\'" + name + "\'"
 							+ ", 0, 1, " + "\'" + color + "\'" + ");");
+		}
+
+		printCourses();
+	}
+
+	public static void printCourses()
+			throws SqliteWrapperException, SQLException {
+
+		ResultSet courses = getCourses();
+		while (courses.next()) {
+			System.out.println(courses.getString(Course.Lookup.DEPT_ID.index)
+					+ " "
+					+ courses.getInt(
+							Course.Lookup.CODE.index + " " + courses.getLong(
+									Course.Lookup.START_TERM_START_DATE.index)));
 		}
 	}
 
@@ -55,10 +70,15 @@ public class Course {
 						+ term.getStartDay());
 
 		if (courses.next()) {
+
+			System.out.println("Found course.");
+
 			found = new CourseDescription(
 					courses.getString(Course.Lookup.DEPT_ID.index),
 					courses.getInt(Course.Lookup.CODE.index), term, term);
 		}
+
+		System.out.println("Course found = " + found);
 
 		return found;
 	}

@@ -2,11 +2,14 @@ package views;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
+import core.Course;
 import core.Main;
+import core.MeetingSet;
 import core.Profile;
 import core.Term;
 import core.TermDescription;
@@ -134,9 +137,13 @@ public class MainController implements Observer {
 		ArrayList<LocalDate> dates = new ArrayList<>();
 		dates.add(LocalDate.now());
 
-		// MeetingSet.addMeetingSet(1, Main.active.termInProgress,
-		// Course.getCourse(Main.active.termInProgress),
-		// LocalTime.of(10, 0), LocalTime.of(11, 0), dates);
+		System.out.println(Main.active.termInProgress);
+		System.out.println("Printing out all courses..");
+		Course.printCourses();
+
+		MeetingSet.addMeetingSet(1, Main.active.termInProgress,
+				Course.getCourse(Main.active.termInProgress),
+				LocalTime.of(10, 0), LocalTime.of(11, 0), dates);
 	}
 
 	private void updateShowCurrentWeek(boolean showCurrentWeek)

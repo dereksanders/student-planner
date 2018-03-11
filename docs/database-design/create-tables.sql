@@ -13,7 +13,7 @@ create table meeting (
 	start_time real NOT NULL,
 	end_time real NOT NULL,
 	name text,
-	type text,
+	meeting_type text,
 	location text,
 	repeat NOT NULL CHECK (repeat IN ('none', 'weekly', 'biweekly', 'monthly')),
 	FOREIGN KEY (term_start_date) references term(start_date) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -44,7 +44,7 @@ create table letter_scale_conversion (
 );
 create table course (
 	start_term_start_date real NOT NULL,
-	end_term_start_date real NOT NULL CHECK (start_term_start_date < end_term_start_date),
+	end_term_start_date real NOT NULL,
 	dept_id text NOT NULL,
 	code integer NOT NULL,
 	name text,

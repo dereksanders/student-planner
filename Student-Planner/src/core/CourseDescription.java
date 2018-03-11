@@ -15,4 +15,16 @@ public class CourseDescription {
 		this.startTerm = startTerm;
 		this.endTerm = endTerm;
 	}
+
+	@Override
+	public String toString() {
+
+		String desc = "";
+
+		desc += dept + " " + code;
+		desc += "\nStart: " + this.startTerm;
+		desc += "\nEnd: " + this.endTerm;
+
+		return desc;
+	}
 }
