@@ -29,8 +29,6 @@ public class MainTest {
 
 		String testName = "loadNonExistantDb";
 
-		Main.restoreDefaults();
-
 		IOManager.writeFile("dbDirectory," + testDbDirectory + testName + "/"
 				+ "\n" + "dbName,nonExistantDb", "planner.cfg");
 
@@ -43,8 +41,6 @@ public class MainTest {
 
 		String testName = "createNewDb";
 
-		Main.restoreDefaults();
-
 		IOManager.writeFile("dbDirectory," + testDbDirectory + testName + "/",
 				"planner.cfg");
 
@@ -56,5 +52,6 @@ public class MainTest {
 	@AfterClass
 	public static void cleanup() {
 
+		IOManager.deleteFile("planner.cfg");
 	}
 }

@@ -44,6 +44,7 @@ public class Main extends Application {
 		clock = TaskScheduler.getInstance(LocalDateTime.now());
 		logger = new Logger();
 		config = new Config();
+		viewController = new ViewController();
 
 		if (config.getDbFilename() != null) {
 
