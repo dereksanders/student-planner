@@ -37,8 +37,9 @@ public class Meeting {
 
 		while (findMeetings.next()) {
 
-			int set = findMeetings.getInt(1);
-			LocalDate dateOf = LocalDate.ofEpochDay(findMeetings.getLong(2));
+			int set = findMeetings.getInt(Meeting.Lookup.SET_ID.index);
+			LocalDate dateOf = LocalDate.ofEpochDay(
+					findMeetings.getLong(Meeting.Lookup.DATE.index));
 
 			meetingsThisWeek.add(new MeetingDescription(set, dateOf));
 		}

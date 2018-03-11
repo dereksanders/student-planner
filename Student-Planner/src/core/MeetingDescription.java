@@ -21,4 +21,10 @@ public class MeetingDescription {
 
 		this.set = MeetingSet.findMeetingSet(setID);
 	}
+
+	@Override
+	public String toString() {
+
+		return this.setID + " " + date;
+	}
 }

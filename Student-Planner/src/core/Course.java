@@ -28,6 +28,8 @@ public class Course {
 		if (courseIsValid(startTermStartDate, endTermStartDate, deptID, code,
 				name, color)) {
 
+			System.out.println("COURSE IS VALID. INSERTING..");
+
 			Main.active.db.execute(
 					"insert into course(start_term_start_date, end_term_start_date, "
 							+ "dept_id, code, name, grade, grade_is_automatic, color) "
@@ -46,10 +48,9 @@ public class Course {
 		ResultSet courses = getCourses();
 		while (courses.next()) {
 			System.out.println(courses.getString(Course.Lookup.DEPT_ID.index)
-					+ " "
-					+ courses.getInt(
-							Course.Lookup.CODE.index + " " + courses.getLong(
-									Course.Lookup.START_TERM_START_DATE.index)));
+					+ " " + courses.getInt(Course.Lookup.CODE.index) + " "
+					+ courses.getLong(
+							Course.Lookup.START_TERM_START_DATE.index));
 		}
 	}
 

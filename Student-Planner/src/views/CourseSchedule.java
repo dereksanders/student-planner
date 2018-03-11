@@ -109,6 +109,8 @@ public class CourseSchedule implements Observer {
 			throws SqliteWrapperException, SQLException {
 
 		int dayOfWeek = meeting.date.getDayOfWeek().getValue();
+		System.out.println(meeting);
+		System.out.println(meeting.set);
 		LocalTime start = meeting.set.start;
 
 		double xOffset = getDayXPosition(dayOfWeek);

@@ -31,6 +31,8 @@ public class Main extends Application {
 	public static Config config;
 	public static ViewController viewController;
 
+	private static boolean dbNotFound = false;
+
 	public static final int CURRENT_VERSION = 1;
 
 	// This is the user-defined 'name' of the db, but the full name of the db
@@ -63,8 +65,7 @@ public class Main extends Application {
 
 			} else {
 
-				throw new InitializationException(
-						"Database not found in path: " + config.getDbPath());
+				dbNotFound = true;
 			}
 		}
 
@@ -87,7 +88,7 @@ public class Main extends Application {
 		Parent root = null;
 		Scene startup = null;
 
-		if (config.getDbFilename() == null) {
+		if (config.getDbFilename() == null || dbNotFound) {
 
 			root = FXMLLoader.load(Main.class.getClass()
 					.getResource(ViewController.welcomeViewPath));
@@ -111,6 +112,12 @@ public class Main extends Application {
 		window.getIcons()
 				.add(new Image(Main.class.getResourceAsStream("/icon.png")));
 		window.show();
+
+		if (dbNotFound) {
+
+			showAlert(AlertType.WARNING, "Cannot load db specified in config",
+					"Database not found in path: " + config.getDbPath());
+		}
 	}
 
 	public static void loadProfile(File chosen)

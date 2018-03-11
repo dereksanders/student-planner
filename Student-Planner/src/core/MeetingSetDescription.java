@@ -19,4 +19,10 @@ public class MeetingSetDescription {
 		this.start = start;
 		this.end = end;
 	}
+
+	@Override
+	public String toString() {
+
+		return "" + this.id + this.term + this.course + this.start + this.end;
+	}
 }

@@ -220,7 +220,7 @@ public class SqliteWrapper {
 					+ " occurred:\n" + e.getMessage());
 		}
 
-		System.out.println(results);
+		// System.out.println(results);
 
 		return results;
 	}
