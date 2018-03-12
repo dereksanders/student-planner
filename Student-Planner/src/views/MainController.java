@@ -144,6 +144,8 @@ public class MainController implements Observer {
 		MeetingSet.addMeetingSet(1, Main.active.termInProgress,
 				Course.getCourse(Main.active.termInProgress),
 				LocalTime.of(10, 0), LocalTime.of(11, 0), dates);
+
+		Main.active.db.showSchema("meeting_set");
 	}
 
 	private void updateShowCurrentWeek(boolean showCurrentWeek)

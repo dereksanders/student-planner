@@ -173,7 +173,8 @@ public class Course {
 						+ course.startTerm.start.toEpochDay()
 						+ " and end_term_start_date = "
 						+ course.endTerm.start.toEpochDay() + " and dept_id = "
-						+ course.dept + " and code = " + course.code);
+						+ "\'" + course.dept + "\'" + " and code = "
+						+ course.code);
 
 		if (getCourse.next()) {
 

@@ -119,7 +119,8 @@ public class CourseSchedule implements Observer {
 		double height = DateTimeUtil.getMinutesBetween(start, meeting.set.end)
 				* PIXELS_PER_MINUTE;
 
-		// FIXME: Issue #6
+		System.out.println("X-offset: " + xOffset + ", Y-offset: " + yOffset);
+
 		Rectangle rect = new Rectangle(xOffset, yOffset, DAY_WIDTH, height);
 		rect.setFill(Paint.valueOf(Course.getColor(meeting.set.course)));
 
@@ -246,19 +247,19 @@ public class CourseSchedule implements Observer {
 		this.scheduleStart = DEFAULT_SCHEDULE_START;
 		this.scheduleEnd = DEFAULT_SCHEDULE_END;
 
-		if (Term.getNumMeetings() > 0) {
-
-			LocalTime earliestStart = Term.getEarliestMeetingStart(term);
-			LocalTime latestEnd = Term.getLatestMeetingEnd(term);
-
-			LocalTime earliestStartRounded = DateTimeUtil
-					.roundToNextHalfHour(earliestStart);
-			LocalTime latestEndRounded = DateTimeUtil
-					.roundToNextHalfHour(latestEnd);
-
-			this.scheduleStart = earliestStartRounded;
-			this.scheduleEnd = latestEndRounded;
-		}
+		/*
+		 * if (Term.getNumMeetings() > 0) {
+		 * 
+		 * LocalTime earliestStart = Term.getEarliestMeetingStart(term);
+		 * LocalTime latestEnd = Term.getLatestMeetingEnd(term);
+		 * 
+		 * LocalTime earliestStartRounded = DateTimeUtil
+		 * .roundToNextHalfHour(earliestStart); LocalTime latestEndRounded =
+		 * DateTimeUtil .roundToNextHalfHour(latestEnd);
+		 * 
+		 * this.scheduleStart = earliestStartRounded; this.scheduleEnd =
+		 * latestEndRounded; }
+		 */
 
 		this.dayHeight = (int) (DateTimeUtil.getMinutesBetween(
 				this.scheduleStart, this.scheduleEnd) * PIXELS_PER_MINUTE);

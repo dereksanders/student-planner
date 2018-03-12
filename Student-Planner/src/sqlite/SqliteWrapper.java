@@ -245,7 +245,6 @@ public class SqliteWrapper {
 
 		if (!connectionExists()) {
 
-			System.out.println("NO DB CONNECTION EXISTS!!!");
 			throw new SqliteWrapperException("No database connection exists.");
 		}
 	}
@@ -280,6 +279,21 @@ public class SqliteWrapper {
 		if (!dbExists(dbName)) {
 
 			throw new SqliteWrapperException("Database does not exist.");
+		}
+	}
+
+	public void showSchema(String table) throws SQLException {
+
+		ResultSet results = this.sql
+				.executeQuery("PRAGMA table_info(" + table + ")");
+
+		System.out.println("MeetingSet table columns:");
+
+		while (results.next()) {
+
+			System.out.println((results.getInt(1) + 1) + " "
+					+ results.getString(2) + " " + results.getString(3) + " "
+					+ results.getString(4));
 		}
 	}
 }

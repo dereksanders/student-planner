@@ -46,10 +46,10 @@ public class MeetingSet {
 							+ "," + term.start.toEpochDay() + ","
 							+ start.toSecondOfDay() + "," + end.toSecondOfDay()
 							+ "," + course.startTerm.getStartDay() + ","
-							+ course.endTerm.getStartDay() + ", \'"
-							+ course.dept + "\'," + course.code + ","
-							+ "\'nullname\'" + "," + "\'nulltype\'" + ","
-							+ "\'nulloc\'" + ",1," + "\'#000000\'" + ");");
+							+ course.endTerm.getStartDay() + ",\'" + course.dept
+							+ "\'," + course.code + "," + "\'nullname\'" + ","
+							+ "\'nulltype\'" + "," + "\'nulloc\'" + ",1," + "\'"
+							+ Course.getColor(course) + "\'" + ");");
 
 		} else {
 
@@ -76,22 +76,6 @@ public class MeetingSet {
 
 			System.out.println("FOUND A MEETING SET WITH ID " + setID);
 
-			LocalDate termStart = LocalDate.ofEpochDay(findMeetingSet
-					.getLong(MeetingSet.Lookup.TERM_START_DATE.index));
-			TermDescription term = Term.findTerm(termStart);
-
-			String deptID = findMeetingSet
-					.getString(MeetingSet.Lookup.COURSE_DEPT_ID.index);
-
-			CourseDescription course = new CourseDescription(
-					findMeetingSet
-							.getString(MeetingSet.Lookup.COURSE_DEPT_ID.index),
-					findMeetingSet.getInt(MeetingSet.Lookup.COURSE_CODE.index),
-					Term.findTerm(LocalDate.ofEpochDay(findMeetingSet.getLong(
-							MeetingSet.Lookup.COURSE_START_TERM_START_DATE.index))),
-					Term.findTerm(LocalDate.ofEpochDay(findMeetingSet.getLong(
-							MeetingSet.Lookup.COURSE_END_TERM_START_DATE.index))));
-
 			long secondStart = findMeetingSet
 					.getLong(MeetingSet.Lookup.START_TIME.index);
 			long secondEnd = findMeetingSet
@@ -101,8 +85,18 @@ public class MeetingSet {
 			LocalTime endTime = LocalTime.ofSecondOfDay(secondEnd);
 
 			found = new MeetingSetDescription(
-					findMeetingSet.getInt(MeetingSet.Lookup.ID.index), term,
-					course, startTime, endTime);
+					findMeetingSet.getInt(MeetingSet.Lookup.ID.index),
+					LocalDate.ofEpochDay(findMeetingSet
+							.getLong(MeetingSet.Lookup.TERM_START_DATE.index)),
+					LocalDate.ofEpochDay(findMeetingSet.getLong(
+							MeetingSet.Lookup.COURSE_START_TERM_START_DATE.index)),
+					LocalDate.ofEpochDay(findMeetingSet.getLong(
+							MeetingSet.Lookup.COURSE_END_TERM_START_DATE.index)),
+					findMeetingSet
+							.getString(MeetingSet.Lookup.COURSE_DEPT_ID.index),
+					findMeetingSet.getInt(MeetingSet.Lookup.COURSE_CODE.index),
+					startTime, endTime, findMeetingSet.getBoolean(
+							MeetingSet.Lookup.IS_COURSE_MEETING.index));
 		}
 
 		System.out.println("Found MeetingSet: " + found);
