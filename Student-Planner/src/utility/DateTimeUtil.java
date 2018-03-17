@@ -75,6 +75,29 @@ public class DateTimeUtil {
 		return rounded;
 	}
 
+	public static LocalTime roundToPrevHalfHour(LocalTime time) {
+
+		LocalTime rounded = LocalTime.of(time.getHour(), time.getMinute());
+
+		if (rounded.getMinute() <= 30) {
+
+			if (time.getHour() > 0) {
+
+				rounded = LocalTime.of(time.getHour() - 1, 30);
+
+			} else {
+
+				rounded = LocalTime.of(time.getHour(), 0);
+			}
+
+		} else {
+
+			rounded = LocalTime.of(time.getHour(), 0);
+		}
+
+		return rounded;
+	}
+
 	public static int getMinutesBetween(LocalTime earliestStart,
 			LocalTime latestEnd) {
 

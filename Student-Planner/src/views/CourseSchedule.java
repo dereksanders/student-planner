@@ -14,8 +14,10 @@ import core.MeetingDescription;
 import core.Profile;
 import core.Term;
 import core.TermDescription;
+import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import sqlite.SqliteWrapperException;
@@ -43,12 +45,13 @@ public class CourseSchedule implements Observer {
 	private static final LocalTime DEFAULT_SCHEDULE_END = LocalTime.of(17, 0);
 
 	private static final int DAY_WIDTH = 100;
-	private static final int TIME_LABEL_WIDTH = 75;
-	private static final int DAY_LABEL_HEIGHT = 20;
+	private static final int TIME_LABEL_WIDTH = 45;
+	private static final int TIME_LABEL_Y_OFFSET = 6;
+	private static final int DAY_LABEL_HEIGHT = 8;
 	private static final double PIXELS_PER_MINUTE = 1.2;
 
-	private static final int PADDING_LEFT = 20;
-	private static final int PADDING_RIGHT = 20;
+	private static final int PADDING_LEFT = 10;
+	private static final int PADDING_RIGHT = 0;
 	private static final int PADDING_BOTTOM = 20;
 	private static final int PADDING_TOP = 20;
 
@@ -67,11 +70,10 @@ public class CourseSchedule implements Observer {
 		this.canvas = new Canvas();
 		this.gc = this.canvas.getGraphicsContext2D();
 		this.meetingBlocks = new ArrayList<>();
-		drawSchedule(this.gc);
+		drawSchedule();
 	}
 
-	private void drawSchedule(GraphicsContext gc)
-			throws SqliteWrapperException, SQLException {
+	private void drawSchedule() throws SqliteWrapperException, SQLException {
 
 		this.gc.clearRect(0, 0, this.canvas.getWidth(),
 				this.canvas.getHeight());
@@ -85,6 +87,22 @@ public class CourseSchedule implements Observer {
 		drawTimeLabels();
 
 		drawMeetings();
+
+		this.canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,
+				new EventHandler<MouseEvent>() {
+
+					@Override
+					public void handle(MouseEvent event) {
+
+						handleMouseClickOnCanvas(event.getSceneX(),
+								event.getSceneY());
+					}
+
+					private void handleMouseClickOnCanvas(double sceneX,
+							double sceneY) {
+
+					}
+				});
 	}
 
 	private void drawMeetings() throws SqliteWrapperException, SQLException {
@@ -114,8 +132,8 @@ public class CourseSchedule implements Observer {
 		LocalTime start = meeting.set.start;
 
 		double xOffset = getDayXPosition(dayOfWeek);
-		double yOffset = DateTimeUtil.getMinutesBetween(scheduleStart, start)
-				* PIXELS_PER_MINUTE;
+		double yOffset = (DateTimeUtil.getMinutesBetween(scheduleStart, start)
+				* PIXELS_PER_MINUTE) + PADDING_TOP + DAY_LABEL_HEIGHT;
 		double height = DateTimeUtil.getMinutesBetween(start, meeting.set.end)
 				* PIXELS_PER_MINUTE;
 
@@ -141,9 +159,41 @@ public class CourseSchedule implements Observer {
 
 		for (int i = 1; i <= maxDay; i++) {
 
-			this.gc.fillText(DateTimeUtil.intToDay(i), getDayXPosition(i),
-					PADDING_TOP);
+			this.gc.fillText(DateTimeUtil.intToDay(i),
+					getDayXPosition(i) + getDayLabelOffset(i), PADDING_TOP);
 		}
+	}
+
+	private int getDayLabelOffset(int day) {
+
+		int offset = 0;
+
+		switch (day) {
+
+		case 1:
+			offset = 20;
+			break;
+		case 2:
+			offset = 20;
+			break;
+		case 3:
+			offset = 12;
+			break;
+		case 4:
+			offset = 20;
+			break;
+		case 5:
+			offset = 30;
+			break;
+		case 6:
+			offset = 20;
+			break;
+		case 7:
+			offset = 26;
+			break;
+		}
+
+		return offset;
 	}
 
 	private int getDayXPosition(int day) {
@@ -155,35 +205,46 @@ public class CourseSchedule implements Observer {
 
 		for (int i = 1; i <= maxDay; i++) {
 
-			if (i == 1) {
+			for (int j = 0; j < DateTimeUtil.getMinutesBetween(
+					this.scheduleStart, this.scheduleEnd); j += 30) {
 
 				setFill(BORDER_COLOR);
 
-				this.gc.fillRect(PADDING_LEFT + TIME_LABEL_WIDTH,
-						PADDING_TOP + DAY_LABEL_HEIGHT, DAY_WIDTH,
-						this.dayHeight);
+				if (i == 1) {
+
+					this.gc.fillRect(PADDING_LEFT + TIME_LABEL_WIDTH,
+							PADDING_TOP + DAY_LABEL_HEIGHT
+									+ (j * PIXELS_PER_MINUTE),
+							DAY_WIDTH, (30 * PIXELS_PER_MINUTE));
+
+				} else {
+
+					this.gc.fillRect(
+							PADDING_LEFT + TIME_LABEL_WIDTH
+									+ (DAY_WIDTH * (i - 1)),
+							PADDING_TOP + DAY_LABEL_HEIGHT
+									+ (j * PIXELS_PER_MINUTE),
+							DAY_WIDTH, (30 * PIXELS_PER_MINUTE));
+				}
 
 				setFill(EMPTY_DAY_COLOR);
 
-				this.gc.fillRect(PADDING_LEFT + TIME_LABEL_WIDTH + 1,
-						PADDING_TOP + DAY_LABEL_HEIGHT + 1, DAY_WIDTH - 2,
-						this.dayHeight - 2);
+				if (i == 1) {
 
-			} else {
+					this.gc.fillRect(PADDING_LEFT + TIME_LABEL_WIDTH + 1,
+							PADDING_TOP + DAY_LABEL_HEIGHT + 1
+									+ (j * PIXELS_PER_MINUTE),
+							DAY_WIDTH - 2, (30 * PIXELS_PER_MINUTE) - 2);
 
-				setFill(BORDER_COLOR);
+				} else {
 
-				this.gc.fillRect(
-						PADDING_LEFT + TIME_LABEL_WIDTH + (DAY_WIDTH * (i - 1)),
-						PADDING_TOP + DAY_LABEL_HEIGHT, DAY_WIDTH,
-						this.dayHeight);
-
-				setFill(EMPTY_DAY_COLOR);
-
-				this.gc.fillRect(
-						PADDING_LEFT + TIME_LABEL_WIDTH + (DAY_WIDTH * (i - 1)),
-						PADDING_TOP + DAY_LABEL_HEIGHT + 1, DAY_WIDTH - 1,
-						this.dayHeight - 2);
+					this.gc.fillRect(
+							PADDING_LEFT + TIME_LABEL_WIDTH
+									+ (DAY_WIDTH * (i - 1)),
+							PADDING_TOP + DAY_LABEL_HEIGHT + 1
+									+ (j * PIXELS_PER_MINUTE),
+							DAY_WIDTH - 1, (30 * PIXELS_PER_MINUTE) - 2);
+				}
 			}
 		}
 	}
@@ -206,10 +267,11 @@ public class CourseSchedule implements Observer {
 
 			if (i == 0) {
 				this.gc.fillText(this.scheduleStart.toString(), PADDING_LEFT,
-						PADDING_TOP + DAY_LABEL_HEIGHT);
+						PADDING_TOP + DAY_LABEL_HEIGHT + TIME_LABEL_Y_OFFSET);
 			} else {
 				this.gc.fillText(this.scheduleStart.plusMinutes(i).toString(),
-						PADDING_LEFT, PADDING_TOP + DAY_LABEL_HEIGHT
+						PADDING_LEFT,
+						PADDING_TOP + DAY_LABEL_HEIGHT + TIME_LABEL_Y_OFFSET
 								+ (i * PIXELS_PER_MINUTE));
 			}
 		}
@@ -247,19 +309,20 @@ public class CourseSchedule implements Observer {
 		this.scheduleStart = DEFAULT_SCHEDULE_START;
 		this.scheduleEnd = DEFAULT_SCHEDULE_END;
 
-		/*
-		 * if (Term.getNumMeetings() > 0) {
-		 * 
-		 * LocalTime earliestStart = Term.getEarliestMeetingStart(term);
-		 * LocalTime latestEnd = Term.getLatestMeetingEnd(term);
-		 * 
-		 * LocalTime earliestStartRounded = DateTimeUtil
-		 * .roundToNextHalfHour(earliestStart); LocalTime latestEndRounded =
-		 * DateTimeUtil .roundToNextHalfHour(latestEnd);
-		 * 
-		 * this.scheduleStart = earliestStartRounded; this.scheduleEnd =
-		 * latestEndRounded; }
-		 */
+		if (Term.getNumMeetings() > 0) {
+
+			LocalTime earliestStart = Term.getEarliestMeetingStart(term);
+			LocalTime latestEnd = Term.getLatestMeetingEnd(term);
+
+			LocalTime earliestStartRounded = DateTimeUtil
+					.roundToPrevHalfHour(earliestStart);
+
+			LocalTime latestEndRounded = DateTimeUtil
+					.roundToNextHalfHour(latestEnd);
+
+			this.scheduleStart = earliestStartRounded;
+			this.scheduleEnd = latestEndRounded;
+		}
 
 		this.dayHeight = (int) (DateTimeUtil.getMinutesBetween(
 				this.scheduleStart, this.scheduleEnd) * PIXELS_PER_MINUTE);
@@ -278,7 +341,7 @@ public class CourseSchedule implements Observer {
 			throws SqliteWrapperException, SQLException {
 
 		this.term = term;
-		drawSchedule(this.gc);
+		drawSchedule();
 	}
 
 	@Override
@@ -286,7 +349,7 @@ public class CourseSchedule implements Observer {
 
 		if (arg0 instanceof Profile) {
 			try {
-				drawSchedule(this.gc);
+				drawSchedule();
 			} catch (SqliteWrapperException | SQLException e) {
 				e.printStackTrace();
 			}
