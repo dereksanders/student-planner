@@ -208,42 +208,39 @@ public class CourseSchedule implements Observer {
 			for (int j = 0; j < DateTimeUtil.getMinutesBetween(
 					this.scheduleStart, this.scheduleEnd); j += 30) {
 
+				double slotYPosition = PADDING_TOP + DAY_LABEL_HEIGHT
+						+ (j * PIXELS_PER_MINUTE);
+
 				setFill(BORDER_COLOR);
 
-				if (i == 1) {
-
-					this.gc.fillRect(PADDING_LEFT + TIME_LABEL_WIDTH,
-							PADDING_TOP + DAY_LABEL_HEIGHT
-									+ (j * PIXELS_PER_MINUTE),
-							DAY_WIDTH, (30 * PIXELS_PER_MINUTE));
-
-				} else {
-
-					this.gc.fillRect(
-							PADDING_LEFT + TIME_LABEL_WIDTH
-									+ (DAY_WIDTH * (i - 1)),
-							PADDING_TOP + DAY_LABEL_HEIGHT
-									+ (j * PIXELS_PER_MINUTE),
-							DAY_WIDTH, (30 * PIXELS_PER_MINUTE));
-				}
+				this.gc.fillRect(getDayXPosition(i), slotYPosition, DAY_WIDTH,
+						(30 * PIXELS_PER_MINUTE));
 
 				setFill(EMPTY_DAY_COLOR);
 
-				if (i == 1) {
+				if (i == 1 && j == 0) {
 
-					this.gc.fillRect(PADDING_LEFT + TIME_LABEL_WIDTH + 1,
-							PADDING_TOP + DAY_LABEL_HEIGHT + 1
-									+ (j * PIXELS_PER_MINUTE),
+					// First day, first slot
+					this.gc.fillRect(getDayXPosition(i) + 1, slotYPosition + 1,
 							DAY_WIDTH - 2, (30 * PIXELS_PER_MINUTE) - 2);
 
-				} else {
+				} else if (i == 1) {
 
-					this.gc.fillRect(
-							PADDING_LEFT + TIME_LABEL_WIDTH
-									+ (DAY_WIDTH * (i - 1)),
-							PADDING_TOP + DAY_LABEL_HEIGHT + 1
-									+ (j * PIXELS_PER_MINUTE),
+					// First day, not the first slot
+					this.gc.fillRect(getDayXPosition(i) + 1, slotYPosition,
+							DAY_WIDTH - 2, (30 * PIXELS_PER_MINUTE) - 1);
+
+				} else if (i != 1 && j == 0) {
+
+					// Not the first day, first slot
+					this.gc.fillRect(getDayXPosition(i), slotYPosition + 1,
 							DAY_WIDTH - 1, (30 * PIXELS_PER_MINUTE) - 2);
+
+				} else if (i != 1) {
+
+					// Not the first day, not the first slot
+					this.gc.fillRect(getDayXPosition(i), slotYPosition,
+							DAY_WIDTH - 1, (30 * PIXELS_PER_MINUTE) - 1);
 				}
 			}
 		}
