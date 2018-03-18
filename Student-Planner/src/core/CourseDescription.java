@@ -22,8 +22,6 @@ public class CourseDescription {
 		String desc = "";
 
 		desc += dept + " " + code;
-		desc += "\nStart: " + this.startTerm;
-		desc += "\nEnd: " + this.endTerm;
 
 		return desc;
 	}

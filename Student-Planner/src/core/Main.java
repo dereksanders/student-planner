@@ -35,10 +35,13 @@ public class Main extends Application {
 
 	public static final int CURRENT_VERSION = 1;
 
+	public static final String TEXT_LIGHT_COLOR = "#ffffff";
+	public static final String TEXT_DARK_COLOR = "#000000";
+
 	// This is the user-defined 'name' of the db, but the full name of the db
 	// will include its version and extension.
 
-	private static String title = "Student Planner v" + CURRENT_VERSION;
+	public static String title = "Student Planner v" + CURRENT_VERSION;
 
 	public static void main(String[] args) throws SqliteWrapperException,
 			InitializationException, IOException {
@@ -95,12 +98,16 @@ public class Main extends Application {
 
 			startup = new Scene(root, prefWidth, prefHeight);
 
+			window.setTitle(title);
+
 		} else {
 
 			root = FXMLLoader.load(Main.class.getClass()
 					.getResource(ViewController.mainViewPath));
 
 			startup = new Scene(root, prefWidth, prefHeight);
+
+			window.setTitle(active.name + " - " + title);
 		}
 
 		window.setOnCloseRequest(event -> {
@@ -108,7 +115,6 @@ public class Main extends Application {
 		});
 
 		window.setScene(startup);
-		window.setTitle(title);
 		window.getIcons()
 				.add(new Image(Main.class.getResourceAsStream("/icon.png")));
 		window.show();

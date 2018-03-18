@@ -95,6 +95,9 @@ public class MeetingSet {
 					findMeetingSet
 							.getString(MeetingSet.Lookup.COURSE_DEPT_ID.index),
 					findMeetingSet.getInt(MeetingSet.Lookup.COURSE_CODE.index),
+					findMeetingSet.getString(MeetingSet.Lookup.NAME.index),
+					findMeetingSet
+							.getString(MeetingSet.Lookup.MEETING_TYPE.index),
 					startTime, endTime, findMeetingSet.getBoolean(
 							MeetingSet.Lookup.IS_COURSE_MEETING.index));
 		}
@@ -102,5 +105,21 @@ public class MeetingSet {
 		System.out.println("Found MeetingSet: " + found);
 
 		return found;
+	}
+
+	public static String getColor(int id)
+			throws SqliteWrapperException, SQLException {
+
+		String color = "";
+
+		ResultSet getMeetingSet = Main.active.db
+				.query("select * from meeting_set where id = " + id);
+
+		if (getMeetingSet.next()) {
+
+			color = getMeetingSet.getString(MeetingSet.Lookup.COLOR.index);
+		}
+
+		return color;
 	}
 }

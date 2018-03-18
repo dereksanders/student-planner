@@ -11,14 +11,17 @@ public class MeetingSetDescription {
 	private int id;
 	private TermDescription term;
 	public CourseDescription course;
-	private boolean isCourseMeeting;
+	public boolean isCourseMeeting;
+	public String name;
+	public String type;
 	public LocalTime start;
 	public LocalTime end;
 
 	public MeetingSetDescription(int id, LocalDate termStart,
 			LocalDate courseStartTermStartDate,
 			LocalDate courseEndTermStartDate, String courseDept, int courseCode,
-			LocalTime start, LocalTime end, boolean isCourseMeeting)
+			String name, String type, LocalTime start, LocalTime end,
+			boolean isCourseMeeting)
 			throws SqliteWrapperException, SQLException {
 
 		this.id = id;
@@ -33,6 +36,9 @@ public class MeetingSetDescription {
 					Term.findTerm(courseStartTermStartDate),
 					Term.findTerm(courseEndTermStartDate));
 		}
+
+		this.name = name;
+		this.type = type;
 	}
 
 	@Override

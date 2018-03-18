@@ -25,7 +25,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import sqlite.SqliteWrapperException;
+import utility.ColorUtil;
 import utility.DateTimeUtil;
 
 public class MainController implements Observer {
@@ -50,6 +53,10 @@ public class MainController implements Observer {
 	private HBox selectedBox;
 	@FXML
 	private Label inProgress;
+	@FXML
+	private Text inProgressHeader;
+	@FXML
+	private Text selectedHeader;
 
 	private static final String EMPTY_TERM_COLOR = "#eeeeee";
 
@@ -60,6 +67,7 @@ public class MainController implements Observer {
 		// when we next start the planner as getting here indicates that we have
 		// either loaded a profile or successfully created a new one.
 		Main.config.write();
+		Main.window.setTitle(Main.active.name + " - " + Main.title);
 
 		this.profile = Main.active;
 		this.profile.addObserver(this);
@@ -133,6 +141,21 @@ public class MainController implements Observer {
 					}
 				});
 
+		scheduleSelectDate = new DatePicker();
+		scheduleSelectDate.valueProperty()
+				.addListener(new ChangeListener<LocalDate>() {
+					@Override
+					public void changed(
+							ObservableValue<? extends LocalDate> observable,
+							LocalDate oldDate, LocalDate newDate) {
+						try {
+							updateSelectedDate(newDate);
+						} catch (SqliteWrapperException | SQLException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+
 		// Add arbitrary MeetingSet
 		ArrayList<LocalDate> dates = new ArrayList<>();
 		dates.add(LocalDate.now().minusDays(5));
@@ -154,7 +177,7 @@ public class MainController implements Observer {
 		if (showCurrentWeek) {
 
 			if (Main.active.termInProgress != null) {
-				updateSelectedDate(LocalDate.now());
+				scheduleSelectDate.setValue(LocalDate.now());
 			}
 		}
 	}
@@ -167,11 +190,14 @@ public class MainController implements Observer {
 		if (containsDate != null) {
 
 			Main.active.setSelectedDate(selected);
-			scheduleSelectDate.setValue(selected);
 
-			if (DateTimeUtil.isSameWeek(selected, LocalDate.now())) {
+			boolean selectCurrentWeek = DateTimeUtil.isSameWeek(selected,
+					LocalDate.now());
+
+			if (!showCurrentWeek.isSelected() && selectCurrentWeek) {
 				showCurrentWeek.setSelected(true);
-			} else {
+
+			} else if (showCurrentWeek.isSelected() && !selectCurrentWeek) {
 				showCurrentWeek.setSelected(false);
 			}
 
@@ -201,8 +227,17 @@ public class MainController implements Observer {
 
 		if (Main.active.termInProgress != null) {
 
-			inProgressBox.setStyle("-fx-background-color: "
-					+ Term.getColor(Main.active.termInProgress));
+			String termColor = Term.getColor(Main.active.termInProgress);
+
+			inProgressBox.setStyle("-fx-background-color: " + termColor + ";");
+
+			if (ColorUtil.isDark(Color.web(termColor))) {
+				inProgressHeader.setFill(Color.web(Main.TEXT_LIGHT_COLOR));
+				inProgress.setStyle("-fx-text-fill: " + Main.TEXT_LIGHT_COLOR);
+			} else {
+				inProgressHeader.setFill(Color.web(Main.TEXT_DARK_COLOR));
+				inProgress.setStyle("-fx-text-fill: " + Main.TEXT_LIGHT_COLOR);
+			}
 
 			// If there is now a Term in progress when there wasn't before, then
 			// we need to enable the showCurrentWeek checkbox which should be
@@ -213,9 +248,6 @@ public class MainController implements Observer {
 				showCurrentWeek.setManaged(true);
 			}
 
-		} else {
-
-			inProgressBox.setStyle("-fx-background-color: " + EMPTY_TERM_COLOR);
 		}
 	}
 
@@ -224,6 +256,15 @@ public class MainController implements Observer {
 
 		selectTerm.setValue(term);
 		selectedTerm = term;
-		selectedBox.setStyle("-fx-background-color: " + Term.getColor(term));
+
+		String termColor = Term.getColor(term);
+
+		selectedBox.setStyle("-fx-background-color: " + termColor + ";");
+
+		if (ColorUtil.isDark(Color.web(termColor))) {
+			selectedHeader.setFill(Color.web(Main.TEXT_LIGHT_COLOR));
+		} else {
+			selectedHeader.setFill(Color.web(Main.TEXT_DARK_COLOR));
+		}
 	}
 }

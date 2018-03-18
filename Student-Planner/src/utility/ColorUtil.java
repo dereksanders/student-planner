@@ -60,19 +60,33 @@ public class ColorUtil {
 			if (Math.random() < 0.5) {
 
 				// choose an int
-				int randInt = (int) (((upperInt - lowerInt) * Math.random()) + lowerInt);
+				int randInt = (int) (((upperInt - lowerInt) * Math.random())
+						+ lowerInt);
 
 				color.append(randInt);
 
 			} else {
 
 				// choose a letter - 97 is ASCII value for 'a'
-				int randAlpha = ((int) (((upperAlpha - lowerAlpha) * Math.random()) + lowerAlpha)) + 97;
+				int randAlpha = ((int) (((upperAlpha - lowerAlpha)
+						* Math.random()) + lowerAlpha)) + 97;
 
 				color.append((char) randAlpha);
 			}
 		}
 
 		return Color.web(color.toString());
+	}
+
+	public static boolean isDark(Color color) {
+
+		boolean isDark = false;
+
+		if (color.getBrightness() < 0.7) {
+
+			isDark = true;
+		}
+
+		return isDark;
 	}
 }

@@ -40,7 +40,7 @@
          <children>
             <HBox fx:id="inProgressBox" maxHeight="46.0" minHeight="46.0">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="In-Progress: " />
+                  <Text fx:id="inProgressHeader" strokeType="OUTSIDE" strokeWidth="0.0" text="In-Progress: " />
                   <Label fx:id="inProgress" />
                </children>
                <VBox.margin>
@@ -111,7 +111,7 @@
          <top>
             <HBox fx:id="selectedBox" maxHeight="46.0" minHeight="46.0" spacing="10.0" BorderPane.alignment="CENTER">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Selected:" />
+                  <Text fx:id="selectedHeader" strokeType="OUTSIDE" strokeWidth="0.0" text="Selected:" />
                   <ChoiceBox fx:id="selectTerm" prefWidth="150.0" />
                </children>
                <padding>

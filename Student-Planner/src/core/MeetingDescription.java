@@ -8,7 +8,7 @@ import sqlite.SqliteWrapperException;
 public class MeetingDescription {
 
 	// MeetingDate attributes
-	private int setID;
+	public int setID;
 	public LocalDate date;
 
 	public MeetingSetDescription set;

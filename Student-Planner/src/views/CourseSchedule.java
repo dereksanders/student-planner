@@ -11,6 +11,7 @@ import core.Main;
 import core.Meeting;
 import core.MeetingBlock;
 import core.MeetingDescription;
+import core.MeetingSet;
 import core.Profile;
 import core.Term;
 import core.TermDescription;
@@ -18,9 +19,11 @@ import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import sqlite.SqliteWrapperException;
+import utility.ColorUtil;
 import utility.DateTimeUtil;
 
 public class CourseSchedule implements Observer {
@@ -40,7 +43,7 @@ public class CourseSchedule implements Observer {
 
 	private ArrayList<MeetingBlock> meetingBlocks;
 
-	private static final int DEFAULT_MAX_DAY = 7;
+	private static final int DEFAULT_MAX_DAY = 5;
 	private static final LocalTime DEFAULT_SCHEDULE_START = LocalTime.of(9, 0);
 	private static final LocalTime DEFAULT_SCHEDULE_END = LocalTime.of(17, 0);
 
@@ -55,8 +58,6 @@ public class CourseSchedule implements Observer {
 	private static final int PADDING_BOTTOM = 20;
 	private static final int PADDING_TOP = 20;
 
-	private static final String DAY_LABEL_COLOR = "#000000";
-	private static final String TIME_LABEL_COLOR = "#000000";
 	private static final String BORDER_COLOR = "#cccccc";
 	private static final String EMPTY_DAY_COLOR = "#eeeeee";
 
@@ -145,17 +146,41 @@ public class CourseSchedule implements Observer {
 		return new MeetingBlock(meeting, rect);
 	}
 
-	private void drawMeeting(MeetingBlock mb) {
+	private void drawMeeting(MeetingBlock mb)
+			throws SqliteWrapperException, SQLException {
 
 		setFill(mb.rect.getFill());
 
 		this.gc.fillRect(mb.rect.getX(), mb.rect.getY(), mb.rect.getWidth(),
 				mb.rect.getHeight());
+
+		Color meetingColor = Color.web(MeetingSet.getColor(mb.meeting.setID));
+
+		if (ColorUtil.isDark(meetingColor)) {
+			setFill(Main.TEXT_LIGHT_COLOR);
+		} else {
+			setFill(Main.TEXT_DARK_COLOR);
+		}
+
+		String meetingText = "";
+
+		if (mb.meeting.set.isCourseMeeting) {
+
+			meetingText = mb.meeting.set.course.toString() + "\n"
+					+ mb.meeting.set.type;
+
+		} else {
+
+			meetingText = mb.meeting.set.name + "\n" + mb.meeting.set.type;
+		}
+
+		this.gc.fillText(meetingText, PADDING_LEFT + mb.rect.getX(),
+				mb.rect.getY() + 20, mb.rect.getWidth());
 	}
 
 	private void drawDayLabels() {
 
-		setFill(DAY_LABEL_COLOR);
+		setFill(Main.TEXT_DARK_COLOR);
 
 		for (int i = 1; i <= maxDay; i++) {
 
@@ -168,28 +193,36 @@ public class CourseSchedule implements Observer {
 
 		int offset = 0;
 
+		final int mondayOffset = 20;
+		final int tuesdayOffset = 20;
+		final int wednesdayOffset = 12;
+		final int thursdayOffset = 20;
+		final int fridayOffset = 30;
+		final int saturdayOffset = 20;
+		final int sundayOffset = 26;
+
 		switch (day) {
 
 		case 1:
-			offset = 20;
+			offset = mondayOffset;
 			break;
 		case 2:
-			offset = 20;
+			offset = tuesdayOffset;
 			break;
 		case 3:
-			offset = 12;
+			offset = wednesdayOffset;
 			break;
 		case 4:
-			offset = 20;
+			offset = thursdayOffset;
 			break;
 		case 5:
-			offset = 30;
+			offset = fridayOffset;
 			break;
 		case 6:
-			offset = 20;
+			offset = saturdayOffset;
 			break;
 		case 7:
-			offset = 26;
+			offset = sundayOffset;
 			break;
 		}
 
@@ -258,7 +291,7 @@ public class CourseSchedule implements Observer {
 
 	private void drawTimeLabels() {
 
-		setFill(TIME_LABEL_COLOR);
+		setFill(Main.TEXT_DARK_COLOR);
 
 		for (int i = 0; i < this.dayHeight; i += 30) {
 
