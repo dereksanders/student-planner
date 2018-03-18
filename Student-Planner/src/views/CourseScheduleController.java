@@ -14,8 +14,8 @@ import core.MeetingDescription;
 import core.MeetingSet;
 import core.Profile;
 import core.Term;
-import core.TermDescription;
 import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
@@ -26,10 +26,9 @@ import sqlite.SqliteWrapperException;
 import utility.ColorUtil;
 import utility.DateTimeUtil;
 
-public class CourseSchedule implements Observer {
+public class CourseScheduleController implements Observer {
 
-	private Observable profile;
-	private TermDescription term;
+	private Profile observable;
 
 	// Drawing
 	private Canvas canvas;
@@ -61,13 +60,12 @@ public class CourseSchedule implements Observer {
 	private static final String BORDER_COLOR = "#cccccc";
 	private static final String EMPTY_DAY_COLOR = "#eeeeee";
 
-	public CourseSchedule(TermDescription term)
-			throws SqliteWrapperException, SQLException {
+	@FXML
+	public void initialize() throws SqliteWrapperException, SQLException {
 
-		this.profile = Main.active;
-		this.profile.addObserver(this);
+		this.observable = Main.active;
+		this.observable.addObserver(this);
 
-		this.term = term;
 		this.canvas = new Canvas();
 		this.gc = this.canvas.getGraphicsContext2D();
 		this.meetingBlocks = new ArrayList<>();
@@ -111,7 +109,7 @@ public class CourseSchedule implements Observer {
 		this.meetingBlocks.clear();
 
 		ArrayList<MeetingDescription> meetingsThisWeek = Meeting
-				.getMeetingsWeekOf(Main.active.selectedDate);
+				.getMeetingsWeekOf(Main.active.getSelectedDate());
 
 		for (MeetingDescription meeting : meetingsThisWeek) {
 
@@ -339,10 +337,12 @@ public class CourseSchedule implements Observer {
 		this.scheduleStart = DEFAULT_SCHEDULE_START;
 		this.scheduleEnd = DEFAULT_SCHEDULE_END;
 
-		if (Term.getNumMeetings() > 0) {
+		if (Term.meetingsExistIn(this.observable.getSelectedTerm())) {
 
-			LocalTime earliestStart = Term.getEarliestMeetingStart(term);
-			LocalTime latestEnd = Term.getLatestMeetingEnd(term);
+			LocalTime earliestStart = Term
+					.getEarliestMeetingStart(this.observable.getSelectedTerm());
+			LocalTime latestEnd = Term
+					.getLatestMeetingEnd(this.observable.getSelectedTerm());
 
 			LocalTime earliestStartRounded = DateTimeUtil
 					.roundToPrevHalfHour(earliestStart);
@@ -363,20 +363,8 @@ public class CourseSchedule implements Observer {
 				+ PADDING_BOTTOM);
 	}
 
-	public Canvas getCanvas() {
-		return this.canvas;
-	}
-
-	public void setTerm(TermDescription term)
-			throws SqliteWrapperException, SQLException {
-
-		this.term = term;
-		drawSchedule();
-	}
-
 	@Override
 	public void update(Observable arg0, Object arg1) {
-
 		if (arg0 instanceof Profile) {
 			try {
 				drawSchedule();

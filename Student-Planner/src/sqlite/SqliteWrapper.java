@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import utility.IOManager;
+import utility.IOUtil;
 
 /**
  * The Class SqliteWrapper.
@@ -38,7 +38,7 @@ public class SqliteWrapper {
 	 */
 	public boolean dbExists(String dbName) {
 
-		return IOManager.fileExists(this.dbDirectory + "/" + dbName);
+		return IOUtil.fileExists(this.dbDirectory + "/" + dbName);
 	}
 
 	/**
@@ -182,7 +182,7 @@ public class SqliteWrapper {
 	public void executeFromFile(String path) throws SqliteWrapperException {
 
 		// Execute each command in the db schema one at a time.
-		String[] lines = IOManager.loadFile(path);
+		String[] lines = IOUtil.loadFile(path);
 		String schema = "";
 		for (String s : lines) {
 			schema += s;

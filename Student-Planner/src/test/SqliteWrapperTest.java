@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import sqlite.SqliteWrapper;
 import sqlite.SqliteWrapperException;
-import utility.IOManager;
+import utility.IOUtil;
 
 public class SqliteWrapperTest {
 
@@ -23,10 +23,10 @@ public class SqliteWrapperTest {
 	@BeforeClass
 	public static void init() throws IOException {
 
-		IOManager.createDirectory(testDbDirectory);
+		IOUtil.createDirectory(testDbDirectory);
 		sqlite = new SqliteWrapper(testDbDirectory);
 
-		IOManager.deleteFile(testDbDirectory + dbName);
+		IOUtil.deleteFile(testDbDirectory + dbName);
 	}
 
 	@Test
@@ -115,6 +115,6 @@ public class SqliteWrapperTest {
 	public static void cleanup() throws SqliteWrapperException {
 
 		sqlite.disconnectFromDb(dbName);
-		IOManager.deleteFile(testDbDirectory + dbName);
+		IOUtil.deleteFile(testDbDirectory + dbName);
 	}
 }

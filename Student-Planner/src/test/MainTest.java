@@ -11,7 +11,7 @@ import org.junit.Test;
 import core.InitializationException;
 import core.Main;
 import sqlite.SqliteWrapperException;
-import utility.IOManager;
+import utility.IOUtil;
 
 public class MainTest {
 
@@ -20,7 +20,7 @@ public class MainTest {
 	@BeforeClass
 	public static void init() throws IOException {
 
-		IOManager.createDirectory(testDbDirectory);
+		IOUtil.createDirectory(testDbDirectory);
 	}
 
 	@Test(expected = InitializationException.class)
@@ -29,7 +29,7 @@ public class MainTest {
 
 		String testName = "loadNonExistantDb";
 
-		IOManager.writeFile("dbDirectory," + testDbDirectory + testName + "/"
+		IOUtil.writeFile("dbDirectory," + testDbDirectory + testName + "/"
 				+ "\n" + "dbName,nonExistantDb", "planner.cfg");
 
 		Main.main(null);
@@ -41,17 +41,17 @@ public class MainTest {
 
 		String testName = "createNewDb";
 
-		IOManager.writeFile("dbDirectory," + testDbDirectory + testName + "/",
+		IOUtil.writeFile("dbDirectory," + testDbDirectory + testName + "/",
 				"planner.cfg");
 
 		Main.main(null);
 
-		assertTrue(IOManager.fileExists(testDbDirectory + testName));
+		assertTrue(IOUtil.fileExists(testDbDirectory + testName));
 	}
 
 	@AfterClass
 	public static void cleanup() {
 
-		IOManager.deleteFile("planner.cfg");
+		IOUtil.deleteFile("planner.cfg");
 	}
 }

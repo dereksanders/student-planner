@@ -262,26 +262,20 @@ public class Term {
 		return latest;
 	}
 
-	public static int getNumMeetings()
+	public static boolean meetingsExistIn(TermDescription term)
 			throws SqliteWrapperException, SQLException {
 
-		ResultSet tables = Main.active.db.query("SELECT * FROM sqlite_master");
+		boolean meetingsExistInTerm = false;
 
-		while (tables.next()) {
-
-			System.out.println(tables.getString(2));
-		}
-
-		ResultSet countMeetings = Main.active.db
-				.query("select count(*) from meeting_date");
-
-		int numMeetings = 0;
+		ResultSet countMeetings = Main.active.db.query(
+				"select count(*) from meeting_set where term_start_date = "
+						+ term.getStartDay());
 
 		if (countMeetings.next()) {
-			numMeetings = countMeetings.getInt(1);
+			meetingsExistInTerm = true;
 		}
 
-		return numMeetings;
+		return meetingsExistInTerm;
 	}
 
 	public static String getColor(TermDescription term)

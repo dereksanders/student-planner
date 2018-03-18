@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -40,7 +37,7 @@
          <children>
             <HBox fx:id="inProgressBox" maxHeight="46.0" minHeight="46.0">
                <children>
-                  <Text fx:id="inProgressHeader" strokeType="OUTSIDE" strokeWidth="0.0" text="In-Progress: " />
+                  <Text fx:id="inProgressTitle" strokeType="OUTSIDE" strokeWidth="0.0" text="In-Progress: " />
                   <Label fx:id="inProgress" />
                </children>
                <VBox.margin>
@@ -71,28 +68,12 @@
                <tabs>
                   <Tab closable="false" text="Schedule">
                     <content>
-                      <AnchorPane fx:id="schedulePane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <CheckBox fx:id="showCurrentWeek" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Show Current Week" />
-                              <DatePicker fx:id="scheduleSelectDate" layoutX="14.0" layoutY="39.0" />
-                              <ScrollPane fx:id="scheduleScroll" layoutX="14.0" layoutY="74.0" prefHeight="578.0" prefWidth="784.0">
-                                <content>
-                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
-                                </content>
-                              </ScrollPane>
-                           </children></AnchorPane>
+                      <AnchorPane fx:id="schedulePane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                     </content>
                   </Tab>
                   <Tab closable="false" text="Calendar">
                     <content>
-                      <AnchorPane fx:id="calendarPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <ScrollPane layoutX="14.0" layoutY="14.0" prefHeight="463.0" prefWidth="546.0">
-                                <content>
-                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
-                                </content>
-                              </ScrollPane>
-                           </children></AnchorPane>
+                      <AnchorPane fx:id="calendarPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                     </content>
                   </Tab>
                   <Tab closable="false" text="Grades">

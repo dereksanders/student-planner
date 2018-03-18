@@ -14,12 +14,12 @@ public class Logger {
 		this.path = DEFAULT_PATH;
 
 		if (!Files.exists(Paths.get(this.path))) {
-			IOManager.writeFile("{ \"logs\":[", this.path);
+			IOUtil.writeFile("{ \"logs\":[", this.path);
 		}
 	}
 
 	public void post(Log log) {
 
-		IOManager.appendToFile(log.toString(), this.path);
+		IOUtil.appendToFile(log.toString(), this.path);
 	}
 }

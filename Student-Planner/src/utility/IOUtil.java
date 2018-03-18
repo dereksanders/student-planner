@@ -20,7 +20,7 @@ import java.nio.file.StandardOpenOption;
  * @author Derek Sanders
  */
 
-public class IOManager {
+public class IOUtil {
 
 	/** The max rows. */
 	private static int MAX_ROWS = 200000;

@@ -2,7 +2,7 @@ package core;
 
 import java.io.IOException;
 
-import utility.IOManager;
+import utility.IOUtil;
 
 public class Config {
 
@@ -18,7 +18,7 @@ public class Config {
 
 		this.path = Config.DEFAULT_PATH;
 
-		if (IOManager.fileExists(this.path)) {
+		if (IOUtil.fileExists(this.path)) {
 
 			this.load();
 
@@ -29,7 +29,7 @@ public class Config {
 		}
 
 		try {
-			IOManager.createDirectory(this.dbDirectory);
+			IOUtil.createDirectory(this.dbDirectory);
 		} catch (IOException e) {
 			throw new InitializationException(
 					"Non-directory file with same name as desired dbDirectory exists.");
@@ -40,7 +40,7 @@ public class Config {
 
 	private void load() {
 
-		String[] config = IOManager.loadFile(this.path);
+		String[] config = IOUtil.loadFile(this.path);
 
 		for (String c : config) {
 
@@ -71,7 +71,7 @@ public class Config {
 		String config = "dbDirectory," + this.dbDirectory + "\n" + "dbName,"
 				+ this.dbFilename;
 
-		IOManager.writeFile(config, this.path);
+		IOUtil.writeFile(config, this.path);
 	}
 
 	public String getDbPath() {

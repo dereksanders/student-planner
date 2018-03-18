@@ -23,19 +23,25 @@ public class TaskScheduler {
 			@Override
 			public void run() {
 
+				LocalDateTime now = LocalDateTime.now();
+
 				if (Main.active != null) {
 
-					try {
+					if (TaskScheduler.last.getMinute() != now.getMinute()) {
 
-						Main.active.update();
+						// Check for meetings & events upcoming within set
+						// threshold.
 
-					} catch (SqliteWrapperException | SQLException e) {
-
-						e.printStackTrace();
+						// Check for meetings & events that have now passed.
+						try {
+							Main.active.update();
+						} catch (SqliteWrapperException | SQLException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 
-				TaskScheduler.last = LocalDateTime.now();
+				TaskScheduler.last = now;
 			}
 		};
 
