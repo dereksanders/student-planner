@@ -77,12 +77,21 @@ public class MainController implements Observer {
 		TermDescription termInProgress = Term.getTermInProgress();
 		Main.active.setTermInProgress(termInProgress);
 
-		updateTermInProgress();
+		updateTermInProgressBox();
 
 		if (termInProgress != null) {
-			updateSelectedTerm(termInProgress);
+			Main.active.setSelectedDate(LocalDate.now());
+			updateSelectedTermBox(termInProgress);
 		} else {
-			updateSelectedTerm(terms.get(terms.size() - 1));
+
+			TermDescription selected = terms.get(terms.size() - 1);
+
+			// FIXME: If there is no term in progress, then the end of the most
+			// recent term should be selected if it is BEFORE the current date.
+			// If there are Terms in the future, select the start of the soonest
+			// one.
+			Main.active.setSelectedDate(selected.start);
+			updateSelectedTermBox(selected);
 		}
 
 		loadTabs();
@@ -97,8 +106,12 @@ public class MainController implements Observer {
 	}
 
 	private void loadTabs() throws IOException {
-		schedulePane = FXMLLoader
+
+		AnchorPane cs = FXMLLoader
 				.load(getClass().getResource("CourseSchedule.fxml"));
+
+		schedulePane.getChildren().setAll(cs.getChildren());
+
 		calendarPane = FXMLLoader
 				.load(getClass().getResource("TermCalendar.fxml"));
 		gradesPane = FXMLLoader.load(getClass().getResource("Grades.fxml"));
@@ -110,14 +123,14 @@ public class MainController implements Observer {
 
 		if (o instanceof Profile) {
 			try {
-				updateTermInProgress();
+				updateTermInProgressBox();
 			} catch (SqliteWrapperException | SQLException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-	private void updateTermInProgress()
+	private void updateTermInProgressBox()
 			throws SqliteWrapperException, SQLException {
 
 		if (Main.active.getTermInProgress() != null) {
@@ -155,7 +168,7 @@ public class MainController implements Observer {
 		}
 	}
 
-	private void updateSelectedTerm(TermDescription term)
+	private void updateSelectedTermBox(TermDescription term)
 			throws SqliteWrapperException, SQLException {
 
 		selectTerm.setValue(term);

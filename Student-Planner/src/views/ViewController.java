@@ -41,7 +41,7 @@ public class ViewController {
 				Main.window.getScene().getHeight());
 
 		view.getStylesheets().add(Main.class.getClass()
-				.getResource("/views/welcome.css").toExternalForm());
+				.getResource("/views/style.css").toExternalForm());
 
 		Main.window.setScene(view);
 	}

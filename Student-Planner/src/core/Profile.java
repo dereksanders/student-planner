@@ -36,7 +36,6 @@ public class Profile extends Observable {
 			throws SqliteWrapperException, SQLException {
 
 		this.termInProgress = termInProgress;
-		update();
 	}
 
 	public TermDescription getTermInProgress() {

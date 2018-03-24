@@ -18,6 +18,8 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -30,8 +32,13 @@ public class CourseScheduleController implements Observer {
 
 	private Profile observable;
 
-	// Drawing
+	@FXML
+	private DatePicker selectWeek;
+	@FXML
+	private CheckBox selectCurrentWeek;
+	@FXML
 	private Canvas canvas;
+
 	private GraphicsContext gc;
 
 	private int maxDay = DEFAULT_MAX_DAY;
@@ -66,7 +73,7 @@ public class CourseScheduleController implements Observer {
 		this.observable = Main.active;
 		this.observable.addObserver(this);
 
-		this.canvas = new Canvas();
+		// this.canvas = new Canvas();
 		this.gc = this.canvas.getGraphicsContext2D();
 		this.meetingBlocks = new ArrayList<>();
 		drawSchedule();

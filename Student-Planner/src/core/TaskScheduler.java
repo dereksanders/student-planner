@@ -29,6 +29,8 @@ public class TaskScheduler {
 
 					if (TaskScheduler.last.getMinute() != now.getMinute()) {
 
+						System.out.println("New minute..");
+
 						// Check for meetings & events upcoming within set
 						// threshold.
 

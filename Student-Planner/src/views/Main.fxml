@@ -11,11 +11,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1024.0" stylesheets="@welcome.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.MainController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1024.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.MainController">
    <top>
       <VBox prefHeight="33.0" prefWidth="800.0" BorderPane.alignment="CENTER">
          <children>
-            <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+            <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0" styleClass="menuBar">
                <children>
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="New" />
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Load" />
@@ -68,22 +68,22 @@
                <tabs>
                   <Tab closable="false" text="Schedule">
                     <content>
-                      <AnchorPane fx:id="schedulePane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                      <AnchorPane fx:id="schedulePane" minHeight="657.6" minWidth="797.6" prefHeight="657.6" prefWidth="797.6" styleClass="tabPane" />
                     </content>
                   </Tab>
                   <Tab closable="false" text="Calendar">
                     <content>
-                      <AnchorPane fx:id="calendarPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                      <AnchorPane fx:id="calendarPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="tabPane" />
                     </content>
                   </Tab>
                   <Tab closable="false" text="Grades">
                      <content>
-                        <AnchorPane fx:id="gradesPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                        <AnchorPane fx:id="gradesPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="tabPane" />
                      </content>
                   </Tab>
                   <Tab closable="false" text="Plots">
                      <content>
-                        <AnchorPane fx:id="plotsPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                        <AnchorPane fx:id="plotsPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="tabPane" />
                      </content>
                   </Tab>
                </tabs>
