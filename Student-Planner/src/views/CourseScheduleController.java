@@ -1,6 +1,7 @@
 package views;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Observable;
@@ -14,6 +15,8 @@ import core.MeetingDescription;
 import core.MeetingSet;
 import core.Profile;
 import core.Term;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -77,6 +80,43 @@ public class CourseScheduleController implements Observer {
 		this.gc = this.canvas.getGraphicsContext2D();
 		this.meetingBlocks = new ArrayList<>();
 		drawSchedule();
+
+		this.selectWeek.valueProperty()
+				.addListener(new ChangeListener<LocalDate>() {
+					@Override
+					public void changed(
+							ObservableValue<? extends LocalDate> observable,
+							LocalDate oldDate, LocalDate newDate) {
+
+						try {
+							Main.active.setSelectedDate(newDate);
+						} catch (SqliteWrapperException | SQLException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+
+		this.selectCurrentWeek.selectedProperty()
+				.addListener(new ChangeListener<Boolean>() {
+					@Override
+					public void changed(
+							ObservableValue<? extends Boolean> observable,
+							Boolean oldVal, Boolean newVal) {
+
+						if (newVal) {
+							updateSelectWeek(LocalDate.now());
+						}
+					}
+				});
+
+		if (Main.active.getTermInProgress() != null) {
+			this.selectCurrentWeek.setSelected(true);
+		}
+	}
+
+	private void updateSelectWeek(LocalDate date) {
+
+		this.selectWeek.setValue(date);
 	}
 
 	private void drawSchedule() throws SqliteWrapperException, SQLException {
@@ -100,15 +140,93 @@ public class CourseScheduleController implements Observer {
 					@Override
 					public void handle(MouseEvent event) {
 
-						handleMouseClickOnCanvas(event.getSceneX(),
-								event.getSceneY());
-					}
-
-					private void handleMouseClickOnCanvas(double sceneX,
-							double sceneY) {
-
+						canvasMouseClicked(event.getX(), event.getY());
 					}
 				});
+	}
+
+	private void canvasMouseClicked(double x, double y) {
+
+		int dayClicked = getDayClicked(x);
+
+		if (dayClicked == 0) {
+			return;
+		}
+
+		LocalTime timeClicked = getTimeClicked(y);
+
+		if (timeClicked == null) {
+			return;
+		}
+
+		LocalTime adjusted = adjustTimeForAddingMeeting(timeClicked);
+
+		System.out.println("Add meeting on " + DateTimeUtil.intToDay(dayClicked)
+				+ " at " + adjusted);
+	}
+
+	private LocalTime adjustTimeForAddingMeeting(LocalTime timeClicked) {
+
+		LocalTime adjusted = timeClicked;
+
+		if (timeClicked.getMinute() < 15) {
+			adjusted = LocalTime.of(timeClicked.getHour(), 0);
+		} else if (timeClicked.getMinute() > 45) {
+			if (timeClicked.getHour() < 23) {
+				adjusted = LocalTime.of(timeClicked.getHour() + 1, 0);
+			} else {
+				adjusted = LocalTime.of(timeClicked.getHour(), 30);
+			}
+		} else {
+			adjusted = LocalTime.of(timeClicked.getHour(), 30);
+		}
+
+		return adjusted;
+	}
+
+	private LocalTime getTimeClicked(double y) {
+
+		LocalTime clicked = null;
+
+		double minY = PADDING_TOP + DAY_LABEL_HEIGHT;
+		double maxY = this.canvas.getHeight() - PADDING_BOTTOM;
+
+		if (y >= minY && y <= maxY) {
+
+			clicked = this.scheduleStart
+					.plusMinutes((long) ((y - minY) / PIXELS_PER_MINUTE));
+		}
+
+		return clicked;
+	}
+
+	private int getDayClicked(double x) {
+
+		int dayClicked = 0;
+
+		if (x >= getDayXPosition(1)
+				&& x <= (getDayXPosition(this.maxDay) + DAY_WIDTH)) {
+
+			int i = 2;
+
+			while (i <= this.maxDay) {
+
+				if (x < getDayXPosition(i)) {
+
+					dayClicked = i - 1;
+					break;
+				}
+
+				i++;
+			}
+
+			if (dayClicked == 0) {
+
+				dayClicked = this.maxDay;
+			}
+		}
+
+		return dayClicked;
 	}
 
 	private void drawMeetings() throws SqliteWrapperException, SQLException {
@@ -236,7 +354,9 @@ public class CourseScheduleController implements Observer {
 
 	private int getDayXPosition(int day) {
 
-		return ((day - 1) * DAY_WIDTH) + PADDING_LEFT + TIME_LABEL_WIDTH;
+		int dayXPos = ((day - 1) * DAY_WIDTH) + PADDING_LEFT + TIME_LABEL_WIDTH;
+
+		return dayXPos;
 	}
 
 	private void drawDays() {

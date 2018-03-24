@@ -3,14 +3,11 @@ package views;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
-import core.Course;
 import core.Main;
-import core.MeetingSet;
 import core.Profile;
 import core.Term;
 import core.TermDescription;
@@ -97,12 +94,12 @@ public class MainController implements Observer {
 		loadTabs();
 
 		// Add arbitrary MeetingSet for testing purposes.
-		ArrayList<LocalDate> dates = new ArrayList<>();
-		dates.add(LocalDate.now().minusDays(5));
+		// ArrayList<LocalDate> dates = new ArrayList<>();
+		// dates.add(LocalDate.now().minusDays(5));
 
-		MeetingSet.addMeetingSet(1, Main.active.getTermInProgress(),
-				Course.getCourse(Main.active.getTermInProgress()),
-				LocalTime.of(9, 0), LocalTime.of(10, 0), dates);
+		// MeetingSet.addMeetingSet(1, Main.active.getTermInProgress(),
+		// Course.getCourse(Main.active.getTermInProgress()),
+		// LocalTime.of(9, 0), LocalTime.of(10, 0), dates);
 	}
 
 	private void loadTabs() throws IOException {
@@ -148,7 +145,7 @@ public class MainController implements Observer {
 			} else {
 				inProgressTitle.setFill(Color.web(Main.TEXT_DARK_COLOR));
 				inProgress.setStyle(
-						"-fx-text-fill: " + Main.TEXT_LIGHT_COLOR + ";");
+						"-fx-text-fill: " + Main.TEXT_DARK_COLOR + ";");
 			}
 
 			inProgress.setText(Main.active.getTermInProgress().toString());

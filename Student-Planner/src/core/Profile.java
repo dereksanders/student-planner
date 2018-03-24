@@ -57,6 +57,8 @@ public class Profile extends Observable {
 
 		setTermInProgress(Term.getTermInProgress());
 
+		System.out.println("Selected date = " + this.selectedDate);
+
 		setChanged();
 		notifyObservers();
 	}

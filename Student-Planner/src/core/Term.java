@@ -267,12 +267,15 @@ public class Term {
 
 		boolean meetingsExistInTerm = false;
 
-		ResultSet countMeetings = Main.active.db.query(
-				"select count(*) from meeting_set where term_start_date = "
-						+ term.getStartDay());
+		if (term != null) {
 
-		if (countMeetings.next()) {
-			meetingsExistInTerm = true;
+			ResultSet countMeetings = Main.active.db.query(
+					"select count(*) from meeting_set where term_start_date = "
+							+ term.getStartDay());
+
+			if (countMeetings.next()) {
+				meetingsExistInTerm = true;
+			}
 		}
 
 		return meetingsExistInTerm;

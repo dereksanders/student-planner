@@ -30,13 +30,7 @@ public class MeetingSet {
 			ArrayList<LocalDate> dates)
 			throws SqliteWrapperException, SQLException {
 
-		System.out.println(course);
-
-		System.out.println("ADDING MEETING_SET 1");
-
 		if (course != null) {
-
-			System.out.println("ADDING MEETING_SET 2");
 
 			Main.active.db.execute(
 					"insert into meeting_set(id, term_start_date, start_time, end_time, "
@@ -67,14 +61,10 @@ public class MeetingSet {
 
 		MeetingSetDescription found = null;
 
-		System.out.println("LOOKING FOR MEETING_SET WITH ID = " + setID);
-
 		ResultSet findMeetingSet = Main.active.db
 				.query("select * from meeting_set where id = " + setID);
 
 		if (findMeetingSet.next()) {
-
-			System.out.println("FOUND A MEETING SET WITH ID " + setID);
 
 			long secondStart = findMeetingSet
 					.getLong(MeetingSet.Lookup.START_TIME.index);
@@ -101,8 +91,6 @@ public class MeetingSet {
 					startTime, endTime, findMeetingSet.getBoolean(
 							MeetingSet.Lookup.IS_COURSE_MEETING.index));
 		}
-
-		System.out.println("Found MeetingSet: " + found);
 
 		return found;
 	}

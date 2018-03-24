@@ -1,5 +1,13 @@
+@font-face {
+    font-family: liberation;
+    src: url("/LiberationSans-Regular.ttf");
+}
+
+.root {
+	font-family: liberation;
+}
+
 .back {
-	
 	-fx-background-image: url("/classroom.jpg");
 	-fx-background-size: 100% 100%;
 }
@@ -26,7 +34,16 @@
 	-fx-background-color: #fff;
 }
 
-.courseSchedule {
-	
-	-fx-background-color: #000;
+.jfx-tab-pane .tab-header-background { -fx-background-color: #dddddd; }
+ 
+.tab {
+	-fx-background-color: #fff;
+}
+
+.sidemenu {
+	-fx-background-color: #dddddd;
+}
+
+.choicebox {
+	-fx-background-color: #fff;
 }

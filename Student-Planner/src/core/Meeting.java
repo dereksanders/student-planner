@@ -35,14 +35,19 @@ public class Meeting {
 						+ startOfWeekJulian + " and date_of < "
 						+ startOfWeekJulian + 7);
 
+		int numMeetings = 0;
+
 		while (findMeetings.next()) {
 
+			numMeetings++;
 			int set = findMeetings.getInt(Meeting.Lookup.SET_ID.index);
 			LocalDate dateOf = LocalDate.ofEpochDay(
 					findMeetings.getLong(Meeting.Lookup.DATE.index));
 
 			meetingsThisWeek.add(new MeetingDescription(set, dateOf));
 		}
+
+		System.out.println("Found " + numMeetings + " the week of " + date);
 
 		return meetingsThisWeek;
 	}
