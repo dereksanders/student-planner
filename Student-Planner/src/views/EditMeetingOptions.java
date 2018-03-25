@@ -1,12 +1,21 @@
 package views;
 
+import core.MeetingSetDescription;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+
 public class EditMeetingOptions {
 
-	private int meetingSetID;
+	private MeetingSetDescription set;
 
-	public EditMeetingOptions(int meetingSetID) {
+	public EditMeetingOptions(MeetingSetDescription set) {
 
-		this.meetingSetID = meetingSetID;
+		this.set = set;
+
+		Stage window = new Stage();
+		window.initModality(Modality.APPLICATION_MODAL);
+		window.setTitle("Edit Meeting");
+
+		window.showAndWait();
 	}
-
 }

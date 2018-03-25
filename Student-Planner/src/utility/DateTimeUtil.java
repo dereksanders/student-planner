@@ -3,8 +3,21 @@ package utility;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+/**
+ * The Class DateTimeUtil.
+ */
 public class DateTimeUtil {
 
+	/**
+	 * Converts an integer representing a day of the week (1 = Monday, 7 =
+	 * Sunday) to the String equivalent according to the ISO-8601 standard.
+	 *
+	 * Will return an empty String if the integer is outside of these bounds.
+	 *
+	 * @param dayAsInt
+	 *            the day as int
+	 * @return the string
+	 */
 	public static String intToDay(int dayAsInt) {
 
 		String day = "";
@@ -37,6 +50,16 @@ public class DateTimeUtil {
 		return day;
 	}
 
+	/**
+	 * Checks if the two dates belong to the same week. Weeks begin on Monday
+	 * according to the ISO-8601 standard.
+	 *
+	 * @param date1
+	 *            the date 1
+	 * @param date2
+	 *            the date 2
+	 * @return true, if is same week
+	 */
 	public static boolean isSameWeek(LocalDate date1, LocalDate date2) {
 
 		if (getStartOfWeek(date1).equals(getStartOfWeek(date2))) {
@@ -46,6 +69,13 @@ public class DateTimeUtil {
 		}
 	}
 
+	/**
+	 * Gets the start of the week, i.e. the Monday.
+	 *
+	 * @param date
+	 *            the date
+	 * @return the start of the week
+	 */
 	public static LocalDate getStartOfWeek(LocalDate date) {
 
 		int dayOfWeek = date.getDayOfWeek().getValue();
@@ -53,6 +83,13 @@ public class DateTimeUtil {
 		return date.minusDays(dayOfWeek - 1);
 	}
 
+	/**
+	 * Round to nearest half hour.
+	 *
+	 * @param time
+	 *            the time
+	 * @return the local time
+	 */
 	public static LocalTime roundToNearestHalfHour(LocalTime time) {
 
 		LocalTime rounded = time;
@@ -80,6 +117,13 @@ public class DateTimeUtil {
 		return rounded;
 	}
 
+	/**
+	 * Round to next half hour.
+	 *
+	 * @param time
+	 *            the time
+	 * @return the local time
+	 */
 	public static LocalTime roundToNextHalfHour(LocalTime time) {
 
 		LocalTime rounded = LocalTime.of(time.getHour(), time.getMinute());
@@ -102,7 +146,15 @@ public class DateTimeUtil {
 		return rounded;
 	}
 
-	public static LocalTime roundToPrevHalfHour(LocalTime time) {
+	/**
+	 * Round to previous half hour that is at least half an hour ago.
+	 *
+	 * @param time
+	 *            the time
+	 * @return the local time
+	 */
+	public static LocalTime roundToPrevHalfHourThatIsAtLeastHalfAnHourAgo(
+			LocalTime time) {
 
 		LocalTime rounded = LocalTime.of(time.getHour(), time.getMinute());
 
@@ -125,12 +177,43 @@ public class DateTimeUtil {
 		return rounded;
 	}
 
-	public static int getMinutesBetween(LocalTime earliestStart,
-			LocalTime latestEnd) {
+	/**
+	 * Round to previous half hour.
+	 *
+	 * @param time
+	 *            the time
+	 * @return the local time
+	 */
+	public static LocalTime roundToPrevHalfHour(LocalTime time) {
 
-		int start = earliestStart.toSecondOfDay() / 60;
-		int end = latestEnd.toSecondOfDay() / 60;
+		LocalTime rounded = LocalTime.of(time.getHour(), time.getMinute());
 
-		return end - start;
+		if (rounded.getMinute() <= 30) {
+
+			rounded = LocalTime.of(time.getHour(), 0);
+
+		} else {
+
+			rounded = LocalTime.of(time.getHour(), 30);
+		}
+
+		return rounded;
+	}
+
+	/**
+	 * Gets the minutes between the two times provided.
+	 *
+	 * @param start
+	 *            the start
+	 * @param end
+	 *            the end
+	 * @return the minutes between
+	 */
+	public static int getMinutesBetween(LocalTime start, LocalTime end) {
+
+		int startMinutes = start.toSecondOfDay() / 60;
+		int endMinutes = end.toSecondOfDay() / 60;
+
+		return endMinutes - startMinutes;
 	}
 }

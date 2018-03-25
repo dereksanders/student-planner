@@ -17,6 +17,9 @@ import javafx.scene.control.TextField;
 import sqlite.SqliteWrapperException;
 import utility.ColorUtil;
 
+/**
+ * The Class CoursesController.
+ */
 public class CoursesController {
 
 	@FXML
@@ -32,6 +35,14 @@ public class CoursesController {
 	@FXML
 	private ColorPicker color;
 
+	/**
+	 * Initialize.
+	 *
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	@FXML
 	public void initialize() throws SqliteWrapperException, SQLException {
 
@@ -44,6 +55,14 @@ public class CoursesController {
 		endTerm.setValue(termDescriptions.get(0));
 	}
 
+	/**
+	 * Adds the course.
+	 *
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	@FXML
 	public void add() throws SqliteWrapperException, SQLException {
 
@@ -73,6 +92,16 @@ public class CoursesController {
 		}
 	}
 
+	/**
+	 * Transitions to the Main view.
+	 *
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
 	@FXML
 	public void next()
 			throws SqliteWrapperException, SQLException, IOException {

@@ -13,6 +13,9 @@ import javafx.scene.control.TextField;
 import sqlite.SqliteWrapperException;
 import utility.ColorUtil;
 
+/**
+ * The Class TermsController.
+ */
 public class TermsController {
 
 	@FXML
@@ -24,11 +27,22 @@ public class TermsController {
 	@FXML
 	private ColorPicker color;
 
+	/**
+	 * Initialize.
+	 */
 	@FXML
 	public void initialize() {
 
 	}
 
+	/**
+	 * Adds the term.
+	 *
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	@FXML
 	public void add() throws SqliteWrapperException, SQLException {
 
@@ -39,6 +53,16 @@ public class TermsController {
 				"#" + ColorUtil.colorToHex(color.getValue()));
 	}
 
+	/**
+	 * Transitions to the Courses view if at least one term has been added.
+	 *
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
 	@FXML
 	public void next()
 			throws SqliteWrapperException, SQLException, IOException {

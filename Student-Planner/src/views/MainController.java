@@ -23,6 +23,9 @@ import javafx.scene.text.Text;
 import sqlite.SqliteWrapperException;
 import utility.ColorUtil;
 
+/**
+ * The Class MainController.
+ */
 public class MainController implements Observer {
 
 	private Observable profile;
@@ -53,6 +56,16 @@ public class MainController implements Observer {
 
 	private static final String EMPTY_TERM_COLOR = "#eeeeee";
 
+	/**
+	 * Initialize.
+	 *
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
 	@FXML
 	public void initialize()
 			throws SqliteWrapperException, SQLException, IOException {
@@ -93,6 +106,7 @@ public class MainController implements Observer {
 
 		loadTabs();
 
+		// FIXME: Remove when no longer needed for testing.
 		// Add arbitrary MeetingSet for testing purposes.
 		// ArrayList<LocalDate> dates = new ArrayList<>();
 		// dates.add(LocalDate.now().minusDays(5));
@@ -102,19 +116,35 @@ public class MainController implements Observer {
 		// LocalTime.of(9, 0), LocalTime.of(10, 0), dates);
 	}
 
+	/**
+	 * Load tabs.
+	 *
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
 	private void loadTabs() throws IOException {
 
 		AnchorPane cs = FXMLLoader
 				.load(getClass().getResource("CourseSchedule.fxml"));
-
 		schedulePane.getChildren().setAll(cs.getChildren());
 
-		calendarPane = FXMLLoader
+		AnchorPane tc = FXMLLoader
 				.load(getClass().getResource("TermCalendar.fxml"));
-		gradesPane = FXMLLoader.load(getClass().getResource("Grades.fxml"));
-		plotsPane = FXMLLoader.load(getClass().getResource("Plots.fxml"));
+		calendarPane.getChildren().setAll(tc.getChildren());
+
+		AnchorPane gp = FXMLLoader.load(getClass().getResource("Grades.fxml"));
+		gradesPane.getChildren().setAll(gp.getChildren());
+
+		AnchorPane plots = FXMLLoader
+				.load(getClass().getResource("Plots.fxml"));
+		plotsPane.getChildren().setAll(plots.getChildren());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+	 */
 	@Override
 	public void update(Observable o, Object arg) {
 
@@ -127,6 +157,14 @@ public class MainController implements Observer {
 		}
 	}
 
+	/**
+	 * Update term in progress box.
+	 *
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	private void updateTermInProgressBox()
 			throws SqliteWrapperException, SQLException {
 
@@ -165,6 +203,16 @@ public class MainController implements Observer {
 		}
 	}
 
+	/**
+	 * Update selected term box.
+	 *
+	 * @param term
+	 *            the term
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	private void updateSelectedTermBox(TermDescription term)
 			throws SqliteWrapperException, SQLException {
 

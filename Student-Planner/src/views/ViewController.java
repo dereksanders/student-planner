@@ -14,6 +14,9 @@ public class ViewController {
 	public static String coursesViewPath = "/views/Courses.fxml";
 	public static String mainViewPath = "/views/Main.fxml";
 
+	// Views used for other windows
+	public static String addMeetingPath = "/views/AddMeeting.fxml";
+
 	public ViewController() {
 	}
 

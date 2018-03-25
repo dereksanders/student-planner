@@ -1,5 +1,6 @@
 package views;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import core.Meeting;
 import core.MeetingBlock;
 import core.MeetingDescription;
 import core.MeetingSet;
+import core.MeetingSetDescription;
 import core.Profile;
 import core.Term;
 import javafx.beans.value.ChangeListener;
@@ -51,8 +53,8 @@ public class CourseScheduleController implements Observer {
 	private int maxDay = DEFAULT_MAX_DAY;
 	private LocalTime scheduleStart = DEFAULT_SCHEDULE_START;
 	private LocalTime scheduleEnd = DEFAULT_SCHEDULE_END;
-	private int dayHeight = DateTimeUtil.getMinutesBetween(scheduleStart,
-			scheduleEnd);
+	private int dayHeight = (int) (DateTimeUtil.getMinutesBetween(scheduleStart,
+			scheduleEnd) * PIXELS_PER_MINUTE);
 
 	private ArrayList<MeetingBlock> meetingBlocks;
 
@@ -102,6 +104,12 @@ public class CourseScheduleController implements Observer {
 
 						try {
 							Main.active.setSelectedDate(newDate);
+
+							if (!DateTimeUtil.isSameWeek(LocalDate.now(),
+									newDate)) {
+
+								updateSelectCurrentWeek(false);
+							}
 						} catch (SqliteWrapperException | SQLException e) {
 							e.printStackTrace();
 						}
@@ -131,9 +139,25 @@ public class CourseScheduleController implements Observer {
 					@Override
 					public void handle(MouseEvent event) {
 
-						canvasMouseClicked(event.getX(), event.getY());
+						try {
+							canvasMouseClicked(event.getX(), event.getY());
+						} catch (SqliteWrapperException | SQLException
+								| IOException e) {
+							e.printStackTrace();
+						}
 					}
 				});
+	}
+
+	/**
+	 * Update the 'select current week' checkbox.
+	 *
+	 * @param selectCurrentWeek
+	 *            whether or not the current week is selected
+	 */
+	private void updateSelectCurrentWeek(boolean selectCurrentWeek) {
+
+		this.selectCurrentWeek.setSelected(selectCurrentWeek);
 	}
 
 	/**
@@ -179,8 +203,15 @@ public class CourseScheduleController implements Observer {
 	 *            the x position relative to the canvas
 	 * @param y
 	 *            the y position relative to the canvas
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
-	private void canvasMouseClicked(double x, double y) {
+	private void canvasMouseClicked(double x, double y)
+			throws SqliteWrapperException, SQLException, IOException {
 
 		int dayClicked = getDayClicked(x);
 
@@ -202,17 +233,17 @@ public class CourseScheduleController implements Observer {
 		LocalDateTime selectedDateTime = LocalDateTime.of(selectedDate,
 				timeClicked);
 
-		MeetingDescription existing = Meeting
+		MeetingSetDescription existing = Meeting
 				.getMeetingDuring(selectedDateTime);
 
 		if (existing != null) {
 
-			new EditMeetingOptions(existing.setID);
+			new EditMeetingOptions(existing);
 
 		} else {
 
 			LocalTime adjustedTime = DateTimeUtil
-					.roundToNearestHalfHour(timeClicked);
+					.roundToPrevHalfHour(timeClicked);
 			LocalDateTime adjustedDateTime = LocalDateTime.of(selectedDate,
 					adjustedTime);
 
@@ -220,7 +251,7 @@ public class CourseScheduleController implements Observer {
 					"Add meeting on " + DateTimeUtil.intToDay(dayClicked)
 							+ " at " + adjustedTime);
 
-			new AddMeetingOnSchedule(adjustedDateTime);
+			new AddMeetingController(adjustedDateTime);
 		}
 	}
 
@@ -552,6 +583,7 @@ public class CourseScheduleController implements Observer {
 
 		setFill(Main.TEXT_DARK_COLOR);
 
+		// FIXME: This works so long as PIXELS_PER_MINUTE > 1.0
 		for (int i = 0; i < this.dayHeight; i += 30) {
 
 			if (i == 0) {
@@ -632,7 +664,8 @@ public class CourseScheduleController implements Observer {
 					.getLatestMeetingEnd(this.observable.getSelectedTerm());
 
 			LocalTime earliestStartRounded = DateTimeUtil
-					.roundToPrevHalfHour(earliestStart);
+					.roundToPrevHalfHourThatIsAtLeastHalfAnHourAgo(
+							earliestStart);
 
 			LocalTime latestEndRounded = DateTimeUtil
 					.roundToNextHalfHour(latestEnd);

@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 import sqlite.SqliteWrapperException;
@@ -53,7 +54,71 @@ public class Meeting {
 		return meetingsThisWeek;
 	}
 
-	public static MeetingDescription getMeetingDuring(LocalDateTime dateTime) {
-		return null;
+	public static MeetingSetDescription getMeetingDuring(LocalDateTime dateTime)
+			throws SqliteWrapperException, SQLException {
+
+		MeetingSetDescription setWithMeetingDuringTime = null;
+
+		ResultSet meetingsThatDay = Main.active.db
+				.query("select * from meeting_date where date_of = "
+						+ dateTime.toLocalDate().toEpochDay());
+
+		ArrayList<MeetingDescription> meetings = new ArrayList<>();
+
+		while (meetingsThatDay.next()) {
+
+			meetings.add(new MeetingDescription(
+					meetingsThatDay.getInt(Meeting.Lookup.SET_ID.index),
+					LocalDate.ofEpochDay(meetingsThatDay
+							.getLong(Meeting.Lookup.DATE.index))));
+		}
+
+		for (MeetingDescription meeting : meetings) {
+
+			ResultSet meetingSet = Main.active.db.query(
+					"select * from meeting_set where id = " + meeting.setID);
+
+			LocalTime meetingStart = null;
+			LocalTime meetingEnd = null;
+
+			// There should only be one MeetingSet per ID.
+			while (meetingSet.next()) {
+
+				meetingStart = LocalTime.ofSecondOfDay(
+						meetingSet.getLong(MeetingSet.Lookup.START_TIME.index));
+
+				meetingEnd = LocalTime.ofSecondOfDay(
+						meetingSet.getLong(MeetingSet.Lookup.END_TIME.index));
+
+				LocalTime time = dateTime.toLocalTime();
+
+				if ((time.equals(meetingStart) || time.isAfter(meetingStart))
+						&& (time.equals(meetingEnd)
+								|| time.isBefore(meetingEnd))) {
+
+					setWithMeetingDuringTime = new MeetingSetDescription(
+							meetingSet.getInt(MeetingSet.Lookup.ID.index),
+							LocalDate.ofEpochDay(meetingSet.getLong(
+									MeetingSet.Lookup.TERM_START_DATE.index)),
+							LocalDate.ofEpochDay(meetingSet.getLong(
+									MeetingSet.Lookup.COURSE_START_TERM_START_DATE.index)),
+							LocalDate.ofEpochDay(meetingSet.getLong(
+									MeetingSet.Lookup.COURSE_END_TERM_START_DATE.index)),
+							meetingSet.getString(
+									MeetingSet.Lookup.COURSE_DEPT_ID.index),
+							meetingSet.getInt(
+									MeetingSet.Lookup.COURSE_CODE.index),
+							meetingSet.getString(MeetingSet.Lookup.NAME.index),
+							meetingSet.getString(
+									MeetingSet.Lookup.MEETING_TYPE.index),
+							meetingStart, meetingEnd, meetingSet.getBoolean(
+									MeetingSet.Lookup.IS_COURSE_MEETING.index));
+
+					break;
+				}
+			}
+		}
+
+		return setWithMeetingDuringTime;
 	}
 }
