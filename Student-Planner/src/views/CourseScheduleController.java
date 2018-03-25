@@ -32,6 +32,9 @@ import sqlite.SqliteWrapperException;
 import utility.ColorUtil;
 import utility.DateTimeUtil;
 
+/**
+ * The Class CourseScheduleController.
+ */
 public class CourseScheduleController implements Observer {
 
 	private Profile observable;
@@ -53,6 +56,7 @@ public class CourseScheduleController implements Observer {
 
 	private ArrayList<MeetingBlock> meetingBlocks;
 
+	// Constants
 	private static final int DEFAULT_MAX_DAY = 5;
 	private static final LocalTime DEFAULT_SCHEDULE_START = LocalTime.of(9, 0);
 	private static final LocalTime DEFAULT_SCHEDULE_END = LocalTime.of(17, 0);
@@ -71,13 +75,20 @@ public class CourseScheduleController implements Observer {
 	private static final String BORDER_COLOR = "#cccccc";
 	private static final String EMPTY_DAY_COLOR = "#eeeeee";
 
+	/**
+	 * Initialize.
+	 *
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	@FXML
 	public void initialize() throws SqliteWrapperException, SQLException {
 
 		this.observable = Main.active;
 		this.observable.addObserver(this);
 
-		// this.canvas = new Canvas();
 		this.gc = this.canvas.getGraphicsContext2D();
 		this.meetingBlocks = new ArrayList<>();
 		drawSchedule();
@@ -125,11 +136,25 @@ public class CourseScheduleController implements Observer {
 				});
 	}
 
+	/**
+	 * Update select week.
+	 *
+	 * @param date
+	 *            the date
+	 */
 	private void updateSelectWeek(LocalDate date) {
 
 		this.selectWeek.setValue(date);
 	}
 
+	/**
+	 * Draw schedule.
+	 *
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	private void drawSchedule() throws SqliteWrapperException, SQLException {
 
 		this.gc.clearRect(0, 0, this.canvas.getWidth(),
@@ -146,6 +171,15 @@ public class CourseScheduleController implements Observer {
 		drawMeetings();
 	}
 
+	/**
+	 * Handle mouse clicks on the schedule. Max position is at the bottom right
+	 * of the canvas.
+	 *
+	 * @param x
+	 *            the x position relative to the canvas
+	 * @param y
+	 *            the y position relative to the canvas
+	 */
 	private void canvasMouseClicked(double x, double y) {
 
 		int dayClicked = getDayClicked(x);
@@ -177,7 +211,8 @@ public class CourseScheduleController implements Observer {
 
 		} else {
 
-			LocalTime adjustedTime = adjustTimeForAddingMeeting(timeClicked);
+			LocalTime adjustedTime = DateTimeUtil
+					.roundToNearestHalfHour(timeClicked);
 			LocalDateTime adjustedDateTime = LocalDateTime.of(selectedDate,
 					adjustedTime);
 
@@ -189,49 +224,13 @@ public class CourseScheduleController implements Observer {
 		}
 	}
 
-	private LocalDate getDateFromDayOfWeek(int dayOfWeek) {
-
-		LocalDate startOfWeek = DateTimeUtil
-				.getStartOfWeek(Main.active.getSelectedDate());
-
-		return startOfWeek.plusDays(dayOfWeek - 1);
-	}
-
-	private LocalTime adjustTimeForAddingMeeting(LocalTime timeClicked) {
-
-		LocalTime adjusted = timeClicked;
-
-		if (timeClicked.getMinute() < 15) {
-			adjusted = LocalTime.of(timeClicked.getHour(), 0);
-		} else if (timeClicked.getMinute() > 45) {
-			if (timeClicked.getHour() < 23) {
-				adjusted = LocalTime.of(timeClicked.getHour() + 1, 0);
-			} else {
-				adjusted = LocalTime.of(timeClicked.getHour(), 30);
-			}
-		} else {
-			adjusted = LocalTime.of(timeClicked.getHour(), 30);
-		}
-
-		return adjusted;
-	}
-
-	private LocalTime getTimeClicked(double y) {
-
-		LocalTime clicked = null;
-
-		double minY = PADDING_TOP + DAY_LABEL_HEIGHT;
-		double maxY = this.canvas.getHeight() - PADDING_BOTTOM;
-
-		if (y >= minY && y <= maxY) {
-
-			clicked = this.scheduleStart
-					.plusMinutes((long) ((y - minY) / PIXELS_PER_MINUTE));
-		}
-
-		return clicked;
-	}
-
+	/**
+	 * Gets the day clicked.
+	 *
+	 * @param x
+	 *            the x
+	 * @return the day clicked
+	 */
 	private int getDayClicked(double x) {
 
 		int dayClicked = 0;
@@ -261,6 +260,52 @@ public class CourseScheduleController implements Observer {
 		return dayClicked;
 	}
 
+	/**
+	 * Gets the time clicked.
+	 *
+	 * @param y
+	 *            the y
+	 * @return the time clicked
+	 */
+	private LocalTime getTimeClicked(double y) {
+
+		LocalTime clicked = null;
+
+		double minY = PADDING_TOP + DAY_LABEL_HEIGHT;
+		double maxY = this.canvas.getHeight() - PADDING_BOTTOM;
+
+		if (y >= minY && y <= maxY) {
+
+			clicked = this.scheduleStart
+					.plusMinutes((long) ((y - minY) / PIXELS_PER_MINUTE));
+		}
+
+		return clicked;
+	}
+
+	/**
+	 * Gets the date of a day of the week from the currently selected week.
+	 *
+	 * @param dayOfWeek
+	 *            the day of the week from the currently selected week
+	 * @return the date
+	 */
+	private LocalDate getDateFromDayOfWeek(int dayOfWeek) {
+
+		LocalDate startOfWeek = DateTimeUtil
+				.getStartOfWeek(Main.active.getSelectedDate());
+
+		return startOfWeek.plusDays(dayOfWeek - 1);
+	}
+
+	/**
+	 * Draw meetings.
+	 *
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	private void drawMeetings() throws SqliteWrapperException, SQLException {
 
 		this.meetingBlocks.clear();
@@ -279,12 +324,21 @@ public class CourseScheduleController implements Observer {
 		}
 	}
 
+	/**
+	 * Creates the meeting block from the meeting.
+	 *
+	 * @param meeting
+	 *            the meeting
+	 * @return the meeting block
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	private MeetingBlock createMeetingBlockFrom(MeetingDescription meeting)
 			throws SqliteWrapperException, SQLException {
 
 		int dayOfWeek = meeting.date.getDayOfWeek().getValue();
-		System.out.println(meeting);
-		System.out.println(meeting.set);
 		LocalTime start = meeting.set.start;
 
 		double xOffset = getDayXPosition(dayOfWeek);
@@ -293,23 +347,32 @@ public class CourseScheduleController implements Observer {
 		double height = DateTimeUtil.getMinutesBetween(start, meeting.set.end)
 				* PIXELS_PER_MINUTE;
 
-		System.out.println("X-offset: " + xOffset + ", Y-offset: " + yOffset);
-
 		Rectangle rect = new Rectangle(xOffset, yOffset, DAY_WIDTH, height);
 		rect.setFill(Paint.valueOf(Course.getColor(meeting.set.course)));
 
 		return new MeetingBlock(meeting, rect);
 	}
 
-	private void drawMeeting(MeetingBlock mb)
+	/**
+	 * Draw meeting.
+	 *
+	 * @param meetingBlock
+	 *            the meeting block
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
+	private void drawMeeting(MeetingBlock meetingBlock)
 			throws SqliteWrapperException, SQLException {
 
-		setFill(mb.rect.getFill());
+		setFill(meetingBlock.rect.getFill());
 
-		this.gc.fillRect(mb.rect.getX(), mb.rect.getY(), mb.rect.getWidth(),
-				mb.rect.getHeight());
+		this.gc.fillRect(meetingBlock.rect.getX(), meetingBlock.rect.getY(),
+				meetingBlock.rect.getWidth(), meetingBlock.rect.getHeight());
 
-		Color meetingColor = Color.web(MeetingSet.getColor(mb.meeting.setID));
+		Color meetingColor = Color
+				.web(MeetingSet.getColor(meetingBlock.meeting.setID));
 
 		if (ColorUtil.isDark(meetingColor)) {
 			setFill(Main.TEXT_LIGHT_COLOR);
@@ -319,20 +382,24 @@ public class CourseScheduleController implements Observer {
 
 		String meetingText = "";
 
-		if (mb.meeting.set.isCourseMeeting) {
+		if (meetingBlock.meeting.set.isCourseMeeting) {
 
-			meetingText = mb.meeting.set.course.toString() + "\n"
-					+ mb.meeting.set.type;
+			meetingText = meetingBlock.meeting.set.course.toString() + "\n"
+					+ meetingBlock.meeting.set.type;
 
 		} else {
 
-			meetingText = mb.meeting.set.name + "\n" + mb.meeting.set.type;
+			meetingText = meetingBlock.meeting.set.name + "\n"
+					+ meetingBlock.meeting.set.type;
 		}
 
-		this.gc.fillText(meetingText, PADDING_LEFT + mb.rect.getX(),
-				mb.rect.getY() + 20, mb.rect.getWidth());
+		this.gc.fillText(meetingText, PADDING_LEFT + meetingBlock.rect.getX(),
+				meetingBlock.rect.getY() + 20, meetingBlock.rect.getWidth());
 	}
 
+	/**
+	 * Draw day labels.
+	 */
 	private void drawDayLabels() {
 
 		setFill(Main.TEXT_DARK_COLOR);
@@ -344,6 +411,16 @@ public class CourseScheduleController implements Observer {
 		}
 	}
 
+	/**
+	 * Gets the day label offset.
+	 * 
+	 * The offsets to center the day labels at the top of the schedule were
+	 * manually calculated.
+	 *
+	 * @param day
+	 *            the day
+	 * @return the day label offset
+	 */
 	private int getDayLabelOffset(int day) {
 
 		int offset = 0;
@@ -384,6 +461,13 @@ public class CourseScheduleController implements Observer {
 		return offset;
 	}
 
+	/**
+	 * Gets the day X position.
+	 *
+	 * @param day
+	 *            the day
+	 * @return the day X position
+	 */
 	private int getDayXPosition(int day) {
 
 		int dayXPos = ((day - 1) * DAY_WIDTH) + PADDING_LEFT + TIME_LABEL_WIDTH;
@@ -391,6 +475,9 @@ public class CourseScheduleController implements Observer {
 		return dayXPos;
 	}
 
+	/**
+	 * Draw days.
+	 */
 	private void drawDays() {
 
 		for (int i = 1; i <= maxDay; i++) {
@@ -436,16 +523,31 @@ public class CourseScheduleController implements Observer {
 		}
 	}
 
+	/**
+	 * Sets the fill.
+	 *
+	 * @param color
+	 *            the new fill
+	 */
 	private void setFill(String color) {
 
 		this.gc.setFill(Paint.valueOf(color));
 	}
 
+	/**
+	 * Sets the fill.
+	 *
+	 * @param paint
+	 *            the new fill
+	 */
 	private void setFill(Paint paint) {
 
 		this.gc.setFill(paint);
 	}
 
+	/**
+	 * Draw time labels.
+	 */
 	private void drawTimeLabels() {
 
 		setFill(Main.TEXT_DARK_COLOR);
@@ -464,12 +566,28 @@ public class CourseScheduleController implements Observer {
 		}
 	}
 
+	/**
+	 * Calc canvas size.
+	 *
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	private void calcCanvasSize() throws SqliteWrapperException, SQLException {
 
 		calcCanvasWidth();
 		calcCanvasHeight();
 	}
 
+	/**
+	 * Calc canvas width.
+	 *
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	private void calcCanvasWidth() throws SqliteWrapperException, SQLException {
 
 		// Determine the width of the schedule by determining if Saturday or
@@ -489,6 +607,14 @@ public class CourseScheduleController implements Observer {
 				+ (DAY_WIDTH * this.maxDay) + PADDING_RIGHT);
 	}
 
+	/**
+	 * Calc canvas height.
+	 *
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	private void calcCanvasHeight()
 			throws SqliteWrapperException, SQLException {
 
@@ -496,6 +622,8 @@ public class CourseScheduleController implements Observer {
 		this.scheduleStart = DEFAULT_SCHEDULE_START;
 		this.scheduleEnd = DEFAULT_SCHEDULE_END;
 
+		// Otherwise, reconfigure the schedule to display 30 minutes
+		// prior to the first meeting to 30 minutes after the last meeting.
 		if (Term.meetingsExistIn(this.observable.getSelectedTerm())) {
 
 			LocalTime earliestStart = Term
@@ -513,15 +641,20 @@ public class CourseScheduleController implements Observer {
 			this.scheduleEnd = latestEndRounded;
 		}
 
+		// Height of each day of the schedule, determined by how much time the
+		// schedule has been configured to span.
 		this.dayHeight = (int) (DateTimeUtil.getMinutesBetween(
 				this.scheduleStart, this.scheduleEnd) * PIXELS_PER_MINUTE);
 
-		// The height of the canvas will be the height of the day labels + 1px
-		// for each minute displayed.
 		this.canvas.setHeight(PADDING_TOP + DAY_LABEL_HEIGHT + this.dayHeight
 				+ PADDING_BOTTOM);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+	 */
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		if (arg0 instanceof Profile) {

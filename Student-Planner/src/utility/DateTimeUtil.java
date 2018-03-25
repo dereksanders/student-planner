@@ -53,6 +53,33 @@ public class DateTimeUtil {
 		return date.minusDays(dayOfWeek - 1);
 	}
 
+	public static LocalTime roundToNearestHalfHour(LocalTime time) {
+
+		LocalTime rounded = time;
+
+		if (time.getMinute() < 15) {
+
+			rounded = LocalTime.of(time.getHour(), 0);
+
+		} else if (time.getMinute() > 45) {
+
+			if (time.getHour() < 23) {
+
+				rounded = LocalTime.of(time.getHour() + 1, 0);
+
+			} else {
+
+				rounded = LocalTime.of(time.getHour(), 30);
+			}
+
+		} else {
+
+			rounded = LocalTime.of(time.getHour(), 30);
+		}
+
+		return rounded;
+	}
+
 	public static LocalTime roundToNextHalfHour(LocalTime time) {
 
 		LocalTime rounded = LocalTime.of(time.getHour(), time.getMinute());
