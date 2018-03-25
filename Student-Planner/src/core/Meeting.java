@@ -3,6 +3,7 @@ package core;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import sqlite.SqliteWrapperException;
@@ -50,5 +51,9 @@ public class Meeting {
 		System.out.println("Found " + numMeetings + " the week of " + date);
 
 		return meetingsThisWeek;
+	}
+
+	public static MeetingDescription getMeetingDuring(LocalDateTime dateTime) {
+		return null;
 	}
 }

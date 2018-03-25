@@ -2,6 +2,7 @@ package views;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Observable;
@@ -112,6 +113,16 @@ public class CourseScheduleController implements Observer {
 		if (Main.active.getTermInProgress() != null) {
 			this.selectCurrentWeek.setSelected(true);
 		}
+
+		this.canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,
+				new EventHandler<MouseEvent>() {
+
+					@Override
+					public void handle(MouseEvent event) {
+
+						canvasMouseClicked(event.getX(), event.getY());
+					}
+				});
 	}
 
 	private void updateSelectWeek(LocalDate date) {
@@ -133,16 +144,6 @@ public class CourseScheduleController implements Observer {
 		drawTimeLabels();
 
 		drawMeetings();
-
-		this.canvas.addEventHandler(MouseEvent.MOUSE_CLICKED,
-				new EventHandler<MouseEvent>() {
-
-					@Override
-					public void handle(MouseEvent event) {
-
-						canvasMouseClicked(event.getX(), event.getY());
-					}
-				});
 	}
 
 	private void canvasMouseClicked(double x, double y) {
@@ -159,10 +160,41 @@ public class CourseScheduleController implements Observer {
 			return;
 		}
 
-		LocalTime adjusted = adjustTimeForAddingMeeting(timeClicked);
+		// First check if the user has clicked on an existing meeting. If so,
+		// prompt them to edit the meeting set to which that meeting belongs.
+		// Otherwise, round the time they clicked on and let them add a Meeting
+		// to the CourseSchedule with the time already filled in.
+		LocalDate selectedDate = getDateFromDayOfWeek(dayClicked);
+		LocalDateTime selectedDateTime = LocalDateTime.of(selectedDate,
+				timeClicked);
 
-		System.out.println("Add meeting on " + DateTimeUtil.intToDay(dayClicked)
-				+ " at " + adjusted);
+		MeetingDescription existing = Meeting
+				.getMeetingDuring(selectedDateTime);
+
+		if (existing != null) {
+
+			new EditMeetingOptions(existing.setID);
+
+		} else {
+
+			LocalTime adjustedTime = adjustTimeForAddingMeeting(timeClicked);
+			LocalDateTime adjustedDateTime = LocalDateTime.of(selectedDate,
+					adjustedTime);
+
+			System.out.println(
+					"Add meeting on " + DateTimeUtil.intToDay(dayClicked)
+							+ " at " + adjustedTime);
+
+			new AddMeetingOnSchedule(adjustedDateTime);
+		}
+	}
+
+	private LocalDate getDateFromDayOfWeek(int dayOfWeek) {
+
+		LocalDate startOfWeek = DateTimeUtil
+				.getStartOfWeek(Main.active.getSelectedDate());
+
+		return startOfWeek.plusDays(dayOfWeek - 1);
 	}
 
 	private LocalTime adjustTimeForAddingMeeting(LocalTime timeClicked) {
