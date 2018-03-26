@@ -1,5 +1,11 @@
 package core;
 
+/**
+ * The Class DbFilename.
+ * 
+ * Database filenames will contain a name prefix (the name of the profile), a
+ * version, and a database extension.
+ */
 public class DbFilename {
 
 	private static final String DB_EXTENSION = ".db";
@@ -7,6 +13,12 @@ public class DbFilename {
 
 	private String[] components;
 
+	/**
+	 * Instantiates a new db filename.
+	 *
+	 * @param filename
+	 *            the filename
+	 */
 	public DbFilename(String filename) {
 
 		if (!filename.contains(".")) {
@@ -17,14 +29,22 @@ public class DbFilename {
 
 		String[] components = filename.split("\\.");
 
-		if (isLegal(components)) {
+		if (isValid(components)) {
 			this.components = components;
 		}
 	}
 
-	private static boolean isLegal(String[] components) {
+	/**
+	 * Validates the components of the filename (the substrings separated by
+	 * '.').
+	 *
+	 * @param components
+	 *            the components of the filename
+	 * @return true, if valid
+	 */
+	private static boolean isValid(String[] components) {
 
-		boolean isLegal = true;
+		boolean isValid = true;
 
 		try {
 
@@ -44,7 +64,7 @@ public class DbFilename {
 					// Check version.
 					String dbVersion = components[1].substring(1);
 
-					if (!isLegalVersion(dbVersion)) {
+					if (!isValidVersion(dbVersion)) {
 
 						throw new DbFilenameException("Invalid db version.");
 					}
@@ -59,15 +79,22 @@ public class DbFilename {
 
 		} catch (DbFilenameException e) {
 
-			isLegal = false;
+			isValid = false;
 		}
 
-		return isLegal;
+		return isValid;
 	}
 
-	private static boolean isLegalVersion(String dbVersion) {
+	/**
+	 * Validates the version.
+	 *
+	 * @param dbVersion
+	 *            the db version
+	 * @return true, if is legal version
+	 */
+	private static boolean isValidVersion(String dbVersion) {
 
-		boolean isLegal = true;
+		boolean isValid = true;
 
 		try {
 
@@ -75,23 +102,38 @@ public class DbFilename {
 
 		} catch (NumberFormatException e) {
 
-			isLegal = false;
+			isValid = false;
 		}
 
-		return isLegal;
+		return isValid;
 	}
 
+	/**
+	 * Gets the name prefix.
+	 *
+	 * @return the name prefix
+	 */
 	public String getNamePrefix() {
 
 		return this.components[0];
 	}
 
+	/**
+	 * Gets the version.
+	 *
+	 * @return the version
+	 */
 	public int getVersion() {
 
 		return Integer.parseInt(
 				this.components[1].substring(VERSION_EXTENSION.length() - 1));
 	}
 
+	/**
+	 * Gets the filename (sum of filename components).
+	 *
+	 * @return the filename
+	 */
 	private String getFilename() {
 
 		String filename = "";
@@ -106,6 +148,11 @@ public class DbFilename {
 		return filename;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 

@@ -19,6 +19,9 @@ import utility.Log;
 import utility.Logger;
 import views.ViewController;
 
+/**
+ * The Class Main.
+ */
 public class Main extends Application {
 
 	public static Stage window;
@@ -40,6 +43,18 @@ public class Main extends Application {
 
 	public static String title = "Student Planner v" + CURRENT_VERSION;
 
+	/**
+	 * The main method.
+	 *
+	 * @param args
+	 *            the arguments
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws InitializationException
+	 *             the initialization exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
 	public static void main(String[] args) throws SqliteWrapperException,
 			InitializationException, IOException {
 
@@ -72,6 +87,12 @@ public class Main extends Application {
 		launch(args);
 	}
 
+	/**
+	 * Migrate db.
+	 *
+	 * @throws InitializationException
+	 *             the initialization exception
+	 */
 	private static void migrateDb() throws InitializationException {
 
 		if (config.getDbFilename().getVersion() != CURRENT_VERSION) {
@@ -80,6 +101,11 @@ public class Main extends Application {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javafx.application.Application#start(javafx.stage.Stage)
+	 */
 	@Override
 	public void start(Stage window) throws Exception {
 
@@ -123,6 +149,16 @@ public class Main extends Application {
 		}
 	}
 
+	/**
+	 * Load profile.
+	 *
+	 * @param chosen
+	 *            the chosen
+	 * @throws InitializationException
+	 *             the initialization exception
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 */
 	public static void loadProfile(File chosen)
 			throws InitializationException, SqliteWrapperException {
 
@@ -136,6 +172,15 @@ public class Main extends Application {
 		active.db.connectToDb(config.getDbFilename().toString());
 	}
 
+	/**
+	 * Initialize db.
+	 *
+	 * @param name
+	 *            the name
+	 * @return true, if successful
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 */
 	public static boolean initializeDb(String name)
 			throws SqliteWrapperException {
 
@@ -164,6 +209,16 @@ public class Main extends Application {
 		return isInitialized;
 	}
 
+	/**
+	 * Show alert.
+	 *
+	 * @param type
+	 *            the type
+	 * @param issue
+	 *            the issue
+	 * @param reason
+	 *            the reason
+	 */
 	public static void showAlert(AlertType type, String issue, String reason) {
 
 		logger.post(new Log("showAlert", issue + ":" + "\n" + reason,

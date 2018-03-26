@@ -4,6 +4,9 @@ import java.io.IOException;
 
 import utility.IOUtil;
 
+/**
+ * The Class Config.
+ */
 public class Config {
 
 	private String path;
@@ -14,6 +17,12 @@ public class Config {
 
 	public static final String DEFAULT_PATH = "planner.cfg";
 
+	/**
+	 * Instantiates a new config.
+	 *
+	 * @throws InitializationException
+	 *             the initialization exception
+	 */
 	public Config() throws InitializationException {
 
 		this.path = Config.DEFAULT_PATH;
@@ -38,6 +47,9 @@ public class Config {
 		writeSchema();
 	}
 
+	/**
+	 * Load config file and populate fields from it.
+	 */
 	private void load() {
 
 		String[] config = IOUtil.loadFile(this.path);
@@ -66,6 +78,9 @@ public class Config {
 		}
 	}
 
+	/**
+	 * Write config file.
+	 */
 	public void write() {
 
 		String config = "dbDirectory," + this.dbDirectory + "\n" + "dbName,"
@@ -74,37 +89,77 @@ public class Config {
 		IOUtil.writeFile(config, this.path);
 	}
 
+	/**
+	 * Gets the db path.
+	 *
+	 * @return the db path
+	 */
 	public String getDbPath() {
 
 		return this.dbDirectory + "/" + this.dbFilename;
 	}
 
+	/**
+	 * Form schema path.
+	 *
+	 * @return the string
+	 */
 	private String formSchemaPath() {
 
 		return this.dbDirectory + "/" + "schema" + ".v" + Main.CURRENT_VERSION
 				+ ".sql";
 	}
 
+	/**
+	 * Write schema.
+	 */
 	private void writeSchema() {
 
 	}
 
+	/**
+	 * Sets the db directory.
+	 *
+	 * @param dbDirectory
+	 *            the new db directory
+	 */
 	public void setDbDirectory(String dbDirectory) {
 		this.dbDirectory = dbDirectory;
 	}
 
+	/**
+	 * Sets the db filename.
+	 *
+	 * @param dbFilename
+	 *            the new db filename
+	 */
 	public void setDbFilename(DbFilename dbFilename) {
 		this.dbFilename = dbFilename;
 	}
 
+	/**
+	 * Gets the db filename.
+	 *
+	 * @return the db filename
+	 */
 	public DbFilename getDbFilename() {
 		return dbFilename;
 	}
 
+	/**
+	 * Gets the db directory.
+	 *
+	 * @return the db directory
+	 */
 	public String getDbDirectory() {
 		return dbDirectory;
 	}
 
+	/**
+	 * Gets the schema path.
+	 *
+	 * @return the schema path
+	 */
 	public String getSchemaPath() {
 		return schemaPath;
 	}

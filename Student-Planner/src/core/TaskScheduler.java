@@ -7,6 +7,9 @@ import java.util.TimerTask;
 
 import sqlite.SqliteWrapperException;
 
+/**
+ * The Class TaskScheduler.
+ */
 public class TaskScheduler {
 
 	private volatile static TaskScheduler uniqueInstance;
@@ -14,6 +17,12 @@ public class TaskScheduler {
 
 	public Timer update;
 
+	/**
+	 * Instantiates a new task scheduler.
+	 *
+	 * @param first
+	 *            the first
+	 */
 	private TaskScheduler(LocalDateTime first) {
 
 		TaskScheduler.last = first;
@@ -53,6 +62,13 @@ public class TaskScheduler {
 		update.scheduleAtFixedRate(updateCurrentTime, 0, 1000);
 	}
 
+	/**
+	 * Gets the single instance of TaskScheduler.
+	 *
+	 * @param first
+	 *            the first
+	 * @return single instance of TaskScheduler
+	 */
 	public static TaskScheduler getInstance(LocalDateTime first) {
 		if (uniqueInstance == null) {
 			synchronized (TaskScheduler.class) {

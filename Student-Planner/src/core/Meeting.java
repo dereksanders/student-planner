@@ -10,19 +10,42 @@ import java.util.ArrayList;
 import sqlite.SqliteWrapperException;
 import utility.DateTimeUtil;
 
+/**
+ * The Class Meeting.
+ */
 public class Meeting {
 
+	/**
+	 * The Enum Lookup.
+	 */
 	public enum Lookup {
 
 		SET_ID(1), DATE(2);
 
 		public int index;
 
+		/**
+		 * Instantiates a new lookup.
+		 *
+		 * @param index
+		 *            the index
+		 */
 		private Lookup(int index) {
 			this.index = index;
 		}
 	};
 
+	/**
+	 * Gets all meetings taking place during the week of the specified date.
+	 *
+	 * @param date
+	 *            the date
+	 * @return the meetings taking place that week
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	public static ArrayList<MeetingDescription> getMeetingsWeekOf(
 			LocalDate date) throws SqliteWrapperException, SQLException {
 
@@ -37,11 +60,8 @@ public class Meeting {
 						+ startOfWeekJulian + " and date_of < "
 						+ startOfWeekJulian + 7);
 
-		int numMeetings = 0;
-
 		while (findMeetings.next()) {
 
-			numMeetings++;
 			int set = findMeetings.getInt(Meeting.Lookup.SET_ID.index);
 			LocalDate dateOf = LocalDate.ofEpochDay(
 					findMeetings.getLong(Meeting.Lookup.DATE.index));
@@ -49,11 +69,22 @@ public class Meeting {
 			meetingsThisWeek.add(new MeetingDescription(set, dateOf));
 		}
 
-		System.out.println("Found " + numMeetings + " the week of " + date);
-
 		return meetingsThisWeek;
 	}
 
+	/**
+	 * Gets the meeting taking place during the specified date time.
+	 * 
+	 * Returns null if no meeting is taking place.
+	 *
+	 * @param dateTime
+	 *            the date time
+	 * @return the meeting during
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	public static MeetingSetDescription getMeetingDuring(LocalDateTime dateTime)
 			throws SqliteWrapperException, SQLException {
 

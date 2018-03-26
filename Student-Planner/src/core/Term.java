@@ -9,8 +9,14 @@ import java.util.ArrayList;
 import javafx.scene.control.Alert.AlertType;
 import sqlite.SqliteWrapperException;
 
+/**
+ * The Class Term.
+ */
 public class Term {
 
+	/**
+	 * The Enum Lookup.
+	 */
 	public enum Lookup {
 
 		START_DATE(1), END_DATE(2), NAME(3), GRADE(4), GRADE_IS_AUTOMATIC(
@@ -18,11 +24,31 @@ public class Term {
 
 		public int index;
 
+		/**
+		 * Instantiates a new lookup.
+		 *
+		 * @param index
+		 *            the index
+		 */
 		private Lookup(int index) {
 			this.index = index;
 		}
 	}
 
+	/**
+	 * Adds the term.
+	 *
+	 * @param startDate
+	 *            the start date
+	 * @param endDate
+	 *            the end date
+	 * @param name
+	 *            the name
+	 * @param color
+	 *            the color
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 */
 	public static void addTerm(long startDate, long endDate, String name,
 			String color) throws SqliteWrapperException {
 
@@ -36,6 +62,13 @@ public class Term {
 		}
 	}
 
+	/**
+	 * Gets the terms.
+	 *
+	 * @return the terms
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 */
 	public static ResultSet getTerms() throws SqliteWrapperException {
 
 		ResultSet terms = Main.active.db
@@ -44,6 +77,15 @@ public class Term {
 		return terms;
 	}
 
+	/**
+	 * Populate terms.
+	 *
+	 * @return the array list
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	public static ArrayList<TermDescription> populateTerms()
 			throws SqliteWrapperException, SQLException {
 
@@ -66,6 +108,15 @@ public class Term {
 		return termDescriptions;
 	}
 
+	/**
+	 * Gets the num terms.
+	 *
+	 * @return the num terms
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	public static int getNumTerms()
 			throws SqliteWrapperException, SQLException {
 
@@ -82,6 +133,19 @@ public class Term {
 		return countTerms;
 	}
 
+	/**
+	 * Validates the term.
+	 *
+	 * @param startDate
+	 *            the start date
+	 * @param endDate
+	 *            the end date
+	 * @param name
+	 *            the name
+	 * @param color
+	 *            the color
+	 * @return true, if valid
+	 */
 	public static boolean termIsValid(long startDate, long endDate, String name,
 			String color) {
 
@@ -137,6 +201,17 @@ public class Term {
 		return termIsValid;
 	}
 
+	/**
+	 * Finds the term taking place during the specified date.
+	 *
+	 * @param date
+	 *            the date
+	 * @return the term description or null if no term is taking place
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	public static TermDescription findTerm(LocalDate date)
 			throws SqliteWrapperException, SQLException {
 
@@ -159,6 +234,15 @@ public class Term {
 		return found;
 	}
 
+	/**
+	 * Gets the term in progress.
+	 *
+	 * @return the term in progress or null if no term is in progress
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	public static TermDescription getTermInProgress()
 			throws SqliteWrapperException, SQLException {
 
@@ -181,7 +265,19 @@ public class Term {
 		return inProgress;
 	}
 
-	public static int getLastDayOfWeek()
+	/**
+	 * Gets the latest day of the week that a meeting is taking place during a
+	 * term.
+	 * 
+	 * FIXME: Needs to be term specific
+	 *
+	 * @return the latest day of week
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
+	public static int getLastDayOfWeek(TermDescription term)
 			throws SqliteWrapperException, SQLException {
 
 		// Days are numbered from 1 (Monday) to 7 (Sunday)
@@ -216,7 +312,18 @@ public class Term {
 		return maxDay;
 	}
 
-	public static LocalTime getEarliestMeetingStart(TermDescription term)
+	/**
+	 * Gets the earliest time that a meeting starts throughout a term.
+	 *
+	 * @param term
+	 *            the term
+	 * @return the earliest meeting start time
+	 * @throws SQLException
+	 *             the SQL exception
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 */
+	public static LocalTime getEarliestMeetingStartTime(TermDescription term)
 			throws SQLException, SqliteWrapperException {
 
 		LocalTime earliest = LocalTime.of(23, 59);
@@ -239,7 +346,18 @@ public class Term {
 		return earliest;
 	}
 
-	public static LocalTime getLatestMeetingEnd(TermDescription term)
+	/**
+	 * Gets the latest time that a meeting ends throughout a term.
+	 *
+	 * @param term
+	 *            the term
+	 * @return the latest meeting end time
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
+	public static LocalTime getLatestMeetingEndTime(TermDescription term)
 			throws SqliteWrapperException, SQLException {
 
 		LocalTime latest = LocalTime.of(0, 0);
@@ -262,10 +380,21 @@ public class Term {
 		return latest;
 	}
 
-	public static boolean meetingsExistIn(TermDescription term)
+	/**
+	 * Checks if the specified term contains any meetings.
+	 *
+	 * @param term
+	 *            the term
+	 * @return true, if successful
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
+	public static boolean hasMeetings(TermDescription term)
 			throws SqliteWrapperException, SQLException {
 
-		boolean meetingsExistInTerm = false;
+		boolean hasMeetings = false;
 
 		if (term != null) {
 
@@ -274,13 +403,24 @@ public class Term {
 							+ term.getStartDay());
 
 			if (countMeetings.next()) {
-				meetingsExistInTerm = true;
+				hasMeetings = true;
 			}
 		}
 
-		return meetingsExistInTerm;
+		return hasMeetings;
 	}
 
+	/**
+	 * Gets the color.
+	 *
+	 * @param term
+	 *            the term
+	 * @return the color
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	public static String getColor(TermDescription term)
 			throws SqliteWrapperException, SQLException {
 

@@ -1,5 +1,8 @@
 package core;
 
+/**
+ * The Class CourseDescription.
+ */
 public class CourseDescription {
 
 	public String dept;
@@ -7,6 +10,18 @@ public class CourseDescription {
 	public TermDescription startTerm;
 	public TermDescription endTerm;
 
+	/**
+	 * Instantiates a new course description.
+	 *
+	 * @param dept
+	 *            the dept
+	 * @param code
+	 *            the code
+	 * @param startTerm
+	 *            the start term
+	 * @param endTerm
+	 *            the end term
+	 */
 	public CourseDescription(String dept, int code, TermDescription startTerm,
 			TermDescription endTerm) {
 
@@ -16,6 +31,11 @@ public class CourseDescription {
 		this.endTerm = endTerm;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 

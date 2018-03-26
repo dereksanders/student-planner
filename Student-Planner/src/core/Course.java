@@ -7,8 +7,14 @@ import java.util.ArrayList;
 import javafx.scene.control.Alert.AlertType;
 import sqlite.SqliteWrapperException;
 
+/**
+ * The Class Course.
+ */
 public class Course {
 
+	/**
+	 * The Enum Lookup.
+	 */
 	public enum Lookup {
 
 		START_TERM_START_DATE(1), END_TERM_START_DATE(2), DEPT_ID(3), CODE(
@@ -16,19 +22,43 @@ public class Course {
 
 		public int index;
 
+		/**
+		 * Instantiates a new lookup.
+		 *
+		 * @param index
+		 *            the index
+		 */
 		private Lookup(int index) {
 			this.index = index;
 		}
 	}
 
+	/**
+	 * Adds the course.
+	 *
+	 * @param startTermStartDate
+	 *            the start term start date
+	 * @param endTermStartDate
+	 *            the end term start date
+	 * @param deptID
+	 *            the dept ID
+	 * @param code
+	 *            the code
+	 * @param name
+	 *            the name
+	 * @param color
+	 *            the color
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	public static void addCourse(long startTermStartDate, long endTermStartDate,
 			String deptID, int code, String name, String color)
 			throws SqliteWrapperException, SQLException {
 
 		if (courseIsValid(startTermStartDate, endTermStartDate, deptID, code,
 				name, color)) {
-
-			System.out.println("COURSE IS VALID. INSERTING..");
 
 			Main.active.db.execute(
 					"insert into course(start_term_start_date, end_term_start_date, "
@@ -38,22 +68,15 @@ public class Course {
 							+ ", " + code + ", " + "\'" + name + "\'"
 							+ ", 0, 1, " + "\'" + color + "\'" + ");");
 		}
-
-		printCourses();
 	}
 
-	public static void printCourses()
-			throws SqliteWrapperException, SQLException {
-
-		ResultSet courses = getCourses();
-		while (courses.next()) {
-			System.out.println(courses.getString(Course.Lookup.DEPT_ID.index)
-					+ " " + courses.getInt(Course.Lookup.CODE.index) + " "
-					+ courses.getLong(
-							Course.Lookup.START_TERM_START_DATE.index));
-		}
-	}
-
+	/**
+	 * Gets all courses.
+	 *
+	 * @return the courses
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 */
 	public static ResultSet getCourses() throws SqliteWrapperException {
 
 		ResultSet courses = Main.active.db.query("select * from course");
@@ -61,40 +84,38 @@ public class Course {
 		return courses;
 	}
 
-	public static CourseDescription getCourse(TermDescription term)
-			throws SqliteWrapperException, SQLException {
+	/**
+	 * Gets all courses in a specified term.
+	 *
+	 * @return the courses
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 */
+	public static ResultSet getCoursesInTerm(TermDescription term)
+			throws SqliteWrapperException {
 
-		CourseDescription found = null;
+		ResultSet courses = Main.active.db.query("select * from course");
 
-		ResultSet courses = Main.active.db
-				.query("select * from course where start_term_start_date = "
-						+ term.getStartDay());
-
-		if (courses.next()) {
-
-			System.out.println("Found course.");
-
-			found = new CourseDescription(
-					courses.getString(Course.Lookup.DEPT_ID.index),
-					courses.getInt(Course.Lookup.CODE.index), term, term);
-		}
-
-		System.out.println("Course found = " + found);
-
-		return found;
+		return courses;
 	}
 
-	public static int getNumCourses()
-			throws SqliteWrapperException, SQLException {
-
-		ResultSet countCoursesQuery = Main.active.db
-				.query("select count(*) from course");
-
-		int countCourses = countCoursesQuery.getInt(1);
-
-		return countCourses;
-	}
-
+	/**
+	 * Validates the course info.
+	 *
+	 * @param startTermStartDate
+	 *            the start term start date
+	 * @param endTermStartDate
+	 *            the end term start date
+	 * @param deptID
+	 *            the dept ID
+	 * @param code
+	 *            the code
+	 * @param name
+	 *            the name
+	 * @param color
+	 *            the color
+	 * @return true, if valid
+	 */
 	public static boolean courseIsValid(long startTermStartDate,
 			long endTermStartDate, String deptID, int code, String name,
 			String color) {
@@ -163,6 +184,17 @@ public class Course {
 		return courseIsValid;
 	}
 
+	/**
+	 * Gets the color.
+	 *
+	 * @param course
+	 *            the course
+	 * @return the color
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	public static String getColor(CourseDescription course)
 			throws SqliteWrapperException, SQLException {
 

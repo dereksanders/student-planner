@@ -8,8 +8,14 @@ import java.util.ArrayList;
 
 import sqlite.SqliteWrapperException;
 
+/**
+ * The Class MeetingSet.
+ */
 public class MeetingSet {
 
+	/**
+	 * The Enum Lookup.
+	 */
 	public enum Lookup {
 
 		ID(1), TERM_START_DATE(2), START_TIME(3), END_TIME(
@@ -20,11 +26,37 @@ public class MeetingSet {
 
 		public int index;
 
+		/**
+		 * Instantiates a new lookup.
+		 *
+		 * @param index
+		 *            the index
+		 */
 		private Lookup(int index) {
 			this.index = index;
 		}
 	}
 
+	/**
+	 * Adds the meeting set.
+	 *
+	 * @param id
+	 *            the id
+	 * @param term
+	 *            the term
+	 * @param course
+	 *            the course
+	 * @param start
+	 *            the start
+	 * @param end
+	 *            the end
+	 * @param dates
+	 *            the dates
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	public static void addMeetingSet(int id, TermDescription term,
 			CourseDescription course, LocalTime start, LocalTime end,
 			ArrayList<LocalDate> dates)
@@ -47,6 +79,7 @@ public class MeetingSet {
 
 		} else {
 
+			// FIXME: Add handling for non-Course MeetingSets
 		}
 
 		for (LocalDate d : dates) {
@@ -56,6 +89,17 @@ public class MeetingSet {
 		}
 	}
 
+	/**
+	 * Find meeting set with the specified ID.
+	 *
+	 * @param setID
+	 *            the set ID
+	 * @return the meeting set description
+	 * @throws SQLException
+	 *             the SQL exception
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 */
 	public static MeetingSetDescription findMeetingSet(int setID)
 			throws SQLException, SqliteWrapperException {
 
@@ -95,6 +139,17 @@ public class MeetingSet {
 		return found;
 	}
 
+	/**
+	 * Gets the color.
+	 *
+	 * @param id
+	 *            the id
+	 * @return the color
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	public static String getColor(int id)
 			throws SqliteWrapperException, SQLException {
 

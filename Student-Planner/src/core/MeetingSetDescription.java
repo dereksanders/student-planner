@@ -6,10 +6,14 @@ import java.time.LocalTime;
 
 import sqlite.SqliteWrapperException;
 
+/**
+ * The Class MeetingSetDescription.
+ */
 public class MeetingSetDescription {
 
 	private int id;
 	private TermDescription term;
+
 	public CourseDescription course;
 	public boolean isCourseMeeting;
 	public String name;
@@ -17,6 +21,36 @@ public class MeetingSetDescription {
 	public LocalTime start;
 	public LocalTime end;
 
+	/**
+	 * Instantiates a new meeting set description.
+	 *
+	 * @param id
+	 *            the id
+	 * @param termStart
+	 *            the term start
+	 * @param courseStartTermStartDate
+	 *            the course start term start date
+	 * @param courseEndTermStartDate
+	 *            the course end term start date
+	 * @param courseDept
+	 *            the course dept
+	 * @param courseCode
+	 *            the course code
+	 * @param name
+	 *            the name
+	 * @param type
+	 *            the type
+	 * @param start
+	 *            the start
+	 * @param end
+	 *            the end
+	 * @param isCourseMeeting
+	 *            the is course meeting
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
 	public MeetingSetDescription(int id, LocalDate termStart,
 			LocalDate courseStartTermStartDate,
 			LocalDate courseEndTermStartDate, String courseDept, int courseCode,
@@ -41,6 +75,11 @@ public class MeetingSetDescription {
 		this.type = type;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 
