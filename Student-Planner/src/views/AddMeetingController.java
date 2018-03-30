@@ -3,12 +3,17 @@ package views;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+import core.CourseDescription;
 import core.Main;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -17,10 +22,20 @@ import javafx.stage.Stage;
  */
 public class AddMeetingController {
 
+	private Stage window;
 	private LocalDateTime selected;
 
 	@FXML
-	private Text selectedText;
+	private CheckBox isCourseMeeting;
+	@FXML
+	private TextField enterMeetingType;
+
+	@FXML
+	private ChoiceBox<CourseDescription> chooseCourse;
+	@FXML
+	private ChoiceBox<String> chooseTypeOfCourseMeeting;
+	@FXML
+	private ChoiceBox<String> chooseTypeOfNonCourseMeeting;
 
 	/**
 	 * Instantiates a controller for an AddMeeting window and launches the
@@ -35,7 +50,7 @@ public class AddMeetingController {
 
 		this.selected = selected;
 
-		Stage window = new Stage();
+		this.window = new Stage();
 		window.initModality(Modality.APPLICATION_MODAL);
 		window.setTitle("Add Meeting");
 
@@ -60,6 +75,22 @@ public class AddMeetingController {
 	@FXML
 	public void initialize() {
 
-		this.selectedText.setText(selected.toString());
+		chooseTypeOfNonCourseMeeting.valueProperty()
+				.addListener(new ChangeListener<String>() {
+					@Override
+					public void changed(
+							ObservableValue<? extends String> observable,
+							String oldType, String newType) {
+
+						if (newType != null) {
+
+							if (newType.equals("Other")) {
+
+							} else {
+
+							}
+						}
+					}
+				});
 	}
 }

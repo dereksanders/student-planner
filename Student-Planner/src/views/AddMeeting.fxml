@@ -1,15 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="400.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="520.0" prefWidth="418.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Text fx:id="selectedText" layoutX="27.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text">
+      <Text fx:id="selectedText1" layoutX="14.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Meeting Info">
          <font>
             <Font size="17.0" />
          </font>
       </Text>
+      <Text layoutX="14.0" layoutY="240.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Start Date" />
+      <DatePicker layoutX="15.0" layoutY="251.0" prefHeight="26.0" prefWidth="150.0" />
+      <Text layoutX="202.0" layoutY="240.0" strokeType="OUTSIDE" strokeWidth="0.0" text="End Date" />
+      <DatePicker layoutX="201.0" layoutY="251.0" prefHeight="26.0" prefWidth="150.0" />
+      <CheckBox layoutX="200.0" layoutY="288.0" mnemonicParsing="false" text="To end of term" />
+      <Text layoutX="14.0" layoutY="319.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Time" />
+      <ComboBox editable="true" layoutX="15.0" layoutY="331.0" prefWidth="150.0" />
+      <Text layoutX="180.0" layoutY="350.0" strokeType="OUTSIDE" strokeWidth="0.0" text="-">
+         <font>
+            <Font size="17.0" />
+         </font>
+      </Text>
+      <ComboBox editable="true" layoutX="200.0" layoutY="331.0" prefHeight="26.0" prefWidth="150.0" />
+      <TextField layoutX="16.0" layoutY="393.0" promptText="Enter meeting location" />
+      <Text layoutX="17.0" layoutY="381.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Location" />
+      <Text layoutX="16.0" layoutY="444.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Repeat" />
+      <ChoiceBox layoutX="15.0" layoutY="457.0" prefHeight="26.0" prefWidth="150.0" />
+      <Button layoutX="235.0" layoutY="484.0" mnemonicParsing="false" prefWidth="80.0" text="OK" />
+      <Button layoutX="324.0" layoutY="484.0" mnemonicParsing="false" prefWidth="80.0" text="Cancel" />
+      <TextField fx:id="enterMeetingType" layoutX="201.0" layoutY="108.0" promptText="Enter meeting type" visible="false" />
+      <TabPane layoutX="15.0" layoutY="47.0" prefHeight="167.0" prefWidth="388.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="Course Meeting">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: #fff;">
+                     <children>
+                        <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Course" />
+                        <ChoiceBox layoutX="14.0" layoutY="27.0" prefHeight="26.0" prefWidth="150.0" stylesheets="@style.css" />
+                        <Text layoutX="181.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Type" />
+                        <ChoiceBox fx:id="chooseTypeOfCourseMeeting" layoutX="181.0" layoutY="27.0" prefHeight="26.0" prefWidth="150.0" />
+                        <TextField fx:id="enterTypeOfCourseMeeting" layoutX="182.0" layoutY="68.0" promptText="Enter meeting type" visible="false" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="Non-Course Meeting">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="388.0" style="-fx-background-color: #fff;">
+                     <children>
+                        <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Type" />
+                        <ChoiceBox fx:id="chooseTypeOfNonCourseMeeting" layoutX="14.0" layoutY="27.0" prefHeight="26.0" prefWidth="150.0" />
+                        <TextField fx:id="enterTypeOfNonCourseMeeting" layoutX="15.0" layoutY="68.0" promptText="Enter meeting type" visible="false" />
+                        <TextField layoutX="181.0" layoutY="27.0" promptText="Enter meeting name" />
+                        <Text layoutX="181.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name" />
+                        <ColorPicker layoutX="181.0" layoutY="68.0" />
+                        <Text layoutX="16.0" layoutY="119.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Recent Colors:" />
+                        <HBox fx:id="recentColors" layoutX="100.0" layoutY="101.0" prefHeight="26.0" prefWidth="188.0" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
    </children>
 </AnchorPane>

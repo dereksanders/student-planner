@@ -24,6 +24,11 @@
 	-fx-background-radius: 20px;
 }
 
+.choiceBox {
+	
+	-fx-background-color: #fff;
+}
+
 .tabPane {
 	
 	-fx-background-color: #fff;
