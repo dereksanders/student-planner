@@ -58,7 +58,7 @@ public class CourseScheduleController implements Observer {
 
 	private ArrayList<MeetingBlock> meetingBlocks;
 
-	// Constants
+	// Art constants
 	private static final int DEFAULT_MAX_DAY = 5;
 	private static final LocalTime DEFAULT_SCHEDULE_START = LocalTime.of(9, 0);
 	private static final LocalTime DEFAULT_SCHEDULE_END = LocalTime.of(17, 0);
@@ -76,6 +76,9 @@ public class CourseScheduleController implements Observer {
 
 	private static final String BORDER_COLOR = "#cccccc";
 	private static final String EMPTY_DAY_COLOR = "#eeeeee";
+
+	// Times for forms related to CourseSchedule.
+	public static final LocalTime[] times = generateTimes();
 
 	/**
 	 * Initialize.
@@ -147,6 +150,26 @@ public class CourseScheduleController implements Observer {
 						}
 					}
 				});
+	}
+
+	private static LocalTime[] generateTimes() {
+
+		int timesPerHour = 2;
+		LocalTime[] times = new LocalTime[24 * timesPerHour];
+
+		for (int i = 0; i < times.length; i++) {
+
+			for (int j = 0; j < 24; j++) {
+
+				for (int k = 0; k < timesPerHour; k++) {
+
+					times[i] = LocalTime.of(j, (60 / timesPerHour) * k);
+					i++;
+				}
+			}
+		}
+
+		return times;
 	}
 
 	/**

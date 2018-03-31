@@ -37,6 +37,9 @@ public class MeetingSet {
 		}
 	}
 
+	public static final String[] REPEAT_OPTIONS = { "Weekly", "Bi-Weekly",
+			"Monthly", "Never" };
+
 	/**
 	 * Adds the meeting set.
 	 *
@@ -69,7 +72,7 @@ public class MeetingSet {
 							+ "course_start_term_start_date, course_end_term_start_date, "
 							+ "course_dept_id, course_code, name, meeting_type, location, "
 							+ "is_course_meeting_set, color) " + "values(" + id
-							+ "," + term.start.toEpochDay() + ","
+							+ "," + term.getStartDay() + ","
 							+ start.toSecondOfDay() + "," + end.toSecondOfDay()
 							+ "," + course.startTerm.getStartDay() + ","
 							+ course.endTerm.getStartDay() + ",\'" + course.dept

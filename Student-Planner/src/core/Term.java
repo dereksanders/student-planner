@@ -96,11 +96,13 @@ public class Term {
 		while (terms.next()) {
 
 			long startDay = terms.getLong(Term.Lookup.START_DATE.index);
+			long endDay = terms.getLong(Term.Lookup.END_DATE.index);
 
 			LocalDate start = LocalDate.ofEpochDay(startDay);
+			LocalDate end = LocalDate.ofEpochDay(endDay);
 
 			TermDescription currentTerm = new TermDescription(
-					terms.getString(Term.Lookup.NAME.index), start);
+					terms.getString(Term.Lookup.NAME.index), start, end);
 
 			termDescriptions.add(currentTerm);
 		}
@@ -228,7 +230,9 @@ public class Term {
 			found = new TermDescription(
 					findTermQuery.getString(Term.Lookup.NAME.index),
 					LocalDate.ofEpochDay(findTermQuery
-							.getLong(Term.Lookup.START_DATE.index)));
+							.getLong(Term.Lookup.START_DATE.index)),
+					LocalDate.ofEpochDay(
+							findTermQuery.getLong(Term.Lookup.END_DATE.index)));
 		}
 
 		return found;
@@ -259,7 +263,9 @@ public class Term {
 			inProgress = new TermDescription(
 					termInProgressQuery.getString(Term.Lookup.NAME.index),
 					LocalDate.ofEpochDay(termInProgressQuery
-							.getLong(Term.Lookup.START_DATE.index)));
+							.getLong(Term.Lookup.START_DATE.index)),
+					LocalDate.ofEpochDay(termInProgressQuery
+							.getLong(Term.Lookup.END_DATE.index)));
 		}
 
 		return inProgress;

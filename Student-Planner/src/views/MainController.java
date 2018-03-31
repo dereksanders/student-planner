@@ -100,7 +100,7 @@ public class MainController implements Observer {
 			// recent term should be selected if it is BEFORE the current date.
 			// If there are Terms in the future, select the start of the soonest
 			// one.
-			Main.active.setSelectedDate(selected.start);
+			Main.active.setSelectedDate(selected.getStart());
 			updateSelectedTermBox(selected);
 		}
 

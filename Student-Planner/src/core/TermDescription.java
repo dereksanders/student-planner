@@ -8,7 +8,8 @@ import java.time.LocalDate;
 public class TermDescription {
 
 	private String name;
-	public LocalDate start;
+	private LocalDate start;
+	private LocalDate end;
 
 	/**
 	 * Instantiates a new term description.
@@ -18,10 +19,11 @@ public class TermDescription {
 	 * @param start
 	 *            the start
 	 */
-	public TermDescription(String name, LocalDate start) {
+	public TermDescription(String name, LocalDate start, LocalDate end) {
 
 		this.name = name;
 		this.start = start;
+		this.end = end;
 	}
 
 	/**
@@ -32,6 +34,14 @@ public class TermDescription {
 	public long getStartDay() {
 
 		return start.toEpochDay();
+	}
+
+	public LocalDate getStart() {
+		return this.start;
+	}
+
+	public LocalDate getEnd() {
+		return this.end;
 	}
 
 	/*

@@ -1,5 +1,10 @@
 package core;
 
+import java.sql.SQLException;
+import java.time.LocalDate;
+
+import sqlite.SqliteWrapperException;
+
 /**
  * The Class CourseDescription.
  */
@@ -29,6 +34,16 @@ public class CourseDescription {
 		this.code = code;
 		this.startTerm = startTerm;
 		this.endTerm = endTerm;
+	}
+
+	public CourseDescription(String dept, int code, LocalDate startTermStartDay,
+			LocalDate endTermStartDay)
+			throws SqliteWrapperException, SQLException {
+
+		this.dept = dept;
+		this.code = code;
+		this.startTerm = Term.findTerm(startTermStartDay);
+		this.endTerm = Term.findTerm(endTermStartDay);
 	}
 
 	/*

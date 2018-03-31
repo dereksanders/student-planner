@@ -2,6 +2,7 @@ package core;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import javafx.scene.control.Alert.AlertType;
@@ -90,11 +91,25 @@ public class Course {
 	 * @return the courses
 	 * @throws SqliteWrapperException
 	 *             the sqlite wrapper exception
+	 * @throws SQLException
 	 */
-	public static ResultSet getCoursesInTerm(TermDescription term)
-			throws SqliteWrapperException {
+	public static ArrayList<CourseDescription> populateCourses(
+			TermDescription term) throws SqliteWrapperException, SQLException {
 
-		ResultSet courses = Main.active.db.query("select * from course");
+		ArrayList<CourseDescription> courses = new ArrayList<>();
+
+		ResultSet findCourses = Main.active.db.query("select * from course");
+
+		while (findCourses.next()) {
+
+			courses.add(new CourseDescription(
+					findCourses.getString(Course.Lookup.DEPT_ID.index),
+					findCourses.getInt(Course.Lookup.CODE.index),
+					LocalDate.ofEpochDay(findCourses.getLong(
+							Course.Lookup.START_TERM_START_DATE.index)),
+					LocalDate.ofEpochDay(findCourses.getLong(
+							Course.Lookup.END_TERM_START_DATE.index))));
+		}
 
 		return courses;
 	}
@@ -202,9 +217,9 @@ public class Course {
 
 		ResultSet getCourse = Main.active.db
 				.query("select * from course where start_term_start_date = "
-						+ course.startTerm.start.toEpochDay()
+						+ course.startTerm.getStartDay()
 						+ " and end_term_start_date = "
-						+ course.endTerm.start.toEpochDay() + " and dept_id = "
+						+ course.endTerm.getStartDay() + " and dept_id = "
 						+ "\'" + course.dept + "\'" + " and code = "
 						+ course.code);
 

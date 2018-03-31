@@ -35,6 +35,12 @@ public class Meeting {
 		}
 	};
 
+	public static final String[] COURSE_TYPES = { "Lecture", "Tutorial", "Lab",
+			"Seminar", "Other" };
+
+	public static final String[] NON_COURSE_TYPES = { "Club", "Work", "Sports",
+			"Other" };
+
 	/**
 	 * Gets all meetings taking place during the week of the specified date.
 	 *
