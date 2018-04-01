@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -42,7 +43,9 @@ public class SqliteWrapperTest {
 
 		sqlite.executeFromFile("create.sql");
 
-		ResultSet results = sqlite.query("select * from term");
+		Statement sql = sqlite.getConnection().createStatement();
+
+		ResultSet results = sql.executeQuery("select * from term");
 
 		while (results.next()) {
 
@@ -51,7 +54,9 @@ public class SqliteWrapperTest {
 					+ results.getDouble(3));
 		}
 
-		sqlite.execute("drop table term");
+		sql.execute("drop table term");
+		results.close();
+		sql.close();
 	}
 
 	private void sanitySetup() throws SqliteWrapperException {
@@ -81,12 +86,14 @@ public class SqliteWrapperTest {
 
 	private void sanityWorkload() throws SqliteWrapperException, SQLException {
 
-		sqlite.execute(
+		Statement sql = sqlite.getConnection().createStatement();
+
+		sql.execute(
 				"create table employees (id integer primary key, name text)");
-		sqlite.execute(
+		sql.execute(
 				"insert into employees(id, name) values(1, \'Walter White\')");
 
-		ResultSet results = sqlite.query("select * from employees");
+		ResultSet results = sql.executeQuery("select * from employees");
 
 		while (results.next()) {
 
@@ -94,13 +101,14 @@ public class SqliteWrapperTest {
 					+ results.getString(2));
 		}
 
-		sqlite.execute("drop table employees");
+		results.close();
 
-		sqlite.execute(
+		sql.execute("drop table employees");
+		sql.execute(
 				"create table employees (id integer primary key, name text)");
-		sqlite.execute("insert into employees(id, name) values(2, \'Dingus\')");
+		sql.execute("insert into employees(id, name) values(2, \'Dingus\')");
 
-		ResultSet results2 = sqlite.query("select * from employees");
+		ResultSet results2 = sql.executeQuery("select * from employees");
 
 		while (results2.next()) {
 
@@ -108,7 +116,9 @@ public class SqliteWrapperTest {
 					+ results2.getString(2));
 		}
 
-		sqlite.execute("drop table employees");
+		results2.close();
+		sql.execute("drop table employees");
+		sql.close();
 	}
 
 	@AfterClass

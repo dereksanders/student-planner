@@ -147,6 +147,36 @@ public class DateTimeUtil {
 	}
 
 	/**
+	 * Round to next half hour.
+	 *
+	 * @param time
+	 *            the time
+	 * @return the local time
+	 */
+	public static LocalTime roundToNextHalfHourThatIsAtLeastHalfAnHourFrom(
+			LocalTime time) {
+
+		LocalTime rounded = LocalTime.of(time.getHour(), time.getMinute());
+
+		if (rounded.getMinute() == 0) {
+
+			rounded = LocalTime.of(time.getHour(), 30);
+
+		} else {
+
+			if (time.getHour() < 23) {
+
+				rounded = LocalTime.of(time.getHour() + 1, 0);
+			} else {
+
+				rounded = LocalTime.of(time.getHour(), 59);
+			}
+		}
+
+		return rounded;
+	}
+
+	/**
 	 * Round to previous half hour that is at least half an hour ago.
 	 *
 	 * @param time
@@ -158,7 +188,7 @@ public class DateTimeUtil {
 
 		LocalTime rounded = LocalTime.of(time.getHour(), time.getMinute());
 
-		if (rounded.getMinute() <= 30) {
+		if (rounded.getMinute() < 30) {
 
 			if (time.getHour() > 0) {
 

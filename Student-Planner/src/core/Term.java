@@ -2,12 +2,15 @@ package core;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
 import javafx.scene.control.Alert.AlertType;
 import sqlite.SqliteWrapperException;
+import utility.Log;
+import utility.Log.Severity;
 
 /**
  * The Class Term.
@@ -48,33 +51,26 @@ public class Term {
 	 *            the color
 	 * @throws SqliteWrapperException
 	 *             the sqlite wrapper exception
+	 * @throws SQLException
 	 */
 	public static void addTerm(long startDate, long endDate, String name,
-			String color) throws SqliteWrapperException {
+			String color) throws SqliteWrapperException, SQLException {
 
 		if (termIsValid(startDate, endDate, name, color)) {
 
-			Main.active.db.execute(
+			Statement sql = Main.active.db.getConnection().createStatement();
+
+			sql.execute(
 					"insert into term(start_date, end_date, name, grade, grade_is_automatic, color) "
 							+ "values(" + startDate + ", " + endDate + ", "
 							+ "\'" + name + "\'" + ", 0, 1, " + "\'" + color
 							+ "\'" + ");");
+			sql.close();
+
+			Main.logger.post(new Log("Term::addTerm",
+					"Added Term: " + name + "(" + endDate + ")",
+					Severity.INFO));
 		}
-	}
-
-	/**
-	 * Gets the terms.
-	 *
-	 * @return the terms
-	 * @throws SqliteWrapperException
-	 *             the sqlite wrapper exception
-	 */
-	public static ResultSet getTerms() throws SqliteWrapperException {
-
-		ResultSet terms = Main.active.db
-				.query("select * from term order by start_date");
-
-		return terms;
 	}
 
 	/**
@@ -89,7 +85,10 @@ public class Term {
 	public static ArrayList<TermDescription> populateTerms()
 			throws SqliteWrapperException, SQLException {
 
-		ResultSet terms = getTerms();
+		Statement sql = Main.active.db.getConnection().createStatement();
+
+		ResultSet terms = sql
+				.executeQuery("select * from term order by start_date");
 
 		ArrayList<TermDescription> termDescriptions = new ArrayList<>();
 
@@ -106,6 +105,8 @@ public class Term {
 
 			termDescriptions.add(currentTerm);
 		}
+		terms.close();
+		sql.close();
 
 		return termDescriptions;
 	}
@@ -122,15 +123,19 @@ public class Term {
 	public static int getNumTerms()
 			throws SqliteWrapperException, SQLException {
 
-		ResultSet countTermsQuery = Main.active.db
-				.query("select count(*) from term");
+		Statement sql = Main.active.db.getConnection().createStatement();
+		ResultSet countTermsQuery = sql
+				.executeQuery("select count(*) from term");
 
 		int countTerms = 0;
 
-		// Note that at least one Term should always exist.
 		if (countTermsQuery.next()) {
 			countTerms = countTermsQuery.getInt(1);
 		}
+		countTermsQuery.close();
+		sql.close();
+
+		System.out.println("There are: " + countTerms + " terms.");
 
 		return countTerms;
 	}
@@ -218,12 +223,12 @@ public class Term {
 			throws SqliteWrapperException, SQLException {
 
 		TermDescription found = null;
-
 		long julianDate = date.toEpochDay();
 
-		ResultSet findTermQuery = Main.active.db
-				.query("select * from term where start_date <= " + julianDate
-						+ " and end_date >= " + julianDate);
+		Statement sql = Main.active.db.getConnection().createStatement();
+		ResultSet findTermQuery = sql
+				.executeQuery("select * from term where start_date <= "
+						+ julianDate + " and end_date >= " + julianDate);
 
 		if (findTermQuery.next()) {
 
@@ -234,6 +239,8 @@ public class Term {
 					LocalDate.ofEpochDay(
 							findTermQuery.getLong(Term.Lookup.END_DATE.index)));
 		}
+		findTermQuery.close();
+		sql.close();
 
 		return found;
 	}
@@ -254,9 +261,10 @@ public class Term {
 
 		TermDescription inProgress = null;
 
-		ResultSet termInProgressQuery = Main.active.db
-				.query("select * from term where start_date <= " + currentDate
-						+ " and end_date >= " + currentDate);
+		Statement sql = Main.active.db.getConnection().createStatement();
+		ResultSet termInProgressQuery = sql
+				.executeQuery("select * from term where start_date <= "
+						+ currentDate + " and end_date >= " + currentDate);
 
 		if (termInProgressQuery.next()) {
 
@@ -267,6 +275,8 @@ public class Term {
 					LocalDate.ofEpochDay(termInProgressQuery
 							.getLong(Term.Lookup.END_DATE.index)));
 		}
+		termInProgressQuery.close();
+		sql.close();
 
 		return inProgress;
 	}
@@ -289,30 +299,42 @@ public class Term {
 		// Days are numbered from 1 (Monday) to 7 (Sunday)
 		int maxDay = 1;
 
-		ResultSet meetingSets = Main.active.db
-				.query("select * from meeting_set");
+		if (term != null) {
 
-		while (meetingSets.next()) {
+			Statement sql = Main.active.db.getConnection().createStatement();
+			ResultSet meetingSets = sql.executeQuery(
+					"select * from meeting_set where term_start_date = "
+							+ term.getStartDay());
 
-			int setID = meetingSets.getInt(MeetingSet.Lookup.ID.index);
+			while (meetingSets.next()) {
 
-			// Get a meeting from this set (all meetings from a set would occur
-			// on the same weekday)
-			//
-			// We can assume that all MeetingSets will have at least on Meeting.
-			ResultSet meeting = Main.active.db.query(
-					"select * from meeting_date where set_id = " + setID);
+				int setID = meetingSets.getInt(MeetingSet.Lookup.ID.index);
 
-			meeting.next();
+				// Get a meeting from this set (all meetings from a set would
+				// occur
+				// on the same weekday)
+				//
+				// We can assume that all MeetingSets will have at least one
+				// Meeting.
+				Statement sql2 = Main.active.db.getConnection()
+						.createStatement();
+				ResultSet meeting = sql2.executeQuery(
+						"select * from meeting_date where set_id = " + setID);
 
-			long julianDay = meeting.getLong(Meeting.Lookup.DATE.index);
+				meeting.next();
+				long julianDay = meeting.getLong(Meeting.Lookup.DATE.index);
+				meeting.close();
+				sql2.close();
 
-			int meetingDayOfWeek = LocalDate.ofEpochDay(julianDay)
-					.getDayOfWeek().getValue();
+				int meetingDayOfWeek = LocalDate.ofEpochDay(julianDay)
+						.getDayOfWeek().getValue();
 
-			if (meetingDayOfWeek > maxDay) {
-				maxDay = meetingDayOfWeek;
+				if (meetingDayOfWeek > maxDay) {
+					maxDay = meetingDayOfWeek;
+				}
 			}
+			meetingSets.close();
+			sql.close();
 		}
 
 		return maxDay;
@@ -333,8 +355,9 @@ public class Term {
 			throws SQLException, SqliteWrapperException {
 
 		LocalTime earliest = LocalTime.of(23, 59);
-		ResultSet meetingSets = Main.active.db
-				.query("select * from meeting_set");
+
+		Statement sql = Main.active.db.getConnection().createStatement();
+		ResultSet meetingSets = sql.executeQuery("select * from meeting_set");
 
 		while (meetingSets.next()) {
 
@@ -348,6 +371,8 @@ public class Term {
 				earliest = start;
 			}
 		}
+		meetingSets.close();
+		sql.close();
 
 		return earliest;
 	}
@@ -367,8 +392,9 @@ public class Term {
 			throws SqliteWrapperException, SQLException {
 
 		LocalTime latest = LocalTime.of(0, 0);
-		ResultSet meetingSets = Main.active.db
-				.query("select * from meeting_set");
+
+		Statement sql = Main.active.db.getConnection().createStatement();
+		ResultSet meetingSets = sql.executeQuery("select * from meeting_set");
 
 		while (meetingSets.next()) {
 
@@ -382,6 +408,8 @@ public class Term {
 				latest = end;
 			}
 		}
+		meetingSets.close();
+		sql.close();
 
 		return latest;
 	}
@@ -404,13 +432,19 @@ public class Term {
 
 		if (term != null) {
 
-			ResultSet countMeetings = Main.active.db.query(
+			Statement sql = Main.active.db.getConnection().createStatement();
+			ResultSet countMeetings = sql.executeQuery(
 					"select count(*) from meeting_set where term_start_date = "
 							+ term.getStartDay());
 
-			if (countMeetings.next()) {
-				hasMeetings = true;
+			while (countMeetings.next()) {
+
+				if (countMeetings.getInt(1) > 0) {
+					hasMeetings = true;
+				}
 			}
+			countMeetings.close();
+			sql.close();
 		}
 
 		return hasMeetings;
@@ -432,13 +466,16 @@ public class Term {
 
 		String color = "";
 
-		ResultSet getTerm = Main.active.db.query(
+		Statement sql = Main.active.db.getConnection().createStatement();
+		ResultSet getTerm = sql.executeQuery(
 				"select * from term where start_date = " + term.getStartDay());
 
 		if (getTerm.next()) {
 
 			color = getTerm.getString(Term.Lookup.COLOR.index);
 		}
+		getTerm.close();
+		sql.close();
 
 		return color;
 	}

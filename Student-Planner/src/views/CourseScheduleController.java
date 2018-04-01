@@ -648,7 +648,8 @@ public class CourseScheduleController implements Observer {
 		// Determine the width of the schedule by determining if Saturday or
 		// Sunday have any meetings during this term. Otherwise, we will show 5
 		// days, Monday-Friday, the default value of maxDay.
-		int lastDayOfWeek = Term.getLastDayOfWeek(null);
+		int lastDayOfWeek = Term
+				.getLastDayOfWeek(this.observable.getSelectedTerm());
 
 		if (lastDayOfWeek <= DEFAULT_MAX_DAY) {
 			this.maxDay = DEFAULT_MAX_DAY;
@@ -689,12 +690,16 @@ public class CourseScheduleController implements Observer {
 			LocalTime earliestStartRounded = DateTimeUtil
 					.roundToPrevHalfHourThatIsAtLeastHalfAnHourAgo(
 							earliestStart);
-
 			LocalTime latestEndRounded = DateTimeUtil
-					.roundToNextHalfHour(latestEnd);
+					.roundToNextHalfHourThatIsAtLeastHalfAnHourFrom(latestEnd);
 
 			this.scheduleStart = earliestStartRounded;
 			this.scheduleEnd = latestEndRounded;
+
+			System.out.println("Earliest meeting start = " + earliestStart
+					+ ", Latest meeting end = " + latestEnd);
+			System.out.println("Schedule starts at " + this.scheduleStart
+					+ " and ends at " + this.scheduleEnd);
 		}
 
 		// Height of each day of the schedule, determined by how much time the

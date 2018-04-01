@@ -11,6 +11,7 @@ import core.Course;
 import core.CourseDescription;
 import core.Main;
 import core.Meeting;
+import core.MeetingDescription;
 import core.MeetingSet;
 import core.TermDescription;
 import javafx.beans.value.ChangeListener;
@@ -25,6 +26,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
@@ -39,6 +41,11 @@ public class AddMeetingController {
 
 	private LocalDateTime selected;
 	private Stage window;
+
+	@FXML
+	private Tab courseMeetingTab;
+	@FXML
+	private Tab nonCourseMeetingTab;
 
 	// Course Meetings
 	@FXML
@@ -56,7 +63,7 @@ public class AddMeetingController {
 	@FXML
 	private TextField enterMeetingName;
 	@FXML
-	private ColorPicker chooseMeetingColor;
+	private ColorPicker chooseColor;
 	@FXML
 	private HBox recentColors;
 
@@ -297,8 +304,65 @@ public class AddMeetingController {
 	}
 
 	@FXML
-	private void confirm() throws SqliteWrapperException, SQLException {
-		MeetingSet.addMeetingSet(0, null, null, null, null, null);
+	private void confirm()
+			throws SqliteWrapperException, SQLException, IOException {
+
+		// Construct list of dates based on repeat choice
+		ArrayList<LocalDate> meetingDates = new ArrayList<>();
+
+		if (chooseRepeat.getValue().equals("Never")) {
+
+			meetingDates.add(chooseStartDate.getValue());
+
+		} else {
+
+			int weeksBetweenMeetings = 1;
+
+			if (chooseRepeat.getValue().equals("Bi-Weekly")) {
+				weeksBetweenMeetings = 2;
+			} else if (chooseRepeat.getValue().equals("Monthly")) {
+				weeksBetweenMeetings = 4;
+			}
+
+			LocalDate current = chooseStartDate.getValue();
+
+			while (current.isBefore(chooseEndDate.getValue())
+					|| current.equals(chooseEndDate.getValue())) {
+
+				meetingDates.add(current);
+				current = current.plusDays(7 * weeksBetweenMeetings);
+			}
+		}
+
+		ArrayList<MeetingDescription> conflicts = Meeting.getConflicts(
+				meetingDates, chooseStartTime.getValue(),
+				chooseEndTime.getValue());
+
+		if (conflicts.size() > 0) {
+
+			ConflictsController cc = new ConflictsController(conflicts,
+					meetingDates);
+
+			meetingDates = cc.getRemainingDates();
+		}
+
+		if (meetingDates.size() > 0) {
+
+			if (courseMeetingTab.isSelected()) {
+
+				MeetingSet.addCourseMeetingSet(Main.active.getSelectedTerm(),
+						chooseCourse.getValue(), chooseStartTime.getValue(),
+						chooseEndTime.getValue(), meetingDates);
+
+			} else if (nonCourseMeetingTab.isSelected()) {
+
+				MeetingSet.addNonCourseMeetingSet(Main.active.getSelectedTerm(),
+						chooseStartTime.getValue(), chooseEndTime.getValue(),
+						meetingDates, chooseColor.getValue());
+			}
+
+			window.close();
+		}
 	}
 
 	@FXML

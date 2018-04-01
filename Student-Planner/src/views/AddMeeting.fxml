@@ -43,7 +43,7 @@
       <TextField fx:id="enterMeetingType" layoutX="201.0" layoutY="108.0" promptText="Enter meeting type" visible="false" />
       <TabPane layoutX="15.0" layoutY="47.0" prefHeight="211.0" prefWidth="388.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
-          <Tab text="Course Meeting">
+          <Tab fx:id="courseMeetingTab" text="Course Meeting">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" style="-fx-background-color: #fff;">
                      <children>
@@ -56,7 +56,7 @@
                   </AnchorPane>
             </content>
           </Tab>
-          <Tab text="Non-Course Meeting">
+          <Tab fx:id="nonCourseMeetingTab" text="Non-Course Meeting">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" style="-fx-background-color: #fff;">
                      <children>

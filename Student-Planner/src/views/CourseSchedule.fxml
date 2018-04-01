@@ -3,13 +3,17 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.CourseScheduleController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="650.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.CourseScheduleController">
    <children>
       <DatePicker fx:id="selectWeek" layoutX="14.0" layoutY="49.0" />
       <CheckBox fx:id="selectCurrentWeek" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Show Current Week" />
-      <Canvas fx:id="canvas" height="501.0" layoutX="14.0" layoutY="100.0" width="786.0" />
+      <ScrollPane layoutX="14.0" layoutY="100.0" prefHeight="552.0" prefWidth="786.0">
+         <content>
+            <Canvas fx:id="canvas" height="501.0" width="786.0" />
+         </content>
+      </ScrollPane>
    </children>
 </AnchorPane>

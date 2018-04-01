@@ -2,6 +2,7 @@ package core;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -61,28 +62,17 @@ public class Course {
 		if (courseIsValid(startTermStartDate, endTermStartDate, deptID, code,
 				name, color)) {
 
-			Main.active.db.execute(
+			Statement sql = Main.active.db.getConnection().createStatement();
+
+			sql.execute(
 					"insert into course(start_term_start_date, end_term_start_date, "
 							+ "dept_id, code, name, grade, grade_is_automatic, color) "
 							+ "values(" + startTermStartDate + ", "
 							+ endTermStartDate + ", " + "\'" + deptID + "\'"
 							+ ", " + code + ", " + "\'" + name + "\'"
 							+ ", 0, 1, " + "\'" + color + "\'" + ");");
+			sql.close();
 		}
-	}
-
-	/**
-	 * Gets all courses.
-	 *
-	 * @return the courses
-	 * @throws SqliteWrapperException
-	 *             the sqlite wrapper exception
-	 */
-	public static ResultSet getCourses() throws SqliteWrapperException {
-
-		ResultSet courses = Main.active.db.query("select * from course");
-
-		return courses;
 	}
 
 	/**
@@ -98,7 +88,8 @@ public class Course {
 
 		ArrayList<CourseDescription> courses = new ArrayList<>();
 
-		ResultSet findCourses = Main.active.db.query("select * from course");
+		Statement sql = Main.active.db.getConnection().createStatement();
+		ResultSet findCourses = sql.executeQuery("select * from course");
 
 		while (findCourses.next()) {
 
@@ -110,6 +101,8 @@ public class Course {
 					LocalDate.ofEpochDay(findCourses.getLong(
 							Course.Lookup.END_TERM_START_DATE.index))));
 		}
+		findCourses.close();
+		sql.close();
 
 		return courses;
 	}
@@ -215,8 +208,10 @@ public class Course {
 
 		String color = "";
 
-		ResultSet getCourse = Main.active.db
-				.query("select * from course where start_term_start_date = "
+		Statement sql = Main.active.db.getConnection().createStatement();
+
+		ResultSet getCourse = sql.executeQuery(
+				"select * from course where start_term_start_date = "
 						+ course.startTerm.getStartDay()
 						+ " and end_term_start_date = "
 						+ course.endTerm.getStartDay() + " and dept_id = "
@@ -227,6 +222,9 @@ public class Course {
 
 			color = getCourse.getString(Course.Lookup.COLOR.index);
 		}
+
+		getCourse.close();
+		sql.close();
 
 		return color;
 	}

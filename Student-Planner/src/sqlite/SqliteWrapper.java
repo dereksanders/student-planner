@@ -13,8 +13,7 @@ import utility.IOUtil;
  */
 public class SqliteWrapper {
 
-	public Connection connection;
-	private Statement sql;
+	private Connection connection;
 	private String dbDirectory;
 
 	private static String jdbcUrl = "jdbc:sqlite:";
@@ -58,7 +57,6 @@ public class SqliteWrapper {
 		try {
 
 			this.connection = DriverManager.getConnection(url);
-			this.sql = this.connection.createStatement();
 
 		} catch (SQLException e) {
 
@@ -94,7 +92,6 @@ public class SqliteWrapper {
 			try {
 
 				this.connection = DriverManager.getConnection(url);
-				this.sql = this.connection.createStatement();
 
 			} catch (SQLException e) {
 
@@ -120,7 +117,6 @@ public class SqliteWrapper {
 		try {
 
 			this.connection = DriverManager.getConnection(url);
-			this.sql = this.connection.createStatement();
 
 		} catch (SQLException e) {
 
@@ -154,31 +150,6 @@ public class SqliteWrapper {
 		return jdbcUrl + dbDirectory + "/" + dbName;
 	}
 
-	/**
-	 * Executes an SQL statement on the database currently connected to.
-	 *
-	 * @param statement
-	 *            the statement
-	 * @throws SqliteWrapperException
-	 *             the sqlite wrapper exception
-	 */
-	public void execute(String statement) throws SqliteWrapperException {
-
-		assertConnectionExists();
-
-		try {
-
-			if (!this.sql.execute(statement)) {
-				System.out.println("Create table success: " + statement);
-			}
-
-		} catch (SQLException e) {
-
-			new SqliteWrapperException("SQL error " + e.getErrorCode()
-					+ " + occurred:\n" + e.getMessage());
-		}
-	}
-
 	public void executeFromFile(String path) throws SqliteWrapperException {
 
 		// Execute each command in the db schema one at a time.
@@ -189,40 +160,23 @@ public class SqliteWrapper {
 		}
 
 		String[] statements = schema.split(";");
-
-		for (String s : statements) {
-			execute(s);
-		}
-	}
-
-	/**
-	 * Query.
-	 *
-	 * @param statement
-	 *            the statement
-	 * @return the result set
-	 * @throws SqliteWrapperException
-	 *             the sqlite wrapper exception
-	 */
-	public ResultSet query(String statement) throws SqliteWrapperException {
-
-		ResultSet results = null;
-
-		assertConnectionExists();
+		Statement sql = null;
 
 		try {
 
-			results = this.sql.executeQuery(statement);
+			sql = this.getConnection().createStatement();
+
+			for (String s : statements) {
+				System.out.println(s);
+				sql.execute(s);
+			}
+
+			sql.close();
 
 		} catch (SQLException e) {
 
-			throw new SqliteWrapperException("SQL error " + e.getErrorCode()
-					+ " occurred:\n" + e.getMessage());
+			e.printStackTrace();
 		}
-
-		// System.out.println(results);
-
-		return results;
 	}
 
 	/**
@@ -233,20 +187,6 @@ public class SqliteWrapper {
 	public boolean connectionExists() {
 
 		return (this.connection != null);
-	}
-
-	/**
-	 * Assert connection exists.
-	 *
-	 * @throws SqliteWrapperException
-	 *             the sqlite wrapper exception
-	 */
-	private void assertConnectionExists() throws SqliteWrapperException {
-
-		if (!connectionExists()) {
-
-			throw new SqliteWrapperException("No database connection exists.");
-		}
 	}
 
 	/**
@@ -284,7 +224,9 @@ public class SqliteWrapper {
 
 	public void showSchema(String table) throws SQLException {
 
-		ResultSet results = this.sql
+		Statement sql = this.getConnection().createStatement();
+
+		ResultSet results = sql
 				.executeQuery("PRAGMA table_info(" + table + ")");
 
 		System.out.println("MeetingSet table columns:");
@@ -295,5 +237,13 @@ public class SqliteWrapper {
 					+ results.getString(2) + " " + results.getString(3) + " "
 					+ results.getString(4));
 		}
+
+		results.close();
+		sql.close();
+	}
+
+	public Connection getConnection() {
+
+		return this.connection;
 	}
 }

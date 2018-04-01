@@ -2,11 +2,14 @@ package core;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
+import javafx.scene.paint.Color;
 import sqlite.SqliteWrapperException;
+import utility.ColorUtil;
 
 /**
  * The Class MeetingSet.
@@ -43,8 +46,6 @@ public class MeetingSet {
 	/**
 	 * Adds the meeting set.
 	 *
-	 * @param id
-	 *            the id
 	 * @param term
 	 *            the term
 	 * @param course
@@ -60,36 +61,137 @@ public class MeetingSet {
 	 * @throws SQLException
 	 *             the SQL exception
 	 */
-	public static void addMeetingSet(int id, TermDescription term,
+	public static void addCourseMeetingSet(TermDescription term,
 			CourseDescription course, LocalTime start, LocalTime end,
 			ArrayList<LocalDate> dates)
 			throws SqliteWrapperException, SQLException {
 
-		if (course != null) {
+		int id = getNextMeetingID();
+		Statement sql = Main.active.db.getConnection().createStatement();
 
-			Main.active.db.execute(
-					"insert into meeting_set(id, term_start_date, start_time, end_time, "
-							+ "course_start_term_start_date, course_end_term_start_date, "
-							+ "course_dept_id, course_code, name, meeting_type, location, "
-							+ "is_course_meeting_set, color) " + "values(" + id
-							+ "," + term.getStartDay() + ","
-							+ start.toSecondOfDay() + "," + end.toSecondOfDay()
-							+ "," + course.startTerm.getStartDay() + ","
-							+ course.endTerm.getStartDay() + ",\'" + course.dept
-							+ "\'," + course.code + "," + "\'nullname\'" + ","
-							+ "\'nulltype\'" + "," + "\'nulloc\'" + ",1," + "\'"
-							+ Course.getColor(course) + "\'" + ");");
-
-		} else {
-
-			// FIXME: Add handling for non-Course MeetingSets
-		}
+		sql.execute(
+				"insert into meeting_set(id, term_start_date, start_time, end_time, "
+						+ "course_start_term_start_date, course_end_term_start_date, "
+						+ "course_dept_id, course_code, name, meeting_type, location, "
+						+ "is_course_meeting_set, color) " + "values(" + id
+						+ "," + term.getStartDay() + "," + start.toSecondOfDay()
+						+ "," + end.toSecondOfDay() + ","
+						+ course.startTerm.getStartDay() + ","
+						+ course.endTerm.getStartDay() + ",\'" + course.dept
+						+ "\'," + course.code + "," + "\'nullname\'" + ","
+						+ "\'nulltype\'" + "," + "\'nulloc\'" + ",1," + "\'"
+						+ Course.getColor(course) + "\'" + ");");
 
 		for (LocalDate d : dates) {
 
-			Main.active.db.execute("insert into meeting_date(set_id, date_of) "
-					+ "values(" + id + ", " + d.toEpochDay() + ");");
+			sql.execute("insert into meeting_date(set_id, date_of) " + "values("
+					+ id + ", " + d.toEpochDay() + ");");
 		}
+		sql.close();
+		Main.active.update();
+	}
+
+	/**
+	 * Adds the meeting set.
+	 *
+	 * @param term
+	 *            the term
+	 * @param start
+	 *            the start
+	 * @param end
+	 *            the end
+	 * @param dates
+	 *            the dates
+	 * @param color
+	 *            the color
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
+	public static void addNonCourseMeetingSet(TermDescription term,
+			LocalTime start, LocalTime end, ArrayList<LocalDate> dates,
+			Color color) throws SqliteWrapperException, SQLException {
+
+		int id = getNextMeetingID();
+
+		Statement sql = Main.active.db.getConnection().createStatement();
+		sql.execute(
+				"insert into meeting_set(id, term_start_date, start_time, end_time, "
+						+ "course_start_term_start_date, course_end_term_start_date, "
+						+ "course_dept_id, course_code, name, meeting_type, location, "
+						+ "is_course_meeting_set, color) " + "values(" + id
+						+ "," + term.getStartDay() + "," + start.toSecondOfDay()
+						+ "," + end.toSecondOfDay() + ",0,0" + ",\'null\',0,"
+						+ "\'nullname\'" + "," + "\'nulltype\'" + ","
+						+ "\'nulloc\'" + ",1," + "\'"
+						+ ColorUtil.colorToHex(color) + "\'" + ");");
+
+		for (LocalDate d : dates) {
+
+			sql.execute("insert into meeting_date(set_id, date_of) " + "values("
+					+ id + ", " + d.toEpochDay() + ");");
+		}
+		sql.close();
+	}
+
+	/**
+	 * Gets the next meeting ID.
+	 *
+	 * @return the next meeting ID
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
+	private static int getNextMeetingID()
+			throws SqliteWrapperException, SQLException {
+
+		int maxID = 0;
+
+		Statement sql = Main.active.db.getConnection().createStatement();
+
+		if (meetingSetsExist()) {
+
+			ResultSet rs = sql.executeQuery("select max(id) from meeting_set");
+
+			while (rs.next()) {
+				maxID = rs.getInt(1);
+			}
+
+			rs.close();
+		}
+		sql.close();
+
+		return maxID + 1;
+	}
+
+	/**
+	 * Meeting sets exist.
+	 *
+	 * @return true, if successful
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
+	private static boolean meetingSetsExist()
+			throws SqliteWrapperException, SQLException {
+
+		int numMeetingSets = 0;
+
+		Statement sql = Main.active.db.getConnection().createStatement();
+		ResultSet countMeetingSets = sql
+				.executeQuery("select count(*) from meeting_set");
+
+		while (countMeetingSets.next()) {
+
+			numMeetingSets = countMeetingSets.getInt(1);
+		}
+		countMeetingSets.close();
+		sql.close();
+
+		return (numMeetingSets > 0);
 	}
 
 	/**
@@ -108,8 +210,9 @@ public class MeetingSet {
 
 		MeetingSetDescription found = null;
 
-		ResultSet findMeetingSet = Main.active.db
-				.query("select * from meeting_set where id = " + setID);
+		Statement sql = Main.active.db.getConnection().createStatement();
+		ResultSet findMeetingSet = sql
+				.executeQuery("select * from meeting_set where id = " + setID);
 
 		if (findMeetingSet.next()) {
 
@@ -138,6 +241,8 @@ public class MeetingSet {
 					startTime, endTime, findMeetingSet.getBoolean(
 							MeetingSet.Lookup.IS_COURSE_MEETING.index));
 		}
+		findMeetingSet.close();
+		sql.close();
 
 		return found;
 	}
@@ -158,13 +263,16 @@ public class MeetingSet {
 
 		String color = "";
 
-		ResultSet getMeetingSet = Main.active.db
-				.query("select * from meeting_set where id = " + id);
+		Statement sql = Main.active.db.getConnection().createStatement();
+		ResultSet getMeetingSet = sql
+				.executeQuery("select * from meeting_set where id = " + id);
 
 		if (getMeetingSet.next()) {
 
 			color = getMeetingSet.getString(MeetingSet.Lookup.COLOR.index);
 		}
+		getMeetingSet.close();
+		sql.close();
 
 		return color;
 	}

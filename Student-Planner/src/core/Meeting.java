@@ -2,6 +2,7 @@ package core;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -58,13 +59,14 @@ public class Meeting {
 		ArrayList<MeetingDescription> meetingsThisWeek = new ArrayList<>();
 
 		LocalDate startOfWeek = DateTimeUtil.getStartOfWeek(date);
-
 		long startOfWeekJulian = startOfWeek.toEpochDay();
+		long startOfNextWeekJulian = startOfWeekJulian + 7;
 
-		ResultSet findMeetings = Main.active.db
-				.query("select * from meeting_date where date_of >= "
+		Statement sql = Main.active.db.getConnection().createStatement();
+		ResultSet findMeetings = sql
+				.executeQuery("select * from meeting_date where date_of >= "
 						+ startOfWeekJulian + " and date_of < "
-						+ startOfWeekJulian + 7);
+						+ startOfNextWeekJulian);
 
 		while (findMeetings.next()) {
 
@@ -73,7 +75,10 @@ public class Meeting {
 					findMeetings.getLong(Meeting.Lookup.DATE.index));
 
 			meetingsThisWeek.add(new MeetingDescription(set, dateOf));
+			System.out.println(set + ", " + dateOf.toEpochDay());
 		}
+		findMeetings.close();
+		sql.close();
 
 		return meetingsThisWeek;
 	}
@@ -96,8 +101,9 @@ public class Meeting {
 
 		MeetingSetDescription setWithMeetingDuringTime = null;
 
-		ResultSet meetingsThatDay = Main.active.db
-				.query("select * from meeting_date where date_of = "
+		Statement sql = Main.active.db.getConnection().createStatement();
+		ResultSet meetingsThatDay = sql
+				.executeQuery("select * from meeting_date where date_of = "
 						+ dateTime.toLocalDate().toEpochDay());
 
 		ArrayList<MeetingDescription> meetings = new ArrayList<>();
@@ -109,10 +115,11 @@ public class Meeting {
 					LocalDate.ofEpochDay(meetingsThatDay
 							.getLong(Meeting.Lookup.DATE.index))));
 		}
+		meetingsThatDay.close();
 
 		for (MeetingDescription meeting : meetings) {
 
-			ResultSet meetingSet = Main.active.db.query(
+			ResultSet meetingSet = sql.executeQuery(
 					"select * from meeting_set where id = " + meeting.setID);
 
 			LocalTime meetingStart = null;
@@ -154,8 +161,17 @@ public class Meeting {
 					break;
 				}
 			}
+			meetingSet.close();
 		}
 
 		return setWithMeetingDuringTime;
+	}
+
+	public static ArrayList<MeetingDescription> getConflicts(
+			ArrayList<LocalDate> meetingDates, LocalTime start, LocalTime end) {
+
+		ArrayList<MeetingDescription> conflicts = new ArrayList<>();
+
+		return conflicts;
 	}
 }

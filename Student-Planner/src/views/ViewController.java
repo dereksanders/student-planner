@@ -16,6 +16,7 @@ public class ViewController {
 
 	// Views used for other windows
 	public static String addMeetingPath = "/views/AddMeeting.fxml";
+	public static String conflictsPath = "/views/Conflicts.fxml";
 
 	public ViewController() {
 	}
