@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
-import core.Course;
 import core.Main;
 import core.Meeting;
 import core.MeetingBlock;
@@ -402,7 +401,7 @@ public class CourseScheduleController implements Observer {
 				* PIXELS_PER_MINUTE;
 
 		Rectangle rect = new Rectangle(xOffset, yOffset, DAY_WIDTH, height);
-		rect.setFill(Paint.valueOf(Course.getColor(meeting.set.course)));
+		rect.setFill(Paint.valueOf(MeetingSet.getColor(meeting.setID)));
 
 		return new MeetingBlock(meeting, rect);
 	}

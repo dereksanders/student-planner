@@ -50,10 +50,12 @@ public class MeetingSet {
 	 *            the term
 	 * @param course
 	 *            the course
+	 * @param meetingType
 	 * @param start
 	 *            the start
 	 * @param end
 	 *            the end
+	 * @param string
 	 * @param dates
 	 *            the dates
 	 * @throws SqliteWrapperException
@@ -62,8 +64,8 @@ public class MeetingSet {
 	 *             the SQL exception
 	 */
 	public static void addCourseMeetingSet(TermDescription term,
-			CourseDescription course, LocalTime start, LocalTime end,
-			ArrayList<LocalDate> dates)
+			CourseDescription course, String meetingType, LocalTime start,
+			LocalTime end, String location, ArrayList<LocalDate> dates)
 			throws SqliteWrapperException, SQLException {
 
 		int id = getNextMeetingID();
@@ -79,8 +81,9 @@ public class MeetingSet {
 						+ course.startTerm.getStartDay() + ","
 						+ course.endTerm.getStartDay() + ",\'" + course.dept
 						+ "\'," + course.code + "," + "\'nullname\'" + ","
-						+ "\'nulltype\'" + "," + "\'nulloc\'" + ",1," + "\'"
-						+ Course.getColor(course) + "\'" + ");");
+						+ "\'" + meetingType + "\'" + "," + "\'" + location
+						+ "\'" + ",1," + "\'" + Course.getColor(course) + "\'"
+						+ ");");
 
 		for (LocalDate d : dates) {
 
@@ -96,10 +99,13 @@ public class MeetingSet {
 	 *
 	 * @param term
 	 *            the term
+	 * @param string
+	 * @param meetingName
 	 * @param start
 	 *            the start
 	 * @param end
 	 *            the end
+	 * @param location
 	 * @param dates
 	 *            the dates
 	 * @param color
@@ -110,7 +116,8 @@ public class MeetingSet {
 	 *             the SQL exception
 	 */
 	public static void addNonCourseMeetingSet(TermDescription term,
-			LocalTime start, LocalTime end, ArrayList<LocalDate> dates,
+			String meetingName, String meetingType, LocalTime start,
+			LocalTime end, String location, ArrayList<LocalDate> dates,
 			Color color) throws SqliteWrapperException, SQLException {
 
 		int id = getNextMeetingID();
@@ -123,8 +130,8 @@ public class MeetingSet {
 						+ "is_course_meeting_set, color) " + "values(" + id
 						+ "," + term.getStartDay() + "," + start.toSecondOfDay()
 						+ "," + end.toSecondOfDay() + ",0,0" + ",\'null\',0,"
-						+ "\'nullname\'" + "," + "\'nulltype\'" + ","
-						+ "\'nulloc\'" + ",1," + "\'"
+						+ "\'" + meetingName + "\'" + "," + "\'" + meetingType
+						+ "\'" + "," + "\'" + location + "\'" + ",0," + "\'"
 						+ ColorUtil.colorToHex(color) + "\'" + ");");
 
 		for (LocalDate d : dates) {
@@ -133,6 +140,7 @@ public class MeetingSet {
 					+ id + ", " + d.toEpochDay() + ");");
 		}
 		sql.close();
+		Main.active.update();
 	}
 
 	/**

@@ -351,14 +351,19 @@ public class AddMeetingController {
 			if (courseMeetingTab.isSelected()) {
 
 				MeetingSet.addCourseMeetingSet(Main.active.getSelectedTerm(),
-						chooseCourse.getValue(), chooseStartTime.getValue(),
-						chooseEndTime.getValue(), meetingDates);
+						chooseCourse.getValue(),
+						chooseTypeOfCourseMeeting.getValue(),
+						chooseStartTime.getValue(), chooseEndTime.getValue(),
+						enterLocation.getText(), meetingDates);
 
 			} else if (nonCourseMeetingTab.isSelected()) {
 
 				MeetingSet.addNonCourseMeetingSet(Main.active.getSelectedTerm(),
+						enterMeetingName.getText(),
+						chooseTypeOfNonCourseMeeting.getValue(),
 						chooseStartTime.getValue(), chooseEndTime.getValue(),
-						meetingDates, chooseColor.getValue());
+						enterLocation.getText(), meetingDates,
+						chooseColor.getValue());
 			}
 
 			window.close();
