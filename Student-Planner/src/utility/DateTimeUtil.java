@@ -246,4 +246,59 @@ public class DateTimeUtil {
 
 		return endMinutes - startMinutes;
 	}
+
+	public static boolean isValidLocalTime(Object time) {
+
+		boolean isValid = false;
+
+		if (time instanceof LocalTime) {
+			isValid = true;
+		} else if (time instanceof String) {
+			String[] components = ((String) time).split(":");
+			if (components.length == 2) {
+				try {
+					LocalTime t = LocalTime.of(Integer.parseInt(components[0]),
+							Integer.parseInt(components[1]));
+
+					isValid = true;
+				} catch (NumberFormatException e) {
+				}
+			}
+		}
+
+		return isValid;
+	}
+
+	public static LocalTime parseLocalTime(String time) {
+
+		LocalTime parsed = null;
+
+		if (isValidLocalTime(time)) {
+
+			String[] components = ((String) time).split(":");
+			parsed = LocalTime.of(Integer.parseInt(components[0]),
+					Integer.parseInt(components[1]));
+		}
+
+		return parsed;
+	}
+
+	public static String localTimeAsString(LocalTime time) {
+
+		String hour = "";
+		if (time.getHour() < 10) {
+			hour = "0" + time.getHour();
+		} else {
+			hour = "" + time.getHour();
+		}
+
+		String minute = "";
+		if (time.getMinute() < 10) {
+			minute = "0" + time.getMinute();
+		} else {
+			minute = "" + time.getMinute();
+		}
+
+		return hour + ":" + minute;
+	}
 }

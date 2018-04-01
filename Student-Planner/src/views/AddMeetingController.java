@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 
 import core.Course;
@@ -33,6 +32,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import sqlite.SqliteWrapperException;
+import utility.DateTimeUtil;
 
 /**
  * The Class AddMeetingController.
@@ -51,15 +51,15 @@ public class AddMeetingController {
 	@FXML
 	private ChoiceBox<CourseDescription> chooseCourse;
 	@FXML
-	private ChoiceBox<String> chooseTypeOfCourseMeeting;
+	private ChoiceBox<String> chooseCourseMeetingType;
 	@FXML
-	private TextField enterTypeOfCourseMeeting;
+	private TextField enterOtherCourseMeetingType;
 
 	// Non-Course Meetings
 	@FXML
-	private ChoiceBox<String> chooseTypeOfNonCourseMeeting;
+	private ChoiceBox<String> chooseNonCourseMeetingType;
 	@FXML
-	private TextField enterTypeOfNonCourseMeeting;
+	private TextField enterOtherNonCourseMeetingType;
 	@FXML
 	private TextField enterMeetingName;
 	@FXML
@@ -74,9 +74,9 @@ public class AddMeetingController {
 	@FXML
 	private CheckBox toEndOfTerm;
 	@FXML
-	private ComboBox<LocalTime> chooseStartTime;
+	private ComboBox<String> chooseStartTime;
 	@FXML
-	private ComboBox<LocalTime> chooseEndTime;
+	private ComboBox<String> chooseEndTime;
 	@FXML
 	private TextField enterLocation;
 	@FXML
@@ -140,11 +140,11 @@ public class AddMeetingController {
 			chooseCourse.setValue(coursesInSelectedTerm.get(0));
 		}
 
-		chooseTypeOfCourseMeeting.setItems(
+		chooseCourseMeetingType.setItems(
 				FXCollections.observableArrayList(Meeting.COURSE_TYPES));
-		chooseTypeOfCourseMeeting.setValue(Meeting.COURSE_TYPES[0]);
+		chooseCourseMeetingType.setValue(Meeting.COURSE_TYPES[0]);
 
-		chooseTypeOfCourseMeeting.valueProperty()
+		chooseCourseMeetingType.valueProperty()
 				.addListener(new ChangeListener<String>() {
 					@Override
 					public void changed(
@@ -154,19 +154,19 @@ public class AddMeetingController {
 						if (newType != null) {
 
 							if (newType.equals("Other")) {
-								enterTypeOfCourseMeeting.setVisible(true);
+								enterOtherCourseMeetingType.setVisible(true);
 							} else {
-								enterTypeOfCourseMeeting.setVisible(false);
+								enterOtherCourseMeetingType.setVisible(false);
 							}
 						}
 					}
 				});
 
-		chooseTypeOfNonCourseMeeting.setItems(
+		chooseNonCourseMeetingType.setItems(
 				FXCollections.observableArrayList(Meeting.NON_COURSE_TYPES));
-		chooseTypeOfNonCourseMeeting.setValue(Meeting.NON_COURSE_TYPES[0]);
+		chooseNonCourseMeetingType.setValue(Meeting.NON_COURSE_TYPES[0]);
 
-		chooseTypeOfNonCourseMeeting.valueProperty()
+		chooseNonCourseMeetingType.valueProperty()
 				.addListener(new ChangeListener<String>() {
 					@Override
 					public void changed(
@@ -176,9 +176,10 @@ public class AddMeetingController {
 						if (newType != null) {
 
 							if (newType.equals("Other")) {
-								enterTypeOfNonCourseMeeting.setVisible(true);
+								enterOtherNonCourseMeetingType.setVisible(true);
 							} else {
-								enterTypeOfNonCourseMeeting.setVisible(false);
+								enterOtherNonCourseMeetingType
+										.setVisible(false);
 							}
 						}
 					}
@@ -273,8 +274,11 @@ public class AddMeetingController {
 
 						if (chooseEndTime.getValue()
 								.equals(chooseStartTime.getValue())
-								|| chooseEndTime.getValue()
-										.isBefore(chooseStartTime.getValue())) {
+								|| DateTimeUtil
+										.parseLocalTime(
+												chooseEndTime.getValue())
+										.isBefore(DateTimeUtil.parseLocalTime(
+												chooseStartTime.getValue()))) {
 
 							Main.showAlert(AlertType.ERROR,
 									"Cannot select time",
@@ -283,19 +287,27 @@ public class AddMeetingController {
 					}
 				});
 
-		chooseStartTime.setValue(selected.toLocalTime());
+		chooseStartTime.setValue(
+				DateTimeUtil.localTimeAsString(selected.toLocalTime()));
 
-		if (chooseStartTime.getValue().getHour() < 23) {
+		if (DateTimeUtil.parseLocalTime(chooseStartTime.getValue())
+				.getHour() < 23) {
 
-			chooseEndTime.setValue(chooseStartTime.getValue().plusHours(1));
+			chooseEndTime.setValue(DateTimeUtil.localTimeAsString(DateTimeUtil
+					.parseLocalTime(chooseStartTime.getValue()).plusHours(1)));
 
-		} else if (chooseStartTime.getValue().getMinute() < 30) {
+		} else if (DateTimeUtil.parseLocalTime(chooseStartTime.getValue())
+				.getMinute() < 30) {
 
-			chooseEndTime.setValue(chooseStartTime.getValue().plusMinutes(30));
+			chooseEndTime.setValue(DateTimeUtil.localTimeAsString(
+					DateTimeUtil.parseLocalTime(chooseStartTime.getValue())
+							.plusMinutes(30)));
 
 		} else {
 
-			chooseEndTime.setValue(chooseStartTime.getValue().plusMinutes(15));
+			chooseEndTime.setValue(DateTimeUtil.localTimeAsString(
+					DateTimeUtil.parseLocalTime(chooseStartTime.getValue())
+							.plusMinutes(15)));
 		}
 
 		chooseRepeat.setItems(
@@ -334,39 +346,79 @@ public class AddMeetingController {
 			}
 		}
 
-		ArrayList<MeetingDescription> conflicts = Meeting.getConflicts(
-				meetingDates, chooseStartTime.getValue(),
-				chooseEndTime.getValue());
+		if (DateTimeUtil.isValidLocalTime(chooseStartTime.getValue())
+				&& DateTimeUtil.isValidLocalTime(chooseEndTime.getValue())) {
 
-		if (conflicts.size() > 0) {
+			ArrayList<MeetingDescription> conflicts = Meeting.getConflicts(
+					meetingDates,
+					DateTimeUtil.parseLocalTime(chooseStartTime.getValue()),
+					DateTimeUtil.parseLocalTime(chooseEndTime.getValue()));
 
-			ConflictsController cc = new ConflictsController(conflicts,
-					meetingDates);
+			if (conflicts.size() > 0) {
 
-			meetingDates = cc.getRemainingDates();
-		}
+				ConflictsController cc = new ConflictsController(conflicts,
+						meetingDates);
 
-		if (meetingDates.size() > 0) {
-
-			if (courseMeetingTab.isSelected()) {
-
-				MeetingSet.addCourseMeetingSet(Main.active.getSelectedTerm(),
-						chooseCourse.getValue(),
-						chooseTypeOfCourseMeeting.getValue(),
-						chooseStartTime.getValue(), chooseEndTime.getValue(),
-						enterLocation.getText(), meetingDates);
-
-			} else if (nonCourseMeetingTab.isSelected()) {
-
-				MeetingSet.addNonCourseMeetingSet(Main.active.getSelectedTerm(),
-						enterMeetingName.getText(),
-						chooseTypeOfNonCourseMeeting.getValue(),
-						chooseStartTime.getValue(), chooseEndTime.getValue(),
-						enterLocation.getText(), meetingDates,
-						chooseColor.getValue());
+				meetingDates = cc.getRemainingDates();
 			}
 
-			window.close();
+			if (meetingDates.size() > 0) {
+
+				if (courseMeetingTab.isSelected()) {
+
+					MeetingSet.addCourseMeetingSet(
+							Main.active.getSelectedTerm(),
+							chooseCourse.getValue(),
+							chooseCourseMeetingType.getValue(),
+							DateTimeUtil
+									.parseLocalTime(chooseStartTime.getValue()),
+							DateTimeUtil
+									.parseLocalTime(chooseEndTime.getValue()),
+							enterLocation.getText(), meetingDates);
+
+				} else if (nonCourseMeetingTab.isSelected()) {
+
+					MeetingSet.addNonCourseMeetingSet(
+							Main.active.getSelectedTerm(),
+							enterMeetingName.getText(),
+							chooseNonCourseMeetingType.getValue(),
+							DateTimeUtil
+									.parseLocalTime(chooseStartTime.getValue()),
+							DateTimeUtil
+									.parseLocalTime(chooseEndTime.getValue()),
+							enterLocation.getText(), meetingDates,
+							chooseColor.getValue());
+				}
+
+				window.close();
+			}
+		} else {
+
+			ArrayList<String> errorMessages = new ArrayList<>();
+
+			if (!DateTimeUtil.isValidLocalTime(chooseStartTime.getValue())) {
+				errorMessages.add(
+						"Start time is invalid. It must be in the format hh:mm");
+			}
+
+			if (!DateTimeUtil.isValidLocalTime(chooseEndTime.getValue())) {
+				errorMessages.add(
+						"End time is invalid. It must be in the format hh:mm");
+			}
+
+			String errorText = "";
+
+			for (int i = 0; i < errorMessages.size(); i++) {
+
+				errorText += (i + 1) + ". " + errorMessages.get(i);
+
+				if (i < errorMessages.size() - 1) {
+
+					errorText += "\n";
+				}
+			}
+
+			Main.showAlert(AlertType.ERROR, "Cannot add meeting", errorText);
 		}
 	}
 

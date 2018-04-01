@@ -50,8 +50,8 @@
                         <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Course" />
                         <ChoiceBox fx:id="chooseCourse" layoutX="14.0" layoutY="27.0" prefHeight="26.0" prefWidth="150.0" stylesheets="@style.css" />
                         <Text layoutX="181.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Type" />
-                        <ChoiceBox fx:id="chooseTypeOfCourseMeeting" layoutX="181.0" layoutY="27.0" prefHeight="26.0" prefWidth="150.0" />
-                        <TextField fx:id="enterTypeOfCourseMeeting" layoutX="182.0" layoutY="68.0" promptText="Enter meeting type" visible="false" />
+                        <ChoiceBox fx:id="chooseCourseMeetingType" layoutX="181.0" layoutY="27.0" prefHeight="26.0" prefWidth="150.0" />
+                        <TextField fx:id="enterOtherCourseMeetingType" layoutX="182.0" layoutY="68.0" promptText="Enter meeting type" visible="false" />
                      </children>
                   </AnchorPane>
             </content>
@@ -61,8 +61,8 @@
               <AnchorPane minHeight="0.0" minWidth="0.0" style="-fx-background-color: #fff;">
                      <children>
                         <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Type" />
-                        <ChoiceBox fx:id="chooseTypeOfNonCourseMeeting" layoutX="14.0" layoutY="27.0" minWidth="150.0" prefHeight="26.0" prefWidth="150.0" />
-                        <TextField fx:id="enterTypeOfNonCourseMeeting" layoutX="15.0" layoutY="68.0" promptText="Enter meeting type" visible="false" />
+                        <ChoiceBox fx:id="chooseNonCourseMeetingType" layoutX="14.0" layoutY="27.0" minWidth="150.0" prefHeight="26.0" prefWidth="150.0" />
+                        <TextField fx:id="enterOtherNonCourseMeetingType" layoutX="15.0" layoutY="68.0" promptText="Enter meeting type" visible="false" />
                         <TextField fx:id="enterMeetingName" layoutX="181.0" layoutY="27.0" promptText="Enter meeting name" />
                         <Text layoutX="181.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name" />
                         <ColorPicker fx:id="chooseColor" layoutX="14.0" layoutY="114.0" minHeight="26.0" prefHeight="26.0" prefWidth="115.0" />

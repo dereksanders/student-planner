@@ -77,7 +77,7 @@ public class CourseScheduleController implements Observer {
 	private static final String EMPTY_DAY_COLOR = "#eeeeee";
 
 	// Times for forms related to CourseSchedule.
-	public static final LocalTime[] times = generateTimes();
+	public static final String[] times = generateTimesAsStrings();
 
 	/**
 	 * Initialize.
@@ -149,6 +149,32 @@ public class CourseScheduleController implements Observer {
 						}
 					}
 				});
+	}
+
+	private static String[] generateTimesAsStrings() {
+
+		int timesPerHour = 2;
+		LocalTime[] times = new LocalTime[24 * timesPerHour];
+		String[] timesAsStrings = new String[times.length];
+
+		for (int i = 0; i < times.length; i++) {
+
+			for (int j = 0; j < 24; j++) {
+
+				for (int k = 0; k < timesPerHour; k++) {
+
+					times[i] = LocalTime.of(j, (60 / timesPerHour) * k);
+					i++;
+				}
+			}
+		}
+
+		for (int i = 0; i < times.length; i++) {
+
+			timesAsStrings[i] = DateTimeUtil.localTimeAsString(times[i]);
+		}
+
+		return timesAsStrings;
 	}
 
 	private static LocalTime[] generateTimes() {
