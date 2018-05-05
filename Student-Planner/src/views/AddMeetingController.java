@@ -319,6 +319,16 @@ public class AddMeetingController {
 	private void confirm()
 			throws SqliteWrapperException, SQLException, IOException {
 
+		String description = "";
+		if (courseMeetingTab.isSelected()) {
+
+			description = chooseCourse.getValue() + " "
+					+ chooseCourseMeetingType.getValue();
+		} else {
+
+			description = enterMeetingName.getText();
+		}
+
 		// Construct list of dates based on repeat choice
 		ArrayList<LocalDate> meetingDates = new ArrayList<>();
 
@@ -357,7 +367,7 @@ public class AddMeetingController {
 			if (conflicts.size() > 0) {
 
 				ConflictsController cc = new ConflictsController(conflicts,
-						meetingDates);
+						meetingDates, description);
 
 				meetingDates = cc.getRemainingDates();
 			}

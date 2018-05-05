@@ -20,7 +20,7 @@ import utility.ColorUtil;
 /**
  * The Class CoursesController.
  */
-public class CoursesController {
+public class CoursesWelcomeController {
 
 	@FXML
 	private ChoiceBox<TermDescription> startTerm;

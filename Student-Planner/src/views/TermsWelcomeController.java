@@ -16,7 +16,7 @@ import utility.ColorUtil;
 /**
  * The Class TermsController.
  */
-public class TermsController {
+public class TermsWelcomeController {
 
 	@FXML
 	private TextField nameField;

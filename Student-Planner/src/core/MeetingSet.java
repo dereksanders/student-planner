@@ -284,4 +284,15 @@ public class MeetingSet {
 
 		return color;
 	}
+
+	public static void deleteMeetingSet(int setID)
+			throws SQLException, SqliteWrapperException {
+
+		Statement sql = Main.active.db.getConnection().createStatement();
+
+		sql.execute("delete from meeting_set where id = " + setID);
+		sql.close();
+
+		Main.active.update();
+	}
 }

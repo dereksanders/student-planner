@@ -1,4 +1,6 @@
-/sqlite/
-/core/
 /views/
+/courseScheduleViews/
+/termCalendarViews/
+/welcomeViews/
 /utility/
+/core/

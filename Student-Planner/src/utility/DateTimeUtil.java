@@ -247,6 +247,13 @@ public class DateTimeUtil {
 		return endMinutes - startMinutes;
 	}
 
+	/**
+	 * Checks if is valid local time.
+	 *
+	 * @param time
+	 *            the time
+	 * @return true, if is valid local time
+	 */
 	public static boolean isValidLocalTime(Object time) {
 
 		boolean isValid = false;
@@ -269,6 +276,13 @@ public class DateTimeUtil {
 		return isValid;
 	}
 
+	/**
+	 * Parses the local time.
+	 *
+	 * @param time
+	 *            the time
+	 * @return the local time
+	 */
 	public static LocalTime parseLocalTime(String time) {
 
 		LocalTime parsed = null;
@@ -283,6 +297,13 @@ public class DateTimeUtil {
 		return parsed;
 	}
 
+	/**
+	 * Local time as string.
+	 *
+	 * @param time
+	 *            the time
+	 * @return the string
+	 */
 	public static String localTimeAsString(LocalTime time) {
 
 		String hour = "";
@@ -300,5 +321,110 @@ public class DateTimeUtil {
 		}
 
 		return hour + ":" + minute;
+	}
+
+	/**
+	 * Short pretty date.
+	 *
+	 * @param startOfWeek
+	 *            the start of week
+	 * @return the string
+	 */
+	public static String shortPrettyDate(LocalDate startOfWeek) {
+
+		String month = getMonthAbbreviation(startOfWeek.getMonthValue());
+		String date = startOfWeek.getDayOfMonth()
+				+ getDateEnding(startOfWeek.getDayOfMonth());
+
+		return month + " " + date;
+	}
+
+	/**
+	 * Gets the date ending.
+	 *
+	 * @param dayOfMonth
+	 *            the day of month
+	 * @return the date ending
+	 */
+	private static String getDateEnding(int dayOfMonth) {
+
+		String ending = "";
+
+		String dayOfMonthAsString = Integer.toString(dayOfMonth);
+
+		int lastDigit = Integer.parseInt(
+				dayOfMonthAsString.substring(dayOfMonthAsString.length() - 1));
+
+		switch (lastDigit) {
+
+		case 1:
+			ending = "st";
+			break;
+		case 2:
+			ending = "nd";
+			break;
+		case 3:
+			ending = "rd";
+			break;
+		default:
+			ending = "th";
+			break;
+		}
+
+		return ending;
+	}
+
+	/**
+	 * Gets the month abbreviation.
+	 *
+	 * @param monthValue
+	 *            the month value
+	 * @return the month abbreviation
+	 */
+	private static String getMonthAbbreviation(int monthValue) {
+
+		String abbreviation = "";
+
+		switch (monthValue) {
+
+		case 1:
+			abbreviation = "Jan.";
+			break;
+		case 2:
+			abbreviation = "Feb.";
+			break;
+		case 3:
+			abbreviation = "Mar.";
+			break;
+		case 4:
+			abbreviation = "Apr.";
+			break;
+		case 5:
+			abbreviation = "May";
+			break;
+		case 6:
+			abbreviation = "June";
+			break;
+		case 7:
+			abbreviation = "July";
+			break;
+		case 8:
+			abbreviation = "Aug.";
+			break;
+		case 9:
+			abbreviation = "Sept.";
+			break;
+		case 10:
+			abbreviation = "Oct.";
+			break;
+		case 11:
+			abbreviation = "Nov.";
+			break;
+		case 12:
+			abbreviation = "Dec.";
+			break;
+		}
+
+		return abbreviation;
 	}
 }

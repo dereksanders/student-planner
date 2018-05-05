@@ -65,7 +65,8 @@ public class CourseScheduleController implements Observer {
 	private static final int DAY_WIDTH = 100;
 	private static final int TIME_LABEL_WIDTH = 45;
 	private static final int TIME_LABEL_Y_OFFSET = 6;
-	private static final int DAY_LABEL_HEIGHT = 8;
+	private static final int DAY_LABEL_HEIGHT = 20;
+	private static final int NEWLINE_HEIGHT = 16;
 	private static final double PIXELS_PER_MINUTE = 1.2;
 
 	private static final int PADDING_LEFT = 10;
@@ -151,6 +152,11 @@ public class CourseScheduleController implements Observer {
 				});
 	}
 
+	/**
+	 * Generate times as strings.
+	 *
+	 * @return the string[]
+	 */
 	private static String[] generateTimesAsStrings() {
 
 		int timesPerHour = 2;
@@ -175,26 +181,6 @@ public class CourseScheduleController implements Observer {
 		}
 
 		return timesAsStrings;
-	}
-
-	private static LocalTime[] generateTimes() {
-
-		int timesPerHour = 2;
-		LocalTime[] times = new LocalTime[24 * timesPerHour];
-
-		for (int i = 0; i < times.length; i++) {
-
-			for (int j = 0; j < 24; j++) {
-
-				for (int k = 0; k < timesPerHour; k++) {
-
-					times[i] = LocalTime.of(j, (60 / timesPerHour) * k);
-					i++;
-				}
-			}
-		}
-
-		return times;
 	}
 
 	/**
@@ -286,7 +272,7 @@ public class CourseScheduleController implements Observer {
 
 		if (existing != null) {
 
-			new EditMeetingOptions(existing);
+			new EditMeetingOptionsController(existing);
 
 		} else {
 
@@ -485,59 +471,18 @@ public class CourseScheduleController implements Observer {
 
 		for (int i = 1; i <= maxDay; i++) {
 
-			this.gc.fillText(DateTimeUtil.intToDay(i),
-					getDayXPosition(i) + getDayLabelOffset(i), PADDING_TOP);
+			LocalDate startOfWeek = this.getDateFromDayOfWeek(i);
+
+			// This will display the date in the format of:
+			//
+			// dayOfWeek (e.g. Monday)
+			// month date (e.g. Jan. 31st)
+			this.gc.fillText(DateTimeUtil.intToDay(i), getDayXPosition(i),
+					PADDING_TOP);
+
+			this.gc.fillText(DateTimeUtil.shortPrettyDate(startOfWeek),
+					getDayXPosition(i), PADDING_TOP + NEWLINE_HEIGHT);
 		}
-	}
-
-	/**
-	 * Gets the day label offset.
-	 * 
-	 * The offsets to center the day labels at the top of the schedule were
-	 * manually calculated.
-	 *
-	 * @param day
-	 *            the day
-	 * @return the day label offset
-	 */
-	private int getDayLabelOffset(int day) {
-
-		int offset = 0;
-
-		final int mondayOffset = 20;
-		final int tuesdayOffset = 20;
-		final int wednesdayOffset = 12;
-		final int thursdayOffset = 20;
-		final int fridayOffset = 30;
-		final int saturdayOffset = 20;
-		final int sundayOffset = 26;
-
-		switch (day) {
-
-		case 1:
-			offset = mondayOffset;
-			break;
-		case 2:
-			offset = tuesdayOffset;
-			break;
-		case 3:
-			offset = wednesdayOffset;
-			break;
-		case 4:
-			offset = thursdayOffset;
-			break;
-		case 5:
-			offset = fridayOffset;
-			break;
-		case 6:
-			offset = saturdayOffset;
-			break;
-		case 7:
-			offset = sundayOffset;
-			break;
-		}
-
-		return offset;
 	}
 
 	/**
@@ -736,6 +681,14 @@ public class CourseScheduleController implements Observer {
 				+ PADDING_BOTTOM);
 	}
 
+	/**
+	 * Update.
+	 *
+	 * @param arg0
+	 *            the arg 0
+	 * @param arg1
+	 *            the arg 1
+	 */
 	/*
 	 * (non-Javadoc)
 	 * 

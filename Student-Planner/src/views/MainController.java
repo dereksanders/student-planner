@@ -105,15 +105,6 @@ public class MainController implements Observer {
 		}
 
 		loadTabs();
-
-		// FIXME: Remove when no longer needed for testing.
-		// Add arbitrary MeetingSet for testing purposes.
-		ArrayList<LocalDate> dates = new ArrayList<>();
-		dates.add(LocalDate.now().minusDays(5));
-
-		// MeetingSet.addMeetingSet(1, Main.active.getTermInProgress(),
-		// Course.getCourse(Main.active.getTermInProgress()),
-		// LocalTime.of(9, 0), LocalTime.of(10, 0), dates);
 	}
 
 	/**

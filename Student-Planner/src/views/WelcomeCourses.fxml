@@ -2,8 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ColorPicker?>
-<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -16,9 +16,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="back" stylesheets="@style.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.TermsController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="back" stylesheets="@style.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.CoursesWelcomeController">
    <center>
-      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="353.0" prefWidth="350.0" styleClass="info" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="446.0" prefWidth="350.0" styleClass="info" BorderPane.alignment="CENTER">
          <children>
             <HBox prefHeight="100.0" prefWidth="330.0" spacing="10.0">
                <children>
@@ -28,7 +28,7 @@
                      </image></ImageView>
                   <VBox prefHeight="100.0" prefWidth="245.0">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Add Terms" wrappingWidth="200.0">
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Add Courses" wrappingWidth="200.0">
                            <font>
                               <Font size="23.0" />
                            </font>
@@ -46,32 +46,52 @@
                <children>
                   <HBox prefHeight="11.0" prefWidth="330.0" spacing="10.0">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Name">
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Start Term">
                            <font>
                               <Font size="17.0" />
                            </font>
                         </Text>
-                        <TextField fx:id="nameField" prefHeight="26.0" prefWidth="190.0" promptText="Enter Term Name" />
+                        <ChoiceBox fx:id="startTerm" prefWidth="150.0" />
                      </children>
                   </HBox>
-                  <HBox prefHeight="12.0" prefWidth="330.0" spacing="10.0">
+                  <HBox prefHeight="11.0" prefWidth="330.0" spacing="10.0">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Start">
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="End Term">
                            <font>
                               <Font size="17.0" />
                            </font>
                         </Text>
-                        <DatePicker fx:id="startDate" />
+                        <ChoiceBox fx:id="endTerm" prefWidth="150.0" />
                      </children>
                   </HBox>
-                  <HBox prefHeight="19.0" prefWidth="330.0" spacing="10.0">
+                  <HBox prefHeight="11.0" prefWidth="330.0" spacing="10.0">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="End">
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Dept">
                            <font>
                               <Font size="17.0" />
                            </font>
                         </Text>
-                        <DatePicker fx:id="endDate" prefWidth="174.0" />
+                        <TextField fx:id="deptField" prefHeight="26.0" prefWidth="190.0" promptText="Department (e.g. PSYC)" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="11.0" prefWidth="330.0" spacing="10.0">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Code">
+                           <font>
+                              <Font size="17.0" />
+                           </font>
+                        </Text>
+                        <TextField fx:id="codeField" prefHeight="26.0" prefWidth="190.0" promptText="Course Code (e.g. 101)" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="11.0" prefWidth="330.0" spacing="10.0">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Title">
+                           <font>
+                              <Font size="17.0" />
+                           </font>
+                        </Text>
+                        <TextField fx:id="titleField" prefHeight="26.0" prefWidth="190.0" promptText="Course Title" />
                      </children>
                   </HBox>
                   <ColorPicker fx:id="color" minHeight="25.0" prefWidth="125.0" />
@@ -92,7 +112,7 @@
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Term" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Course" />
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Start" GridPane.columnIndex="1" />
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="End" GridPane.columnIndex="2" />
                      </children>

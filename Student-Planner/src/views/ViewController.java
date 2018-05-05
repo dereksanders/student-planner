@@ -10,8 +10,8 @@ import javafx.scene.Scene;
 public class ViewController {
 
 	public static String welcomeViewPath = "/views/Welcome.fxml";
-	public static String termsViewPath = "/views/Terms.fxml";
-	public static String coursesViewPath = "/views/Courses.fxml";
+	public static String termsViewPath = "/views/WelcomeTerms.fxml";
+	public static String coursesViewPath = "/views/WelcomeCourses.fxml";
 	public static String mainViewPath = "/views/Main.fxml";
 
 	// Views used for other windows

@@ -163,15 +163,109 @@ public class Meeting {
 			}
 			meetingSet.close();
 		}
+		sql.close();
 
 		return setWithMeetingDuringTime;
 	}
 
+	/**
+	 * Gets the conflicts.
+	 *
+	 * @param meetingDates
+	 *            the meeting dates
+	 * @param start
+	 *            the start
+	 * @param end
+	 *            the end
+	 * @return the conflicts
+	 * @throws SQLException
+	 * @throws SqliteWrapperException
+	 */
 	public static ArrayList<MeetingDescription> getConflicts(
-			ArrayList<LocalDate> meetingDates, LocalTime start, LocalTime end) {
+			ArrayList<LocalDate> meetingDates, LocalTime start, LocalTime end)
+			throws SQLException, SqliteWrapperException {
 
 		ArrayList<MeetingDescription> conflicts = new ArrayList<>();
 
+		Statement sql = Main.active.db.getConnection().createStatement();
+
+		for (LocalDate date : meetingDates) {
+
+			ResultSet meetingsThatDay = sql
+					.executeQuery("select * from meeting_date where date_of = "
+							+ date.toEpochDay());
+
+			ArrayList<MeetingDescription> meetings = new ArrayList<>();
+
+			while (meetingsThatDay.next()) {
+
+				meetings.add(new MeetingDescription(
+						meetingsThatDay.getInt(Meeting.Lookup.SET_ID.index),
+						LocalDate.ofEpochDay(meetingsThatDay
+								.getLong(Meeting.Lookup.DATE.index))));
+			}
+			meetingsThatDay.close();
+
+			for (MeetingDescription meeting : meetings) {
+
+				ResultSet meetingSet = sql
+						.executeQuery("select * from meeting_set where id = "
+								+ meeting.setID);
+
+				LocalTime meetingStart = null;
+				LocalTime meetingEnd = null;
+
+				// There should only be one MeetingSet per ID.
+				while (meetingSet.next()) {
+
+					meetingStart = LocalTime.ofSecondOfDay(meetingSet
+							.getLong(MeetingSet.Lookup.START_TIME.index));
+
+					meetingEnd = LocalTime.ofSecondOfDay(meetingSet
+							.getLong(MeetingSet.Lookup.END_TIME.index));
+
+					if (!(start.isAfter(meetingEnd) || start.equals(meetingEnd)
+							|| end.isBefore(meetingStart)
+							|| end.equals(meetingStart))) {
+
+						conflicts.add(meeting);
+					}
+				}
+				meetingSet.close();
+			}
+		}
+		sql.close();
+
 		return conflicts;
+	}
+
+	public static void deleteMeeting(MeetingDescription meeting)
+			throws SQLException, SqliteWrapperException {
+
+		Statement sql = Main.active.db.getConnection().createStatement();
+
+		sql.execute("delete from meeting_date where set_id = " + meeting.setID
+				+ " and date_of = " + meeting.date.toEpochDay());
+
+		ResultSet countMeetingsInSet = sql.executeQuery(
+				"select count(*) from meeting_date where set_id = "
+						+ meeting.setID);
+
+		int numMeetings = 0;
+
+		if (countMeetingsInSet.next()) {
+			numMeetings = countMeetingsInSet.getInt(1);
+		}
+
+		// If the set no longer has any meetings, delete it.
+		if (numMeetings == 0) {
+
+			MeetingSet.deleteMeetingSet(meeting.setID);
+		}
+
+		countMeetingsInSet.close();
+		sql.close();
+
+		Main.active.update();
 	}
 }

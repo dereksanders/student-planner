@@ -44,6 +44,18 @@ public class MeetingDescription {
 	@Override
 	public String toString() {
 
-		return this.setID + " " + date;
+		String description = "";
+
+		if (this.set.isCourseMeeting) {
+
+			description = this.set.course + " " + this.set.type + "\n"
+					+ this.date + "\n" + this.set.start + " - " + this.set.end;
+		} else {
+
+			description = this.set.name + " " + this.set.type + "\n" + this.date
+					+ "\n" + this.set.start + " - " + this.set.end;
+		}
+
+		return description;
 	}
 }

@@ -4,11 +4,11 @@ import core.MeetingSetDescription;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class EditMeetingOptions {
+public class EditMeetingOptionsController {
 
 	private MeetingSetDescription set;
 
-	public EditMeetingOptions(MeetingSetDescription set) {
+	public EditMeetingOptionsController(MeetingSetDescription set) {
 
 		this.set = set;
 
