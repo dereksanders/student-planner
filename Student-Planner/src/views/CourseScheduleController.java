@@ -14,7 +14,6 @@ import core.Meeting;
 import core.MeetingBlock;
 import core.MeetingDescription;
 import core.MeetingSet;
-import core.MeetingSetDescription;
 import core.Profile;
 import core.Term;
 import javafx.beans.value.ChangeListener;
@@ -267,7 +266,7 @@ public class CourseScheduleController implements Observer {
 		LocalDateTime selectedDateTime = LocalDateTime.of(selectedDate,
 				timeClicked);
 
-		MeetingSetDescription existing = Meeting
+		MeetingDescription existing = Meeting
 				.getMeetingDuring(selectedDateTime);
 
 		if (existing != null) {

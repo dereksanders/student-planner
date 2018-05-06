@@ -6,19 +6,19 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="243.0" prefWidth="570.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <CheckBox fx:id="repeat" layoutX="302.0" layoutY="249.0" mnemonicParsing="false" text="Repeat for" />
-      <Text fx:id="currentConflict" layoutX="157.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Conflict Description" />
-      <Text fx:id="meetingBeingAdded" layoutX="358.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Meeting Being Added" />
+      <CheckBox fx:id="repeat" layoutX="39.0" layoutY="149.0" mnemonicParsing="false" text="Repeat for" />
+      <Text fx:id="currentConflict" layoutX="37.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Conflict Description" />
+      <Text fx:id="meetingBeingAdded" layoutX="312.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Meeting Being Added" />
       <Text layoutX="14.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Conflict(s) Exist">
          <font>
             <Font size="17.0" />
          </font>
       </Text>
-      <Button fx:id="deleteOld" layoutX="302.0" layoutY="283.0" mnemonicParsing="false" onAction="#deleteOld" text="Delete Old" />
-      <Button fx:id="deleteNew" layoutX="396.0" layoutY="283.0" mnemonicParsing="false" onAction="#deleteNew" text="Delete New" />
-      <Text layoutX="157.0" layoutY="64.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Old Meeting" />
-      <Text layoutX="359.0" layoutY="63.0" strokeType="OUTSIDE" strokeWidth="0.0" text="New Meeting" />
+      <Button fx:id="deleteOld" layoutX="39.0" layoutY="183.0" mnemonicParsing="false" onAction="#deleteOld" text="Delete Old" />
+      <Button fx:id="deleteNew" layoutX="127.0" layoutY="183.0" mnemonicParsing="false" onAction="#deleteNew" text="Delete New" />
+      <Text layoutX="37.0" layoutY="72.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Old Meeting" />
+      <Text layoutX="312.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="New Meeting" />
    </children>
 </AnchorPane>

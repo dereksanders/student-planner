@@ -96,7 +96,8 @@ public class Meeting {
 	 * @throws SQLException
 	 *             the SQL exception
 	 */
-	public static MeetingSetDescription getMeetingDuring(LocalDateTime dateTime)
+	public static MeetingSetDescription getMeetingSetDuring(
+			LocalDateTime dateTime)
 			throws SqliteWrapperException, SQLException {
 
 		MeetingSetDescription setWithMeetingDuringTime = null;
@@ -166,6 +167,73 @@ public class Meeting {
 		sql.close();
 
 		return setWithMeetingDuringTime;
+	}
+
+	/**
+	 * Gets the meeting taking place during the specified date time.
+	 * 
+	 * Returns null if no meeting is taking place.
+	 *
+	 * @param dateTime
+	 *            the date time
+	 * @return the meeting during
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 * @throws SQLException
+	 *             the SQL exception
+	 */
+	public static MeetingDescription getMeetingDuring(LocalDateTime dateTime)
+			throws SqliteWrapperException, SQLException {
+
+		MeetingDescription meetingDuringTime = null;
+
+		Statement sql = Main.active.db.getConnection().createStatement();
+		ResultSet meetingsThatDay = sql
+				.executeQuery("select * from meeting_date where date_of = "
+						+ dateTime.toLocalDate().toEpochDay());
+
+		ArrayList<MeetingDescription> meetings = new ArrayList<>();
+
+		while (meetingsThatDay.next()) {
+
+			meetings.add(new MeetingDescription(
+					meetingsThatDay.getInt(Meeting.Lookup.SET_ID.index),
+					LocalDate.ofEpochDay(meetingsThatDay
+							.getLong(Meeting.Lookup.DATE.index))));
+		}
+		meetingsThatDay.close();
+
+		for (MeetingDescription meeting : meetings) {
+
+			ResultSet meetingSet = sql.executeQuery(
+					"select * from meeting_set where id = " + meeting.setID);
+
+			LocalTime time = dateTime.toLocalTime();
+
+			LocalTime meetingStart = null;
+			LocalTime meetingEnd = null;
+
+			// There should only be one MeetingSet per ID.
+			while (meetingSet.next()) {
+
+				meetingStart = LocalTime.ofSecondOfDay(
+						meetingSet.getLong(MeetingSet.Lookup.START_TIME.index));
+
+				meetingEnd = LocalTime.ofSecondOfDay(
+						meetingSet.getLong(MeetingSet.Lookup.END_TIME.index));
+			}
+			meetingSet.close();
+
+			if ((time.equals(meetingStart) || time.isAfter(meetingStart))
+					&& (time.equals(meetingEnd) || time.isBefore(meetingEnd))) {
+
+				meetingDuringTime = meeting;
+				break;
+			}
+		}
+		sql.close();
+
+		return meetingDuringTime;
 	}
 
 	/**

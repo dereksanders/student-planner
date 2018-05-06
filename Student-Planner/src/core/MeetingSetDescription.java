@@ -11,7 +11,7 @@ import sqlite.SqliteWrapperException;
  */
 public class MeetingSetDescription {
 
-	private int id;
+	public int id;
 	private TermDescription term;
 
 	public CourseDescription course;

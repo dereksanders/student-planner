@@ -51,11 +51,13 @@ public class MeetingSet {
 	 * @param course
 	 *            the course
 	 * @param meetingType
+	 *            the meeting type
 	 * @param start
 	 *            the start
 	 * @param end
 	 *            the end
-	 * @param string
+	 * @param location
+	 *            the location
 	 * @param dates
 	 *            the dates
 	 * @throws SqliteWrapperException
@@ -99,13 +101,16 @@ public class MeetingSet {
 	 *
 	 * @param term
 	 *            the term
-	 * @param string
 	 * @param meetingName
+	 *            the meeting name
+	 * @param meetingType
+	 *            the meeting type
 	 * @param start
 	 *            the start
 	 * @param end
 	 *            the end
 	 * @param location
+	 *            the location
 	 * @param dates
 	 *            the dates
 	 * @param color
@@ -285,6 +290,16 @@ public class MeetingSet {
 		return color;
 	}
 
+	/**
+	 * Delete meeting set.
+	 *
+	 * @param setID
+	 *            the set ID
+	 * @throws SQLException
+	 *             the SQL exception
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 */
 	public static void deleteMeetingSet(int setID)
 			throws SQLException, SqliteWrapperException {
 
@@ -294,5 +309,92 @@ public class MeetingSet {
 		sql.close();
 
 		Main.active.update();
+	}
+
+	/**
+	 * Gets all of the meetings in the set, ordered by date (ascending).
+	 *
+	 * @param id
+	 *            the id
+	 * @return the meetings in set
+	 * @throws SQLException
+	 *             the SQL exception
+	 * @throws SqliteWrapperException
+	 *             the sqlite wrapper exception
+	 */
+	public static ArrayList<MeetingDescription> getMeetingsInSet(int id)
+			throws SQLException, SqliteWrapperException {
+
+		ArrayList<MeetingDescription> meetings = new ArrayList<>();
+
+		Statement sql = Main.active.db.getConnection().createStatement();
+
+		ResultSet meetingsInSet = sql
+				.executeQuery("select * from meeting_date where set_id = " + id
+						+ " order by date_of asc");
+
+		while (meetingsInSet.next()) {
+
+			meetings.add(new MeetingDescription(id, LocalDate.ofEpochDay(
+					meetingsInSet.getLong(Meeting.Lookup.DATE.index))));
+		}
+		meetingsInSet.close();
+		sql.close();
+
+		return meetings;
+	}
+
+	public static MeetingDescription getFirstMeeting(int id)
+			throws SQLException, SqliteWrapperException {
+
+		return getMeetingsInSet(id).get(0);
+
+		/*
+		 * MeetingDescription firstMeeting = null;
+		 * 
+		 * Statement sql = Main.active.db.getConnection().createStatement();
+		 * 
+		 * ResultSet meetingsInSet = sql
+		 * .executeQuery("select * from meeting_date where set_id = " + id +
+		 * " and date_of = (select MIN(date_of) from meeting_date)");
+		 * 
+		 * while (meetingsInSet.next()) {
+		 * 
+		 * System.out.println("First meeting found.");
+		 * 
+		 * firstMeeting = new MeetingDescription(id, LocalDate.ofEpochDay(
+		 * meetingsInSet.getLong(Meeting.Lookup.DATE.index))); }
+		 * meetingsInSet.close(); sql.close();
+		 * 
+		 * return firstMeeting;
+		 */
+	}
+
+	public static MeetingDescription getLastMeeting(int id)
+			throws SQLException, SqliteWrapperException {
+
+		ArrayList<MeetingDescription> meetings = getMeetingsInSet(id);
+
+		return meetings.get(meetings.size() - 1);
+
+		/*
+		 * MeetingDescription lastMeeting = null;
+		 * 
+		 * Statement sql = Main.active.db.getConnection().createStatement();
+		 * 
+		 * ResultSet meetingsInSet = sql
+		 * .executeQuery("select * from meeting_date where set_id = " + id +
+		 * " and date_of = (select MAX(date_of) from meeting_date)");
+		 * 
+		 * while (meetingsInSet.next()) {
+		 * 
+		 * System.out.println("Last meeting found.");
+		 * 
+		 * lastMeeting = new MeetingDescription(id, LocalDate.ofEpochDay(
+		 * meetingsInSet.getLong(Meeting.Lookup.DATE.index))); }
+		 * meetingsInSet.close(); sql.close();
+		 * 
+		 * return lastMeeting;
+		 */
 	}
 }

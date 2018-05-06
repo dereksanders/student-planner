@@ -36,6 +36,21 @@ public class MeetingDescription {
 		this.set = MeetingSet.findMeetingSet(setID);
 	}
 
+	@Override
+	public boolean equals(Object o) {
+
+		if (o instanceof MeetingDescription) {
+
+			if (((MeetingDescription) o).setID == this.setID
+					&& ((MeetingDescription) o).date.equals(this.date)) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -48,14 +63,17 @@ public class MeetingDescription {
 
 		if (this.set.isCourseMeeting) {
 
-			description = this.set.course + " " + this.set.type + "\n"
-					+ this.date + "\n" + this.set.start + " - " + this.set.end;
+			description = this.set.course + " " + this.set.type + ": "
+					+ this.set.start + " - " + this.set.end + " (" + this.date
+					+ ")";
 		} else {
 
-			description = this.set.name + " " + this.set.type + "\n" + this.date
-					+ "\n" + this.set.start + " - " + this.set.end;
+			description = this.set.name + " " + this.set.type + ": "
+					+ this.set.start + " - " + this.set.end + " (" + this.date
+					+ ")";
 		}
 
 		return description;
 	}
+
 }
