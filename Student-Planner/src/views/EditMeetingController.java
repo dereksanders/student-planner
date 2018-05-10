@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import core.Course;
 import core.CourseDescription;
 import core.Main;
+import core.Meeting;
 import core.MeetingDescription;
 import core.MeetingSet;
 import javafx.collections.FXCollections;
@@ -34,6 +35,8 @@ public class EditMeetingController {
 
 		EDIT_THIS_INSTANCE, EDIT_ALL_INSTANCES, EDIT_THIS_AND_FUTURE_INSTANCES;
 	};
+
+	private Stage window;
 
 	private MeetingDescription selected;
 	private Option option;
@@ -87,7 +90,7 @@ public class EditMeetingController {
 		this.selected = selected;
 		this.option = option;
 
-		Stage window = new Stage();
+		this.window = new Stage();
 		window.initModality(Modality.APPLICATION_MODAL);
 		window.setTitle("Edit Meeting");
 
@@ -156,13 +159,34 @@ public class EditMeetingController {
 				.setValue(DateTimeUtil.localTimeAsString(selected.set.start));
 		chooseEndTime
 				.setValue(DateTimeUtil.localTimeAsString(selected.set.end));
+
+		enterLocation.setText(selected.set.location);
 	}
 
 	@FXML
-	private void confirm() {
+	private void confirm() throws SQLException, SqliteWrapperException {
+
+		// delete all edited meetings from existing set
+		if (this.option.equals(Option.EDIT_THIS_INSTANCE)) {
+
+			Meeting.deleteMeeting(selected);
+
+		} else if (this.option.equals(Option.EDIT_THIS_AND_FUTURE_INSTANCES)) {
+
+			Meeting.deleteMeetingsFromSet(selected.date);
+
+		} else if (this.option.equals(Option.EDIT_ALL_INSTANCES)) {
+
+			MeetingSet.deleteMeetingSet(selected.setID);
+		}
+
+		// create a new set containing these edited meetings
+
 	}
 
 	@FXML
 	private void cancel() {
+
+		this.window.close();
 	}
 }

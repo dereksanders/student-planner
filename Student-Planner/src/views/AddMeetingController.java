@@ -141,8 +141,8 @@ public class AddMeetingController {
 		}
 
 		chooseCourseMeetingType.setItems(
-				FXCollections.observableArrayList(Meeting.COURSE_TYPES));
-		chooseCourseMeetingType.setValue(Meeting.COURSE_TYPES[0]);
+				FXCollections.observableArrayList(MeetingSet.COURSE_TYPES));
+		chooseCourseMeetingType.setValue(MeetingSet.COURSE_TYPES[0]);
 
 		chooseCourseMeetingType.valueProperty()
 				.addListener(new ChangeListener<String>() {
@@ -163,8 +163,8 @@ public class AddMeetingController {
 				});
 
 		chooseNonCourseMeetingType.setItems(
-				FXCollections.observableArrayList(Meeting.NON_COURSE_TYPES));
-		chooseNonCourseMeetingType.setValue(Meeting.NON_COURSE_TYPES[0]);
+				FXCollections.observableArrayList(MeetingSet.NON_COURSE_TYPES));
+		chooseNonCourseMeetingType.setValue(MeetingSet.NON_COURSE_TYPES[0]);
 
 		chooseNonCourseMeetingType.valueProperty()
 				.addListener(new ChangeListener<String>() {

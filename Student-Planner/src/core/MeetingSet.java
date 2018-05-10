@@ -40,6 +40,12 @@ public class MeetingSet {
 		}
 	}
 
+	public static final String[] COURSE_TYPES = { "Lecture", "Tutorial", "Lab",
+			"Seminar", "Other" };
+
+	public static final String[] NON_COURSE_TYPES = { "Club", "Work", "Sports",
+			"Other" };
+
 	public static final String[] REPEAT_OPTIONS = { "Weekly", "Bi-Weekly",
 			"Monthly", "Never" };
 
@@ -251,6 +257,7 @@ public class MeetingSet {
 					findMeetingSet.getString(MeetingSet.Lookup.NAME.index),
 					findMeetingSet
 							.getString(MeetingSet.Lookup.MEETING_TYPE.index),
+					findMeetingSet.getString(MeetingSet.Lookup.LOCATION.index),
 					startTime, endTime, findMeetingSet.getBoolean(
 							MeetingSet.Lookup.IS_COURSE_MEETING.index));
 		}

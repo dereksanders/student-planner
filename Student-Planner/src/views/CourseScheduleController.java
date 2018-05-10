@@ -74,7 +74,8 @@ public class CourseScheduleController implements Observer {
 	private static final int PADDING_TOP = 20;
 
 	private static final String BORDER_COLOR = "#cccccc";
-	private static final String EMPTY_DAY_COLOR = "#eeeeee";
+	private static final String EMPTY_SLOT_COLOR_PRESENT_OR_FUTURE = "#eeeeee";
+	private static final String EMPTY_SLOT_COLOR_PAST = "#dddddd";
 
 	// Times for forms related to CourseSchedule.
 	public static final String[] times = generateTimesAsStrings();
@@ -508,42 +509,114 @@ public class CourseScheduleController implements Observer {
 			for (int j = 0; j < DateTimeUtil.getMinutesBetween(
 					this.scheduleStart, this.scheduleEnd); j += 30) {
 
+				// The start date/time represented by this slot.
+				LocalDateTime slot = LocalDateTime.of(getDateFromDayOfWeek(i),
+						this.scheduleStart.plusMinutes(j));
+
+				LocalDateTime now = LocalDateTime.now();
+
+				// First, draw the border.
+				setFill(BORDER_COLOR);
+
 				double slotYPosition = PADDING_TOP + DAY_LABEL_HEIGHT
 						+ (j * PIXELS_PER_MINUTE);
-
-				setFill(BORDER_COLOR);
 
 				this.gc.fillRect(getDayXPosition(i), slotYPosition, DAY_WIDTH,
 						(30 * PIXELS_PER_MINUTE));
 
-				setFill(EMPTY_DAY_COLOR);
+				// Determine how much of the slot should be colored as in the
+				// past.
+				int minutesInPast = 0;
 
+				boolean entireSlotIsInPast = slot.isBefore(LocalDateTime.of(
+						now.toLocalDate(),
+						DateTimeUtil.roundToPrevHalfHour(now.toLocalTime())));
+
+				if (entireSlotIsInPast) {
+
+					minutesInPast = 30;
+
+				} else if (slot.isBefore(now)) {
+
+					// Some of the slot is in the past.
+					minutesInPast = now.getMinute() - slot.getMinute();
+				}
+
+				// For each slot, first draw the portion that is in the past;
+				// then draw the portion that is in the present or future.
 				if (i == 1 && j == 0) {
 
 					// First day, first slot
+
+					setFill(EMPTY_SLOT_COLOR_PAST);
+
 					this.gc.fillRect(getDayXPosition(i) + 1, slotYPosition + 1,
-							DAY_WIDTH - 2, (30 * PIXELS_PER_MINUTE) - 2);
+							DAY_WIDTH - 2,
+							(minutesInPast * PIXELS_PER_MINUTE) - 2);
+
+					setFill(EMPTY_SLOT_COLOR_PRESENT_OR_FUTURE);
+
+					this.gc.fillRect(getDayXPosition(i) + 1,
+							slotYPosition + 1
+									+ (minutesInPast * PIXELS_PER_MINUTE),
+							DAY_WIDTH - 2,
+							((30 - minutesInPast) * PIXELS_PER_MINUTE) - 2);
 
 				} else if (i == 1) {
 
 					// First day, not the first slot
+
+					setFill(EMPTY_SLOT_COLOR_PAST);
+
 					this.gc.fillRect(getDayXPosition(i) + 1, slotYPosition,
-							DAY_WIDTH - 2, (30 * PIXELS_PER_MINUTE) - 1);
+							DAY_WIDTH - 2,
+							(minutesInPast * PIXELS_PER_MINUTE) - 1);
+
+					setFill(EMPTY_SLOT_COLOR_PRESENT_OR_FUTURE);
+
+					this.gc.fillRect(getDayXPosition(i) + 1,
+							slotYPosition + (minutesInPast * PIXELS_PER_MINUTE),
+							DAY_WIDTH - 2,
+							((30 - minutesInPast) * PIXELS_PER_MINUTE) - 1);
 
 				} else if (i != 1 && j == 0) {
 
 					// Not the first day, first slot
+
+					setFill(EMPTY_SLOT_COLOR_PAST);
+
 					this.gc.fillRect(getDayXPosition(i), slotYPosition + 1,
-							DAY_WIDTH - 1, (30 * PIXELS_PER_MINUTE) - 2);
+							DAY_WIDTH - 1,
+							(minutesInPast * PIXELS_PER_MINUTE) - 2);
+
+					setFill(EMPTY_SLOT_COLOR_PRESENT_OR_FUTURE);
+
+					this.gc.fillRect(getDayXPosition(i),
+							slotYPosition + 1
+									+ (minutesInPast * PIXELS_PER_MINUTE),
+							DAY_WIDTH - 1,
+							((30 - minutesInPast) * PIXELS_PER_MINUTE) - 2);
 
 				} else if (i != 1) {
 
 					// Not the first day, not the first slot
+
+					setFill(EMPTY_SLOT_COLOR_PAST);
+
 					this.gc.fillRect(getDayXPosition(i), slotYPosition,
-							DAY_WIDTH - 1, (30 * PIXELS_PER_MINUTE) - 1);
+							DAY_WIDTH - 1,
+							(minutesInPast * PIXELS_PER_MINUTE) - 1);
+
+					setFill(EMPTY_SLOT_COLOR_PRESENT_OR_FUTURE);
+
+					this.gc.fillRect(getDayXPosition(i),
+							slotYPosition + (minutesInPast * PIXELS_PER_MINUTE),
+							DAY_WIDTH - 1,
+							((30 - minutesInPast) * PIXELS_PER_MINUTE) - 1);
 				}
 			}
 		}
+
 	}
 
 	/**

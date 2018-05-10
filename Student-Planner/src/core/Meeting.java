@@ -36,12 +36,6 @@ public class Meeting {
 		}
 	};
 
-	public static final String[] COURSE_TYPES = { "Lecture", "Tutorial", "Lab",
-			"Seminar", "Other" };
-
-	public static final String[] NON_COURSE_TYPES = { "Club", "Work", "Sports",
-			"Other" };
-
 	/**
 	 * Gets all meetings taking place during the week of the specified date.
 	 *
@@ -156,6 +150,8 @@ public class Meeting {
 							meetingSet.getString(MeetingSet.Lookup.NAME.index),
 							meetingSet.getString(
 									MeetingSet.Lookup.MEETING_TYPE.index),
+							meetingSet.getString(
+									MeetingSet.Lookup.LOCATION.index),
 							meetingStart, meetingEnd, meetingSet.getBoolean(
 									MeetingSet.Lookup.IS_COURSE_MEETING.index));
 
@@ -335,5 +331,10 @@ public class Meeting {
 		sql.close();
 
 		Main.active.update();
+	}
+
+	public static void deleteMeetingsFromSet(LocalDate date) {
+		// TODO
+		// Delete all meetings in this set from 'date' onwards.
 	}
 }

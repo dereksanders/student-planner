@@ -326,17 +326,17 @@ public class DateTimeUtil {
 	/**
 	 * Short pretty date.
 	 *
-	 * @param startOfWeek
-	 *            the start of week
+	 * @param date
+	 *            the date
 	 * @return the string
 	 */
-	public static String shortPrettyDate(LocalDate startOfWeek) {
+	public static String shortPrettyDate(LocalDate date) {
 
-		String month = getMonthAbbreviation(startOfWeek.getMonthValue());
-		String date = startOfWeek.getDayOfMonth()
-				+ getDateEnding(startOfWeek.getDayOfMonth());
+		String monthAbbreviation = getMonthAbbreviation(date.getMonthValue());
+		String dateWithEnding = date.getDayOfMonth()
+				+ getDateEnding(date.getDayOfMonth());
 
-		return month + " " + date;
+		return monthAbbreviation + " " + dateWithEnding;
 	}
 
 	/**

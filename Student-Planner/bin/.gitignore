@@ -1,6 +1,5 @@
-/views/
-/courseScheduleViews/
-/termCalendarViews/
-/welcomeViews/
-/utility/
 /core/
+/sqlite/
+/test/
+/utility/
+/views/
