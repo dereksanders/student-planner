@@ -23,7 +23,7 @@
       </Text>
       <Text layoutX="14.0" layoutY="285.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Start Date" />
       <DatePicker fx:id="chooseStartDate" layoutX="15.0" layoutY="296.0" prefHeight="26.0" prefWidth="150.0" />
-      <Text layoutX="202.0" layoutY="285.0" strokeType="OUTSIDE" strokeWidth="0.0" text="End Date" />
+      <Text fx:id="chooseEndDateTitle" layoutX="202.0" layoutY="285.0" strokeType="OUTSIDE" strokeWidth="0.0" text="End Date" />
       <DatePicker fx:id="chooseEndDate" layoutX="201.0" layoutY="296.0" prefHeight="26.0" prefWidth="150.0" />
       <CheckBox fx:id="toEndOfTerm" layoutX="200.0" layoutY="333.0" mnemonicParsing="false" text="To end of term" />
       <Text layoutX="14.0" layoutY="364.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Time" />
@@ -36,7 +36,7 @@
       <ComboBox fx:id="chooseEndTime" editable="true" layoutX="200.0" layoutY="376.0" prefHeight="26.0" prefWidth="150.0" />
       <TextField fx:id="enterLocation" layoutX="16.0" layoutY="438.0" promptText="Enter meeting location" />
       <Text layoutX="17.0" layoutY="426.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Location" />
-      <Text layoutX="16.0" layoutY="489.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Repeat" />
+      <Text fx:id="chooseRepeatTitle" layoutX="16.0" layoutY="489.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Repeat" />
       <ChoiceBox fx:id="chooseRepeat" layoutX="15.0" layoutY="502.0" prefHeight="26.0" prefWidth="150.0" />
       <Button fx:id="confirm" layoutX="235.0" layoutY="545.0" mnemonicParsing="false" onAction="#confirm" prefWidth="80.0" text="OK" />
       <Button fx:id="cancel" layoutX="324.0" layoutY="545.0" mnemonicParsing="false" onAction="#cancel" prefWidth="80.0" text="Cancel" />
@@ -74,5 +74,6 @@
           </Tab>
         </tabs>
       </TabPane>
+      <Button fx:id="confirm1" layoutX="324.0" layoutY="12.0" mnemonicParsing="false" onAction="#confirm" prefWidth="80.0" text="Delete" />
    </children>
 </AnchorPane>

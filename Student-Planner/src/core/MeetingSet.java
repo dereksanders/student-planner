@@ -24,8 +24,8 @@ public class MeetingSet {
 		ID(1), TERM_START_DATE(2), START_TIME(3), END_TIME(
 				4), COURSE_START_TERM_START_DATE(5), COURSE_END_TERM_START_DATE(
 						6), COURSE_DEPT_ID(7), COURSE_CODE(8), NAME(
-								9), MEETING_TYPE(10), LOCATION(
-										11), IS_COURSE_MEETING(12), COLOR(13);
+								9), MEETING_TYPE(10), LOCATION(11), REPEAT(
+										12), IS_COURSE_MEETING(13), COLOR(14);
 
 		public int index;
 
@@ -73,7 +73,8 @@ public class MeetingSet {
 	 */
 	public static void addCourseMeetingSet(TermDescription term,
 			CourseDescription course, String meetingType, LocalTime start,
-			LocalTime end, String location, ArrayList<LocalDate> dates)
+			LocalTime end, String location, String repeat,
+			ArrayList<LocalDate> dates)
 			throws SqliteWrapperException, SQLException {
 
 		int id = getNextMeetingID();
@@ -82,7 +83,7 @@ public class MeetingSet {
 		sql.execute(
 				"insert into meeting_set(id, term_start_date, start_time, end_time, "
 						+ "course_start_term_start_date, course_end_term_start_date, "
-						+ "course_dept_id, course_code, name, meeting_type, location, "
+						+ "course_dept_id, course_code, name, meeting_type, location, repeat, "
 						+ "is_course_meeting_set, color) " + "values(" + id
 						+ "," + term.getStartDay() + "," + start.toSecondOfDay()
 						+ "," + end.toSecondOfDay() + ","
@@ -90,8 +91,8 @@ public class MeetingSet {
 						+ course.endTerm.getStartDay() + ",\'" + course.dept
 						+ "\'," + course.code + "," + "\'nullname\'" + ","
 						+ "\'" + meetingType + "\'" + "," + "\'" + location
-						+ "\'" + ",1," + "\'" + Course.getColor(course) + "\'"
-						+ ");");
+						+ "\'" + "," + "\'" + repeat + "\'" + ",1," + "\'"
+						+ Course.getColor(course) + "\'" + ");");
 
 		for (LocalDate d : dates) {
 
@@ -128,8 +129,9 @@ public class MeetingSet {
 	 */
 	public static void addNonCourseMeetingSet(TermDescription term,
 			String meetingName, String meetingType, LocalTime start,
-			LocalTime end, String location, ArrayList<LocalDate> dates,
-			Color color) throws SqliteWrapperException, SQLException {
+			LocalTime end, String location, String repeat,
+			ArrayList<LocalDate> dates, Color color)
+			throws SqliteWrapperException, SQLException {
 
 		int id = getNextMeetingID();
 
@@ -137,12 +139,13 @@ public class MeetingSet {
 		sql.execute(
 				"insert into meeting_set(id, term_start_date, start_time, end_time, "
 						+ "course_start_term_start_date, course_end_term_start_date, "
-						+ "course_dept_id, course_code, name, meeting_type, location, "
+						+ "course_dept_id, course_code, name, meeting_type, location, repeat, "
 						+ "is_course_meeting_set, color) " + "values(" + id
 						+ "," + term.getStartDay() + "," + start.toSecondOfDay()
 						+ "," + end.toSecondOfDay() + ",0,0" + ",\'null\',0,"
 						+ "\'" + meetingName + "\'" + "," + "\'" + meetingType
-						+ "\'" + "," + "\'" + location + "\'" + ",0," + "\'"
+						+ "\'" + "," + "\'" + location + "\'" + "," + "\'"
+						+ repeat + "\'" + ",0," + "\'"
 						+ ColorUtil.colorToHex(color) + "\'" + ");");
 
 		for (LocalDate d : dates) {
@@ -258,6 +261,7 @@ public class MeetingSet {
 					findMeetingSet
 							.getString(MeetingSet.Lookup.MEETING_TYPE.index),
 					findMeetingSet.getString(MeetingSet.Lookup.LOCATION.index),
+					findMeetingSet.getString(MeetingSet.Lookup.REPEAT.index),
 					startTime, endTime, findMeetingSet.getBoolean(
 							MeetingSet.Lookup.IS_COURSE_MEETING.index));
 		}

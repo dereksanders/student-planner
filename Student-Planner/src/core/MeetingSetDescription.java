@@ -19,6 +19,7 @@ public class MeetingSetDescription {
 	public String name;
 	public String type;
 	public String location;
+	public String repeat;
 	public LocalTime start;
 	public LocalTime end;
 
@@ -55,8 +56,8 @@ public class MeetingSetDescription {
 	public MeetingSetDescription(int id, LocalDate termStart,
 			LocalDate courseStartTermStartDate,
 			LocalDate courseEndTermStartDate, String courseDept, int courseCode,
-			String name, String type, String location, LocalTime start,
-			LocalTime end, boolean isCourseMeeting)
+			String name, String type, String location, String repeat,
+			LocalTime start, LocalTime end, boolean isCourseMeeting)
 			throws SqliteWrapperException, SQLException {
 
 		this.id = id;

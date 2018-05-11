@@ -384,7 +384,8 @@ public class AddMeetingController {
 									.parseLocalTime(chooseStartTime.getValue()),
 							DateTimeUtil
 									.parseLocalTime(chooseEndTime.getValue()),
-							enterLocation.getText(), meetingDates);
+							enterLocation.getText(), chooseRepeat.getValue(),
+							meetingDates);
 
 				} else if (nonCourseMeetingTab.isSelected()) {
 
@@ -396,8 +397,8 @@ public class AddMeetingController {
 									.parseLocalTime(chooseStartTime.getValue()),
 							DateTimeUtil
 									.parseLocalTime(chooseEndTime.getValue()),
-							enterLocation.getText(), meetingDates,
-							chooseColor.getValue());
+							enterLocation.getText(), chooseRepeat.getValue(),
+							meetingDates, chooseColor.getValue());
 				}
 
 				window.close();

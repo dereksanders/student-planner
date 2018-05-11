@@ -152,6 +152,8 @@ public class Meeting {
 									MeetingSet.Lookup.MEETING_TYPE.index),
 							meetingSet.getString(
 									MeetingSet.Lookup.LOCATION.index),
+							meetingSet
+									.getString(MeetingSet.Lookup.REPEAT.index),
 							meetingStart, meetingEnd, meetingSet.getBoolean(
 									MeetingSet.Lookup.IS_COURSE_MEETING.index));
 

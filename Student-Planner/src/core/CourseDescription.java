@@ -60,4 +60,19 @@ public class CourseDescription {
 
 		return desc;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+
+		if (o instanceof CourseDescription) {
+
+			if (this.dept.equals(((CourseDescription) o).dept)
+					&& this.code == ((CourseDescription) o).code) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

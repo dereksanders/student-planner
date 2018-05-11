@@ -24,6 +24,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import sqlite.SqliteWrapperException;
@@ -72,6 +73,8 @@ public class EditMeetingController {
 	@FXML
 	private DatePicker chooseStartDate;
 	@FXML
+	private Text chooseEndDateTitle;
+	@FXML
 	private DatePicker chooseEndDate;
 	@FXML
 	private CheckBox toEndOfTerm;
@@ -81,6 +84,8 @@ public class EditMeetingController {
 	private ComboBox<String> chooseEndTime;
 	@FXML
 	private TextField enterLocation;
+	@FXML
+	private Text chooseRepeatTitle;
 	@FXML
 	private ChoiceBox<String> chooseRepeat;
 
@@ -118,6 +123,15 @@ public class EditMeetingController {
 
 		chooseCourse.setItems(FXCollections.observableArrayList(courses));
 
+		chooseCourseMeetingType.setItems(
+				FXCollections.observableArrayList(MeetingSet.COURSE_TYPES));
+		chooseNonCourseMeetingType.setItems(
+				FXCollections.observableArrayList(MeetingSet.NON_COURSE_TYPES));
+
+		chooseRepeat.setItems(
+				FXCollections.observableArrayList(MeetingSet.REPEAT_OPTIONS));
+		chooseRepeat.setValue(selected.set.repeat);
+
 		if (selected.set.isCourseMeeting) {
 
 			meetingTabs.getSelectionModel().select(courseMeetingTab);
@@ -125,21 +139,43 @@ public class EditMeetingController {
 
 			chooseCourse.setValue(selected.set.course);
 
+			if (chooseCourseMeetingType.getItems()
+					.contains(selected.set.type)) {
+
+				chooseCourseMeetingType.setValue(selected.set.type);
+
+			} else {
+
+				chooseCourseMeetingType.setValue("Other");
+				enterOtherCourseMeetingType.setText(selected.set.type);
+			}
+
 		} else {
 
 			meetingTabs.getSelectionModel().select(nonCourseMeetingTab);
 			courseMeetingTab.setDisable(true);
+
+			if (chooseNonCourseMeetingType.getItems()
+					.contains(selected.set.type)) {
+
+				chooseNonCourseMeetingType.setValue(selected.set.type);
+
+			} else {
+
+				chooseNonCourseMeetingType.setValue("Other");
+				enterOtherNonCourseMeetingType.setText(selected.set.type);
+			}
 		}
 
 		if (this.option.equals(Option.EDIT_THIS_INSTANCE)) {
 
 			chooseStartDate.setValue(selected.date);
 
+			chooseEndDateTitle.setVisible(false);
 			chooseEndDate.setVisible(false);
-			chooseEndDate.setManaged(false);
-
+			toEndOfTerm.setVisible(false);
+			chooseRepeatTitle.setVisible(false);
 			chooseRepeat.setVisible(false);
-			chooseRepeat.setManaged(false);
 
 		} else if (this.option.equals(Option.EDIT_THIS_AND_FUTURE_INSTANCES)) {
 
