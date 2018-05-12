@@ -316,7 +316,9 @@ public class MeetingSet {
 
 		Statement sql = Main.active.db.getConnection().createStatement();
 
+		sql.execute("delete from meeting_date where set_id = " + setID);
 		sql.execute("delete from meeting_set where id = " + setID);
+
 		sql.close();
 
 		Main.active.update();

@@ -75,6 +75,8 @@ public class MeetingSetDescription {
 
 		this.name = name;
 		this.type = type;
+		this.location = location;
+		this.repeat = repeat;
 	}
 
 	/*

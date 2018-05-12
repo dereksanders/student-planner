@@ -335,8 +335,32 @@ public class Meeting {
 		Main.active.update();
 	}
 
-	public static void deleteMeetingsFromSet(LocalDate date) {
-		// TODO
-		// Delete all meetings in this set from 'date' onwards.
+	public static void deleteMeetingsFromSet(int setID, LocalDate date)
+			throws SQLException, SqliteWrapperException {
+
+		Statement sql = Main.active.db.getConnection().createStatement();
+
+		sql.execute("delete from meeting_date where set_id = " + setID
+				+ " and date_of >= " + date.toEpochDay());
+
+		ResultSet countMeetingsInSet = sql.executeQuery(
+				"select count(*) from meeting_date where set_id = " + setID);
+
+		int numMeetings = 0;
+
+		if (countMeetingsInSet.next()) {
+			numMeetings = countMeetingsInSet.getInt(1);
+		}
+
+		// If the set no longer has any meetings, delete it.
+		if (numMeetings == 0) {
+
+			MeetingSet.deleteMeetingSet(setID);
+		}
+
+		countMeetingsInSet.close();
+		sql.close();
+
+		Main.active.update();
 	}
 }

@@ -38,8 +38,8 @@
       <Text layoutX="17.0" layoutY="426.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Location" />
       <Text fx:id="chooseRepeatTitle" layoutX="16.0" layoutY="489.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Repeat" />
       <ChoiceBox fx:id="chooseRepeat" layoutX="15.0" layoutY="502.0" prefHeight="26.0" prefWidth="150.0" />
-      <Button fx:id="confirm" layoutX="235.0" layoutY="545.0" mnemonicParsing="false" onAction="#confirm" prefWidth="80.0" text="OK" />
-      <Button fx:id="cancel" layoutX="324.0" layoutY="545.0" mnemonicParsing="false" onAction="#cancel" prefWidth="80.0" text="Cancel" />
+      <Button layoutX="235.0" layoutY="545.0" mnemonicParsing="false" onAction="#confirm" prefWidth="80.0" text="OK" />
+      <Button layoutX="324.0" layoutY="545.0" mnemonicParsing="false" onAction="#cancel" prefWidth="80.0" text="Cancel" />
       <TextField fx:id="enterMeetingType" layoutX="201.0" layoutY="108.0" promptText="Enter meeting type" visible="false" />
       <TabPane fx:id="meetingTabs" layoutX="15.0" layoutY="47.0" prefHeight="211.0" prefWidth="388.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
@@ -74,6 +74,6 @@
           </Tab>
         </tabs>
       </TabPane>
-      <Button fx:id="confirm1" layoutX="324.0" layoutY="12.0" mnemonicParsing="false" onAction="#confirm" prefWidth="80.0" text="Delete" />
+      <Button layoutX="180.0" layoutY="12.0" mnemonicParsing="false" onAction="#delete" prefWidth="80.0" text="Delete" />
    </children>
 </AnchorPane>

@@ -2,6 +2,7 @@ package views;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import core.Course;
@@ -14,6 +15,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
@@ -177,6 +179,8 @@ public class EditMeetingController {
 			chooseRepeatTitle.setVisible(false);
 			chooseRepeat.setVisible(false);
 
+			chooseRepeat.setValue("Never");
+
 		} else if (this.option.equals(Option.EDIT_THIS_AND_FUTURE_INSTANCES)) {
 
 			chooseStartDate.setValue(selected.date);
@@ -200,7 +204,8 @@ public class EditMeetingController {
 	}
 
 	@FXML
-	private void confirm() throws SQLException, SqliteWrapperException {
+	private void confirm()
+			throws SQLException, SqliteWrapperException, IOException {
 
 		// delete all edited meetings from existing set
 		if (this.option.equals(Option.EDIT_THIS_INSTANCE)) {
@@ -209,7 +214,7 @@ public class EditMeetingController {
 
 		} else if (this.option.equals(Option.EDIT_THIS_AND_FUTURE_INSTANCES)) {
 
-			Meeting.deleteMeetingsFromSet(selected.date);
+			Meeting.deleteMeetingsFromSet(selected.setID, selected.date);
 
 		} else if (this.option.equals(Option.EDIT_ALL_INSTANCES)) {
 
@@ -217,11 +222,141 @@ public class EditMeetingController {
 		}
 
 		// create a new set containing these edited meetings
+		String description = "";
+		if (courseMeetingTab.isSelected()) {
 
+			description = chooseCourse.getValue() + " "
+					+ chooseCourseMeetingType.getValue();
+		} else {
+
+			description = enterMeetingName.getText();
+		}
+
+		// Construct list of dates based on repeat choice
+		ArrayList<LocalDate> meetingDates = new ArrayList<>();
+
+		if (chooseRepeat.getValue().equals("Never")) {
+
+			meetingDates.add(chooseStartDate.getValue());
+
+		} else {
+
+			int weeksBetweenMeetings = 1;
+
+			if (chooseRepeat.getValue().equals("Bi-Weekly")) {
+				weeksBetweenMeetings = 2;
+			} else if (chooseRepeat.getValue().equals("Monthly")) {
+				weeksBetweenMeetings = 4;
+			}
+
+			LocalDate current = chooseStartDate.getValue();
+
+			while (current.isBefore(chooseEndDate.getValue())
+					|| current.equals(chooseEndDate.getValue())) {
+
+				meetingDates.add(current);
+				current = current.plusDays(7 * weeksBetweenMeetings);
+			}
+		}
+
+		if (DateTimeUtil.isValidLocalTime(chooseStartTime.getValue())
+				&& DateTimeUtil.isValidLocalTime(chooseEndTime.getValue())) {
+
+			ArrayList<MeetingDescription> conflicts = Meeting.getConflicts(
+					meetingDates,
+					DateTimeUtil.parseLocalTime(chooseStartTime.getValue()),
+					DateTimeUtil.parseLocalTime(chooseEndTime.getValue()));
+
+			if (conflicts.size() > 0) {
+
+				ConflictsController cc = new ConflictsController(conflicts,
+						meetingDates, description);
+
+				meetingDates = cc.getRemainingDates();
+			}
+
+			if (meetingDates.size() > 0) {
+
+				if (courseMeetingTab.isSelected()) {
+
+					MeetingSet.addCourseMeetingSet(
+							Main.active.getSelectedTerm(),
+							chooseCourse.getValue(),
+							chooseCourseMeetingType.getValue(),
+							DateTimeUtil
+									.parseLocalTime(chooseStartTime.getValue()),
+							DateTimeUtil
+									.parseLocalTime(chooseEndTime.getValue()),
+							enterLocation.getText(), chooseRepeat.getValue(),
+							meetingDates);
+
+				} else if (nonCourseMeetingTab.isSelected()) {
+
+					MeetingSet.addNonCourseMeetingSet(
+							Main.active.getSelectedTerm(),
+							enterMeetingName.getText(),
+							chooseNonCourseMeetingType.getValue(),
+							DateTimeUtil
+									.parseLocalTime(chooseStartTime.getValue()),
+							DateTimeUtil
+									.parseLocalTime(chooseEndTime.getValue()),
+							enterLocation.getText(), chooseRepeat.getValue(),
+							meetingDates, chooseColor.getValue());
+				}
+
+				window.close();
+			}
+		} else {
+
+			ArrayList<String> errorMessages = new ArrayList<>();
+
+			if (!DateTimeUtil.isValidLocalTime(chooseStartTime.getValue())) {
+				errorMessages.add(
+						"Start time is invalid. It must be in the format hh:mm");
+			}
+
+			if (!DateTimeUtil.isValidLocalTime(chooseEndTime.getValue())) {
+				errorMessages.add(
+						"End time is invalid. It must be in the format hh:mm");
+			}
+
+			String errorText = "";
+
+			for (int i = 0; i < errorMessages.size(); i++) {
+
+				errorText += (i + 1) + ". " + errorMessages.get(i);
+
+				if (i < errorMessages.size() - 1) {
+
+					errorText += "\n";
+				}
+			}
+
+			Main.showAlert(AlertType.ERROR, "Cannot add meeting", errorText);
+		}
 	}
 
 	@FXML
 	private void cancel() {
+
+		this.window.close();
+	}
+
+	@FXML
+	private void delete() throws SQLException, SqliteWrapperException {
+
+		if (this.option.equals(Option.EDIT_THIS_INSTANCE)) {
+
+			Meeting.deleteMeeting(selected);
+
+		} else if (this.option.equals(Option.EDIT_THIS_AND_FUTURE_INSTANCES)) {
+
+			Meeting.deleteMeetingsFromSet(selected.setID, selected.date);
+
+		} else if (this.option.equals(Option.EDIT_ALL_INSTANCES)) {
+
+			MeetingSet.deleteMeetingSet(selected.setID);
+		}
 
 		this.window.close();
 	}

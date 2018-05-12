@@ -10,8 +10,9 @@ import core.MeetingSet;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.text.Text;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import sqlite.SqliteWrapperException;
@@ -19,18 +20,18 @@ import views.EditMeetingController.Option;
 
 public class EditMeetingOptionsController {
 
+	private Stage window;
+
 	private MeetingDescription selected;
 	@FXML
-	private Text meetings;
-	@FXML
-	private Text selectedDescription;
+	private VBox meetings;
 
 	public EditMeetingOptionsController(MeetingDescription selected)
 			throws IOException {
 
 		this.selected = selected;
 
-		Stage window = new Stage();
+		window = new Stage();
 		window.initModality(Modality.APPLICATION_MODAL);
 		window.setTitle("Edit Meeting");
 
@@ -53,21 +54,21 @@ public class EditMeetingOptionsController {
 	@FXML
 	public void initialize() throws SQLException, SqliteWrapperException {
 
-		selectedDescription.setText(
-				selectedDescription.getText() + " " + this.selected.toString());
-
-		meetings.setText("");
-
 		ArrayList<MeetingDescription> meetingsInSet = MeetingSet
 				.getMeetingsInSet(selected.setID);
 
 		for (MeetingDescription m : meetingsInSet) {
 
+			Label description = new Label();
+			description.setText(m.toString());
+
 			if (m.equals(this.selected)) {
 
-				// meetings.setFont(Font.ITALIC);
+				description.setStyle(
+						"-fx-font-style: italic;" + "-fx-text-fill: #1636a0;");
 			}
-			meetings.setText(meetings.getText() + m + "\n\n");
+
+			meetings.getChildren().add(description);
 		}
 	}
 
@@ -75,12 +76,14 @@ public class EditMeetingOptionsController {
 	public void editThisInstance() throws IOException {
 
 		new EditMeetingController(this.selected, Option.EDIT_THIS_INSTANCE);
+		this.window.close();
 	}
 
 	@FXML
 	public void editAllInstances() throws IOException {
 
 		new EditMeetingController(this.selected, Option.EDIT_ALL_INSTANCES);
+		this.window.close();
 	}
 
 	@FXML
@@ -88,5 +91,6 @@ public class EditMeetingOptionsController {
 
 		new EditMeetingController(this.selected,
 				Option.EDIT_THIS_AND_FUTURE_INSTANCES);
+		this.window.close();
 	}
 }
