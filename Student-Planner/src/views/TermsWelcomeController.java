@@ -50,7 +50,7 @@ public class TermsWelcomeController {
 		long endDay = endDate.getValue().toEpochDay();
 
 		Term.addTerm(startDay, endDay, nameField.getText(),
-				"#" + ColorUtil.colorToHex(color.getValue()));
+				ColorUtil.colorToHex(color.getValue()));
 	}
 
 	/**

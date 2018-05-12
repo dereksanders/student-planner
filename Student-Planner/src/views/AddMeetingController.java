@@ -29,6 +29,8 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import sqlite.SqliteWrapperException;
@@ -184,6 +186,18 @@ public class AddMeetingController {
 						}
 					}
 				});
+
+		for (Color c : CourseScheduleController.getRecentColors()) {
+
+			Rectangle r = new Rectangle(30, 30);
+			r.setFill(c);
+
+			r.setOnMouseClicked(e -> {
+				chooseColor.setValue(c);
+			});
+
+			recentColors.getChildren().add(r);
+		}
 
 		// Enable "To end of term" by default, setting the end date of the
 		// Meeting to the end date of the term.
@@ -399,6 +413,9 @@ public class AddMeetingController {
 									.parseLocalTime(chooseEndTime.getValue()),
 							enterLocation.getText(), chooseRepeat.getValue(),
 							meetingDates, chooseColor.getValue());
+
+					CourseScheduleController
+							.addRecentColor(chooseColor.getValue());
 				}
 
 				window.close();

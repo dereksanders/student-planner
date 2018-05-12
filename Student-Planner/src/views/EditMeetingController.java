@@ -26,6 +26,8 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -167,6 +169,23 @@ public class EditMeetingController {
 				chooseNonCourseMeetingType.setValue("Other");
 				enterOtherNonCourseMeetingType.setText(selected.set.type);
 			}
+
+			enterMeetingName.setText(selected.set.name);
+
+			chooseColor
+					.setValue(Color.web(MeetingSet.getColor(selected.setID)));
+
+			for (Color c : CourseScheduleController.getRecentColors()) {
+
+				Rectangle r = new Rectangle(30, 30);
+				r.setFill(c);
+
+				r.setOnMouseClicked(e -> {
+					chooseColor.setValue(c);
+				});
+
+				recentColors.getChildren().add(r);
+			}
 		}
 
 		if (this.option.equals(Option.EDIT_THIS_INSTANCE)) {
@@ -206,6 +225,8 @@ public class EditMeetingController {
 	@FXML
 	private void confirm()
 			throws SQLException, SqliteWrapperException, IOException {
+
+		Color previousColor = Color.web(MeetingSet.getColor(selected.setID));
 
 		// delete all edited meetings from existing set
 		if (this.option.equals(Option.EDIT_THIS_INSTANCE)) {
@@ -302,6 +323,13 @@ public class EditMeetingController {
 									.parseLocalTime(chooseEndTime.getValue()),
 							enterLocation.getText(), chooseRepeat.getValue(),
 							meetingDates, chooseColor.getValue());
+
+					// If the color has been changed, add it to the Recent
+					// Colors list.
+					if (!previousColor.equals(chooseColor.getValue())) {
+						CourseScheduleController
+								.addRecentColor(chooseColor.getValue());
+					}
 				}
 
 				window.close();

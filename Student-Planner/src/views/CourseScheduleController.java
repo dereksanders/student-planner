@@ -77,8 +77,13 @@ public class CourseScheduleController implements Observer {
 	private static final String EMPTY_SLOT_COLOR_PRESENT_OR_FUTURE = "#eeeeee";
 	private static final String EMPTY_SLOT_COLOR_PAST = "#dddddd";
 
+	private static final int MAX_RECENT_COLORS = 5;
+
 	// Times for forms related to CourseSchedule.
-	public static final String[] times = generateTimesAsStrings();
+	public static String[] times = generateTimesAsStrings();
+
+	// Recent colors used for non-course meetings.
+	private static ArrayList<Color> recentColors = new ArrayList<>();
 
 	/**
 	 * Initialize.
@@ -751,6 +756,26 @@ public class CourseScheduleController implements Observer {
 
 		this.canvas.setHeight(PADDING_TOP + DAY_LABEL_HEIGHT + this.dayHeight
 				+ PADDING_BOTTOM);
+	}
+
+	public static void addRecentColor(Color color) {
+
+		if (recentColors.contains(color)) {
+
+			recentColors.remove(color);
+		}
+
+		else if (recentColors.size() == MAX_RECENT_COLORS) {
+
+			recentColors.remove(MAX_RECENT_COLORS - 1);
+		}
+
+		recentColors.add(0, color);
+	}
+
+	public static ArrayList<Color> getRecentColors() {
+
+		return recentColors;
 	}
 
 	/**
