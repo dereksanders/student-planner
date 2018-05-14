@@ -11,6 +11,8 @@ import core.Main;
 import core.Meeting;
 import core.MeetingDescription;
 import core.MeetingSet;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -132,6 +134,43 @@ public class EditMeetingController {
 		chooseNonCourseMeetingType.setItems(
 				FXCollections.observableArrayList(MeetingSet.NON_COURSE_TYPES));
 
+		chooseStartTime.setItems(FXCollections
+				.observableArrayList(CourseScheduleController.times));
+		chooseEndTime.setItems(FXCollections
+				.observableArrayList(CourseScheduleController.times));
+
+		chooseEndTime.getSelectionModel().selectedIndexProperty()
+				.addListener(new ChangeListener<Number>() {
+					@Override
+					public void changed(
+							ObservableValue<? extends Number> observable,
+							Number old, Number current) {
+
+						if (chooseEndTime.getValue()
+								.equals(chooseStartTime.getValue())
+								|| DateTimeUtil
+										.parseLocalTime(
+												chooseEndTime.getValue())
+										.isBefore(DateTimeUtil.parseLocalTime(
+												chooseStartTime.getValue()))) {
+
+							Main.showAlert(AlertType.ERROR,
+									"Cannot select time",
+									"End time cannot be equal to or before start time.");
+
+							chooseEndTime.setValue(chooseEndTime.getItems()
+									.get(chooseEndTime.getItems().indexOf(
+											chooseStartTime.getValue()) + 1));
+						}
+					}
+				});
+
+		chooseStartTime
+				.setValue(DateTimeUtil.localTimeAsString(selected.set.start));
+
+		chooseEndTime
+				.setValue(DateTimeUtil.localTimeAsString(selected.set.end));
+
 		chooseRepeat.setItems(
 				FXCollections.observableArrayList(MeetingSet.REPEAT_OPTIONS));
 		chooseRepeat.setValue(selected.set.repeat);
@@ -228,20 +267,6 @@ public class EditMeetingController {
 
 		Color previousColor = Color.web(MeetingSet.getColor(selected.setID));
 
-		// delete all edited meetings from existing set
-		if (this.option.equals(Option.EDIT_THIS_INSTANCE)) {
-
-			Meeting.deleteMeeting(selected);
-
-		} else if (this.option.equals(Option.EDIT_THIS_AND_FUTURE_INSTANCES)) {
-
-			Meeting.deleteMeetingsFromSet(selected.setID, selected.date);
-
-		} else if (this.option.equals(Option.EDIT_ALL_INSTANCES)) {
-
-			MeetingSet.deleteMeetingSet(selected.setID);
-		}
-
 		// create a new set containing these edited meetings
 		String description = "";
 		if (courseMeetingTab.isSelected()) {
@@ -280,8 +305,29 @@ public class EditMeetingController {
 			}
 		}
 
+		// Checking that the start time is before the end time requires that the
+		// times are valid. Therefore the order of the ANDs in this statement
+		// matter.
 		if (DateTimeUtil.isValidLocalTime(chooseStartTime.getValue())
-				&& DateTimeUtil.isValidLocalTime(chooseEndTime.getValue())) {
+				&& DateTimeUtil.isValidLocalTime(chooseEndTime.getValue())
+				&& DateTimeUtil.parseLocalTime(chooseStartTime.getValue())
+						.isBefore(DateTimeUtil
+								.parseLocalTime(chooseEndTime.getValue()))) {
+
+			// delete all edited meetings from existing set
+			if (this.option.equals(Option.EDIT_THIS_INSTANCE)) {
+
+				Meeting.deleteMeeting(selected);
+
+			} else if (this.option
+					.equals(Option.EDIT_THIS_AND_FUTURE_INSTANCES)) {
+
+				Meeting.deleteMeetingsFromSet(selected.setID, selected.date);
+
+			} else if (this.option.equals(Option.EDIT_ALL_INSTANCES)) {
+
+				MeetingSet.deleteMeetingSet(selected.setID);
+			}
 
 			ArrayList<MeetingDescription> conflicts = Meeting.getConflicts(
 					meetingDates,
@@ -338,14 +384,32 @@ public class EditMeetingController {
 
 			ArrayList<String> errorMessages = new ArrayList<>();
 
+			boolean timesAreValid = true;
+
 			if (!DateTimeUtil.isValidLocalTime(chooseStartTime.getValue())) {
 				errorMessages.add(
 						"Start time is invalid. It must be in the format hh:mm");
+
+				timesAreValid = false;
 			}
 
 			if (!DateTimeUtil.isValidLocalTime(chooseEndTime.getValue())) {
 				errorMessages.add(
 						"End time is invalid. It must be in the format hh:mm");
+
+				timesAreValid = false;
+			}
+
+			// This check requires that the specified times are valid.
+			if (timesAreValid) {
+
+				if (!DateTimeUtil.parseLocalTime(chooseStartTime.getValue())
+						.isBefore(DateTimeUtil
+								.parseLocalTime(chooseEndTime.getValue()))) {
+
+					errorMessages.add(
+							"End time cannot be equal to or before start time.");
+				}
 			}
 
 			String errorText = "";
@@ -360,7 +424,7 @@ public class EditMeetingController {
 				}
 			}
 
-			Main.showAlert(AlertType.ERROR, "Cannot add meeting", errorText);
+			Main.showAlert(AlertType.ERROR, "Cannot edit meeting", errorText);
 		}
 	}
 

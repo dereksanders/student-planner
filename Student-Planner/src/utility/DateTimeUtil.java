@@ -278,6 +278,8 @@ public class DateTimeUtil {
 
 	/**
 	 * Parses the local time.
+	 * 
+	 * Returns null if the local time is invalid.
 	 *
 	 * @param time
 	 *            the time

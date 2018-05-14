@@ -297,6 +297,10 @@ public class AddMeetingController {
 							Main.showAlert(AlertType.ERROR,
 									"Cannot select time",
 									"End time cannot be equal to or before start time.");
+
+							chooseEndTime.setValue(chooseEndTime.getItems()
+									.get(chooseEndTime.getItems().indexOf(
+											chooseStartTime.getValue()) + 1));
 						}
 					}
 				});
@@ -370,8 +374,14 @@ public class AddMeetingController {
 			}
 		}
 
+		// Checking that the start time is before the end time requires that the
+		// times are valid. Therefore the order of the ANDs in this statement
+		// matter.
 		if (DateTimeUtil.isValidLocalTime(chooseStartTime.getValue())
-				&& DateTimeUtil.isValidLocalTime(chooseEndTime.getValue())) {
+				&& DateTimeUtil.isValidLocalTime(chooseEndTime.getValue())
+				&& DateTimeUtil.parseLocalTime(chooseStartTime.getValue())
+						.isBefore(DateTimeUtil
+								.parseLocalTime(chooseEndTime.getValue()))) {
 
 			ArrayList<MeetingDescription> conflicts = Meeting.getConflicts(
 					meetingDates,
@@ -424,14 +434,32 @@ public class AddMeetingController {
 
 			ArrayList<String> errorMessages = new ArrayList<>();
 
+			boolean timesAreValid = true;
+
 			if (!DateTimeUtil.isValidLocalTime(chooseStartTime.getValue())) {
 				errorMessages.add(
 						"Start time is invalid. It must be in the format hh:mm");
+
+				timesAreValid = false;
 			}
 
 			if (!DateTimeUtil.isValidLocalTime(chooseEndTime.getValue())) {
 				errorMessages.add(
 						"End time is invalid. It must be in the format hh:mm");
+
+				timesAreValid = false;
+			}
+
+			// This check requires that the specified times are valid.
+			if (timesAreValid) {
+
+				if (!DateTimeUtil.parseLocalTime(chooseStartTime.getValue())
+						.isBefore(DateTimeUtil
+								.parseLocalTime(chooseEndTime.getValue()))) {
+
+					errorMessages.add(
+							"End time cannot be equal to or before start time.");
+				}
 			}
 
 			String errorText = "";
