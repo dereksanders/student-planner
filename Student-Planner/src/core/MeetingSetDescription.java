@@ -11,17 +11,17 @@ import sqlite.SqliteWrapperException;
  */
 public class MeetingSetDescription {
 
-	public int id;
+	private int id;
 	private TermDescription term;
 
-	public CourseDescription course;
-	public boolean isCourseMeeting;
-	public String name;
-	public String type;
-	public String location;
-	public String repeat;
-	public LocalTime start;
-	public LocalTime end;
+	private CourseDescription course;
+	private boolean isCourseMeeting;
+	private String name;
+	private String type;
+	private String location;
+	private String repeat;
+	private LocalTime start;
+	private LocalTime end;
 
 	/**
 	 * Instantiates a new meeting set description.
@@ -88,5 +88,45 @@ public class MeetingSetDescription {
 	public String toString() {
 
 		return "" + this.id + this.term + this.course + this.start + this.end;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public TermDescription getTerm() {
+		return term;
+	}
+
+	public CourseDescription getCourse() {
+		return course;
+	}
+
+	public boolean isCourseMeeting() {
+		return isCourseMeeting;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public String getRepeat() {
+		return repeat;
+	}
+
+	public LocalTime getStart() {
+		return start;
+	}
+
+	public LocalTime getEnd() {
+		return end;
 	}
 }

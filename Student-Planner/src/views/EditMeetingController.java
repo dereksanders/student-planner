@@ -3,14 +3,15 @@ package views;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 import core.Course;
 import core.CourseDescription;
 import core.Main;
-import core.Meeting;
 import core.MeetingDescription;
 import core.MeetingSet;
+import core.MeetingSet.EditOption;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -38,15 +39,10 @@ import utility.DateTimeUtil;
 
 public class EditMeetingController {
 
-	public enum Option {
-
-		EDIT_THIS_INSTANCE, EDIT_ALL_INSTANCES, EDIT_THIS_AND_FUTURE_INSTANCES;
-	};
-
 	private Stage window;
 
 	private MeetingDescription selected;
-	private Option option;
+	private EditOption option;
 
 	@FXML
 	private TabPane meetingTabs;
@@ -95,7 +91,7 @@ public class EditMeetingController {
 	@FXML
 	private ChoiceBox<String> chooseRepeat;
 
-	public EditMeetingController(MeetingDescription selected, Option option)
+	public EditMeetingController(MeetingDescription selected, EditOption option)
 			throws IOException {
 
 		this.selected = selected;
@@ -165,32 +161,99 @@ public class EditMeetingController {
 					}
 				});
 
-		chooseStartTime
-				.setValue(DateTimeUtil.localTimeAsString(selected.set.start));
+		toEndOfTerm.selectedProperty()
+				.addListener(new ChangeListener<Boolean>() {
+					@Override
+					public void changed(
+							ObservableValue<? extends Boolean> observable,
+							Boolean oldVal, Boolean newVal) {
 
-		chooseEndTime
-				.setValue(DateTimeUtil.localTimeAsString(selected.set.end));
+						if (newVal) {
+							chooseEndDate.setValue(
+									Main.active.getSelectedTerm().getEnd());
+							chooseEndDate.setDisable(true);
+						} else {
+							chooseEndDate.setDisable(false);
+						}
+					}
+				});
+
+		// Check each time the end date is changed that it is after the start
+		// date and the end of the term.
+		chooseEndDate.valueProperty()
+				.addListener(new ChangeListener<LocalDate>() {
+					@Override
+					public void changed(
+							ObservableValue<? extends LocalDate> observable,
+							LocalDate oldEndDate, LocalDate newEndDate) {
+
+						if (newEndDate.isBefore(chooseStartDate.getValue())) {
+
+							Main.showAlert(AlertType.ERROR,
+									"Cannot select date",
+									"End date cannot be prior to start date.");
+
+						} else if (newEndDate.isAfter(
+								Main.active.getSelectedTerm().getEnd())) {
+
+							Main.showAlert(AlertType.ERROR,
+									"Cannot select date",
+									"End date cannot be after the end of the term.");
+						}
+					}
+				});
+
+		// Check each time the start date is changed that it is before the end
+		// date and not before the start of the term.
+		chooseStartDate.valueProperty()
+				.addListener(new ChangeListener<LocalDate>() {
+					@Override
+					public void changed(
+							ObservableValue<? extends LocalDate> observable,
+							LocalDate oldStartDate, LocalDate newStartDate) {
+
+						if (newStartDate.isAfter(chooseEndDate.getValue())) {
+
+							Main.showAlert(AlertType.ERROR,
+									"Cannot select date",
+									"Start date cannot be after end date.");
+
+						} else if (newStartDate.isBefore(
+								Main.active.getSelectedTerm().getStart())) {
+
+							Main.showAlert(AlertType.ERROR,
+									"Cannot select date",
+									"Start date cannot be before the start of the term.");
+						}
+					}
+				});
+
+		chooseStartTime.setValue(
+				DateTimeUtil.localTimeAsString(selected.set.getStart()));
+
+		chooseEndTime.setValue(
+				DateTimeUtil.localTimeAsString(selected.set.getEnd()));
 
 		chooseRepeat.setItems(
 				FXCollections.observableArrayList(MeetingSet.REPEAT_OPTIONS));
-		chooseRepeat.setValue(selected.set.repeat);
+		chooseRepeat.setValue(selected.set.getRepeat());
 
-		if (selected.set.isCourseMeeting) {
+		if (selected.set.isCourseMeeting()) {
 
 			meetingTabs.getSelectionModel().select(courseMeetingTab);
 			nonCourseMeetingTab.setDisable(true);
 
-			chooseCourse.setValue(selected.set.course);
+			chooseCourse.setValue(selected.set.getCourse());
 
 			if (chooseCourseMeetingType.getItems()
-					.contains(selected.set.type)) {
+					.contains(selected.set.getType())) {
 
-				chooseCourseMeetingType.setValue(selected.set.type);
+				chooseCourseMeetingType.setValue(selected.set.getType());
 
 			} else {
 
 				chooseCourseMeetingType.setValue("Other");
-				enterOtherCourseMeetingType.setText(selected.set.type);
+				enterOtherCourseMeetingType.setText(selected.set.getType());
 			}
 
 		} else {
@@ -199,17 +262,17 @@ public class EditMeetingController {
 			courseMeetingTab.setDisable(true);
 
 			if (chooseNonCourseMeetingType.getItems()
-					.contains(selected.set.type)) {
+					.contains(selected.set.getType())) {
 
-				chooseNonCourseMeetingType.setValue(selected.set.type);
+				chooseNonCourseMeetingType.setValue(selected.set.getType());
 
 			} else {
 
 				chooseNonCourseMeetingType.setValue("Other");
-				enterOtherNonCourseMeetingType.setText(selected.set.type);
+				enterOtherNonCourseMeetingType.setText(selected.set.getType());
 			}
 
-			enterMeetingName.setText(selected.set.name);
+			enterMeetingName.setText(selected.set.getName());
 
 			chooseColor
 					.setValue(Color.web(MeetingSet.getColor(selected.setID)));
@@ -227,7 +290,7 @@ public class EditMeetingController {
 			}
 		}
 
-		if (this.option.equals(Option.EDIT_THIS_INSTANCE)) {
+		if (this.option.equals(EditOption.EDIT_THIS_INSTANCE)) {
 
 			chooseStartDate.setValue(selected.date);
 
@@ -239,13 +302,14 @@ public class EditMeetingController {
 
 			chooseRepeat.setValue("Never");
 
-		} else if (this.option.equals(Option.EDIT_THIS_AND_FUTURE_INSTANCES)) {
+		} else if (this.option
+				.equals(EditOption.EDIT_THIS_AND_FUTURE_INSTANCES)) {
 
 			chooseStartDate.setValue(selected.date);
 			chooseEndDate
 					.setValue(MeetingSet.getLastMeeting(selected.setID).date);
 
-		} else if (this.option.equals(Option.EDIT_ALL_INSTANCES)) {
+		} else if (this.option.equals(EditOption.EDIT_ALL_INSTANCES)) {
 
 			chooseStartDate
 					.setValue(MeetingSet.getFirstMeeting(selected.setID).date);
@@ -253,164 +317,83 @@ public class EditMeetingController {
 					.setValue(MeetingSet.getLastMeeting(selected.setID).date);
 		}
 
-		chooseStartTime
-				.setValue(DateTimeUtil.localTimeAsString(selected.set.start));
-		chooseEndTime
-				.setValue(DateTimeUtil.localTimeAsString(selected.set.end));
+		chooseStartTime.setValue(
+				DateTimeUtil.localTimeAsString(selected.set.getStart()));
+		chooseEndTime.setValue(
+				DateTimeUtil.localTimeAsString(selected.set.getEnd()));
 
-		enterLocation.setText(selected.set.location);
+		enterLocation.setText(selected.set.getLocation());
 	}
 
 	@FXML
 	private void confirm()
 			throws SQLException, SqliteWrapperException, IOException {
 
-		Color previousColor = Color.web(MeetingSet.getColor(selected.setID));
+		if (timesAreValid(chooseStartTime.getValue(),
+				chooseEndTime.getValue())) {
 
-		// create a new set containing these edited meetings
-		String description = "";
-		if (courseMeetingTab.isSelected()) {
+			if (courseMeetingTab.isSelected()) {
 
-			description = chooseCourse.getValue() + " "
-					+ chooseCourseMeetingType.getValue();
-		} else {
+				MeetingSet.editCourseMeetingSet(this.selected, this.option,
+						chooseCourse.getValue(),
+						chooseCourseMeetingType.getValue(),
+						chooseStartDate.getValue(), chooseEndDate.getValue(),
+						DateTimeUtil.parseLocalTime(chooseStartTime.getValue()),
+						DateTimeUtil.parseLocalTime(chooseEndTime.getValue()),
+						enterLocation.getText(), chooseRepeat.getValue());
 
-			description = enterMeetingName.getText();
-		}
+				window.close();
 
-		// Construct list of dates based on repeat choice
-		ArrayList<LocalDate> meetingDates = new ArrayList<>();
+			} else {
 
-		if (chooseRepeat.getValue().equals("Never")) {
-
-			meetingDates.add(chooseStartDate.getValue());
-
-		} else {
-
-			int weeksBetweenMeetings = 1;
-
-			if (chooseRepeat.getValue().equals("Bi-Weekly")) {
-				weeksBetweenMeetings = 2;
-			} else if (chooseRepeat.getValue().equals("Monthly")) {
-				weeksBetweenMeetings = 4;
-			}
-
-			LocalDate current = chooseStartDate.getValue();
-
-			while (current.isBefore(chooseEndDate.getValue())
-					|| current.equals(chooseEndDate.getValue())) {
-
-				meetingDates.add(current);
-				current = current.plusDays(7 * weeksBetweenMeetings);
-			}
-		}
-
-		// Checking that the start time is before the end time requires that the
-		// times are valid. Therefore the order of the ANDs in this statement
-		// matter.
-		if (DateTimeUtil.isValidLocalTime(chooseStartTime.getValue())
-				&& DateTimeUtil.isValidLocalTime(chooseEndTime.getValue())
-				&& DateTimeUtil.parseLocalTime(chooseStartTime.getValue())
-						.isBefore(DateTimeUtil
-								.parseLocalTime(chooseEndTime.getValue()))) {
-
-			// delete all edited meetings from existing set
-			if (this.option.equals(Option.EDIT_THIS_INSTANCE)) {
-
-				Meeting.deleteMeeting(selected);
-
-			} else if (this.option
-					.equals(Option.EDIT_THIS_AND_FUTURE_INSTANCES)) {
-
-				Meeting.deleteMeetingsFromSet(selected.setID, selected.date);
-
-			} else if (this.option.equals(Option.EDIT_ALL_INSTANCES)) {
-
-				MeetingSet.deleteMeetingSet(selected.setID);
-			}
-
-			ArrayList<MeetingDescription> conflicts = Meeting.getConflicts(
-					meetingDates,
-					DateTimeUtil.parseLocalTime(chooseStartTime.getValue()),
-					DateTimeUtil.parseLocalTime(chooseEndTime.getValue()));
-
-			if (conflicts.size() > 0) {
-
-				ConflictsController cc = new ConflictsController(conflicts,
-						meetingDates, description);
-
-				meetingDates = cc.getRemainingDates();
-			}
-
-			if (meetingDates.size() > 0) {
-
-				if (courseMeetingTab.isSelected()) {
-
-					MeetingSet.addCourseMeetingSet(
-							Main.active.getSelectedTerm(),
-							chooseCourse.getValue(),
-							chooseCourseMeetingType.getValue(),
-							DateTimeUtil
-									.parseLocalTime(chooseStartTime.getValue()),
-							DateTimeUtil
-									.parseLocalTime(chooseEndTime.getValue()),
-							enterLocation.getText(), chooseRepeat.getValue(),
-							meetingDates);
-
-				} else if (nonCourseMeetingTab.isSelected()) {
-
-					MeetingSet.addNonCourseMeetingSet(
-							Main.active.getSelectedTerm(),
-							enterMeetingName.getText(),
-							chooseNonCourseMeetingType.getValue(),
-							DateTimeUtil
-									.parseLocalTime(chooseStartTime.getValue()),
-							DateTimeUtil
-									.parseLocalTime(chooseEndTime.getValue()),
-							enterLocation.getText(), chooseRepeat.getValue(),
-							meetingDates, chooseColor.getValue());
-
-					// If the color has been changed, add it to the Recent
-					// Colors list.
-					if (!previousColor.equals(chooseColor.getValue())) {
-						CourseScheduleController
-								.addRecentColor(chooseColor.getValue());
-					}
-				}
+				MeetingSet.editNonCourseMeetingSet(this.selected, this.option,
+						enterMeetingName.getText(),
+						chooseNonCourseMeetingType.getValue(),
+						chooseStartDate.getValue(), chooseEndDate.getValue(),
+						DateTimeUtil.parseLocalTime(chooseStartTime.getValue()),
+						DateTimeUtil.parseLocalTime(chooseEndTime.getValue()),
+						enterLocation.getText(), chooseRepeat.getValue(),
+						chooseColor.getValue());
 
 				window.close();
 			}
-		} else {
+		}
+	}
 
-			ArrayList<String> errorMessages = new ArrayList<>();
+	private boolean timesAreValid(String startTime, String endTime) {
 
-			boolean timesAreValid = true;
+		boolean timesAreValid = true;
 
-			if (!DateTimeUtil.isValidLocalTime(chooseStartTime.getValue())) {
-				errorMessages.add(
-						"Start time is invalid. It must be in the format hh:mm");
+		LocalTime start = DateTimeUtil
+				.parseLocalTime(chooseStartTime.getValue());
 
-				timesAreValid = false;
+		LocalTime end = DateTimeUtil.parseLocalTime(chooseEndTime.getValue());
+
+		ArrayList<String> errorMessages = new ArrayList<>();
+
+		if (start == null) {
+			errorMessages.add(
+					"Start time is invalid. It must be in the format hh:mm");
+
+			timesAreValid = false;
+		}
+
+		if (end == null) {
+			errorMessages
+					.add("End time is invalid. It must be in the format hh:mm");
+
+			timesAreValid = false;
+		}
+
+		if (timesAreValid) {
+
+			if (!start.isBefore(end)) {
+
+				errorMessages.add("Start time must be before end time.");
 			}
+		}
 
-			if (!DateTimeUtil.isValidLocalTime(chooseEndTime.getValue())) {
-				errorMessages.add(
-						"End time is invalid. It must be in the format hh:mm");
-
-				timesAreValid = false;
-			}
-
-			// This check requires that the specified times are valid.
-			if (timesAreValid) {
-
-				if (!DateTimeUtil.parseLocalTime(chooseStartTime.getValue())
-						.isBefore(DateTimeUtil
-								.parseLocalTime(chooseEndTime.getValue()))) {
-
-					errorMessages.add(
-							"End time cannot be equal to or before start time.");
-				}
-			}
+		if (!timesAreValid) {
 
 			String errorText = "";
 
@@ -426,6 +409,8 @@ public class EditMeetingController {
 
 			Main.showAlert(AlertType.ERROR, "Cannot edit meeting", errorText);
 		}
+
+		return timesAreValid;
 	}
 
 	@FXML
@@ -437,18 +422,7 @@ public class EditMeetingController {
 	@FXML
 	private void delete() throws SQLException, SqliteWrapperException {
 
-		if (this.option.equals(Option.EDIT_THIS_INSTANCE)) {
-
-			Meeting.deleteMeeting(selected);
-
-		} else if (this.option.equals(Option.EDIT_THIS_AND_FUTURE_INSTANCES)) {
-
-			Meeting.deleteMeetingsFromSet(selected.setID, selected.date);
-
-		} else if (this.option.equals(Option.EDIT_ALL_INSTANCES)) {
-
-			MeetingSet.deleteMeetingSet(selected.setID);
-		}
+		MeetingSet.deleteMeetings(this.selected, this.option);
 
 		this.window.close();
 	}

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import core.Main;
 import core.MeetingDescription;
 import core.MeetingSet;
+import core.MeetingSet.EditOption;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -16,7 +17,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import sqlite.SqliteWrapperException;
-import views.EditMeetingController.Option;
 
 public class EditMeetingOptionsController {
 
@@ -75,14 +75,14 @@ public class EditMeetingOptionsController {
 	@FXML
 	public void editThisInstance() throws IOException {
 
-		new EditMeetingController(this.selected, Option.EDIT_THIS_INSTANCE);
+		new EditMeetingController(this.selected, EditOption.EDIT_THIS_INSTANCE);
 		this.window.close();
 	}
 
 	@FXML
 	public void editAllInstances() throws IOException {
 
-		new EditMeetingController(this.selected, Option.EDIT_ALL_INSTANCES);
+		new EditMeetingController(this.selected, EditOption.EDIT_ALL_INSTANCES);
 		this.window.close();
 	}
 
@@ -90,7 +90,7 @@ public class EditMeetingOptionsController {
 	public void editThisAndFutureInstances() throws IOException {
 
 		new EditMeetingController(this.selected,
-				Option.EDIT_THIS_AND_FUTURE_INSTANCES);
+				EditOption.EDIT_THIS_AND_FUTURE_INSTANCES);
 		this.window.close();
 	}
 }

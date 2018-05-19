@@ -409,13 +409,13 @@ public class CourseScheduleController implements Observer {
 			throws SqliteWrapperException, SQLException {
 
 		int dayOfWeek = meeting.date.getDayOfWeek().getValue();
-		LocalTime start = meeting.set.start;
+		LocalTime start = meeting.set.getStart();
 
 		double xOffset = getDayXPosition(dayOfWeek);
 		double yOffset = (DateTimeUtil.getMinutesBetween(scheduleStart, start)
 				* PIXELS_PER_MINUTE) + PADDING_TOP + DAY_LABEL_HEIGHT;
-		double height = DateTimeUtil.getMinutesBetween(start, meeting.set.end)
-				* PIXELS_PER_MINUTE;
+		double height = DateTimeUtil.getMinutesBetween(start,
+				meeting.set.getEnd()) * PIXELS_PER_MINUTE;
 
 		Rectangle rect = new Rectangle(xOffset, yOffset, DAY_WIDTH, height);
 		rect.setFill(Paint.valueOf(MeetingSet.getColor(meeting.setID)));
@@ -452,15 +452,15 @@ public class CourseScheduleController implements Observer {
 
 		String meetingText = "";
 
-		if (meetingBlock.meeting.set.isCourseMeeting) {
+		if (meetingBlock.meeting.set.isCourseMeeting()) {
 
-			meetingText = meetingBlock.meeting.set.course.toString() + "\n"
-					+ meetingBlock.meeting.set.type;
+			meetingText = meetingBlock.meeting.set.getCourse().toString() + "\n"
+					+ meetingBlock.meeting.set.getType();
 
 		} else {
 
-			meetingText = meetingBlock.meeting.set.name + "\n"
-					+ meetingBlock.meeting.set.type;
+			meetingText = meetingBlock.meeting.set.getName() + "\n"
+					+ meetingBlock.meeting.set.getType();
 		}
 
 		this.gc.fillText(meetingText, PADDING_LEFT + meetingBlock.rect.getX(),

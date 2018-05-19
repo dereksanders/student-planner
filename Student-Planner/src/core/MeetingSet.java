@@ -1,5 +1,6 @@
 package core;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -10,6 +11,8 @@ import java.util.ArrayList;
 import javafx.scene.paint.Color;
 import sqlite.SqliteWrapperException;
 import utility.ColorUtil;
+import views.ConflictsController;
+import views.CourseScheduleController;
 
 /**
  * The Class MeetingSet.
@@ -40,17 +43,23 @@ public class MeetingSet {
 		}
 	}
 
+	public enum EditOption {
+
+		EDIT_THIS_INSTANCE, EDIT_ALL_INSTANCES, EDIT_THIS_AND_FUTURE_INSTANCES;
+	};
+
 	public static final String[] COURSE_TYPES = { "Lecture", "Tutorial", "Lab",
 			"Seminar", "Other" };
 
 	public static final String[] NON_COURSE_TYPES = { "Club", "Work", "Sports",
 			"Other" };
 
+	// FIXME: This should probably be an enum.
 	public static final String[] REPEAT_OPTIONS = { "Weekly", "Bi-Weekly",
 			"Monthly", "Never" };
 
 	/**
-	 * Adds the meeting set.
+	 * Adds the course meeting set.
 	 *
 	 * @param term
 	 *            the term
@@ -104,7 +113,7 @@ public class MeetingSet {
 	}
 
 	/**
-	 * Adds the meeting set.
+	 * Adds the non-course meeting set.
 	 *
 	 * @param term
 	 *            the term
@@ -155,6 +164,86 @@ public class MeetingSet {
 		}
 		sql.close();
 		Main.active.update();
+	}
+
+	public static void editCourseMeetingSet(MeetingDescription editingFrom,
+			EditOption option, CourseDescription course, String type,
+			LocalDate startDate, LocalDate endDate, LocalTime startTime,
+			LocalTime endTime, String location, String repeat)
+			throws SQLException, SqliteWrapperException, IOException {
+
+		// delete all edited meetings from existing set
+		deleteMeetings(editingFrom, option);
+
+		ArrayList<LocalDate> dates = generateMeetingDates(startDate, endDate,
+				repeat);
+
+		ArrayList<MeetingDescription> conflicts = Meeting.getConflicts(dates,
+				startTime, endTime);
+
+		String description = course + " " + type;
+
+		handleConflicts(dates, conflicts, description);
+
+		if (dates.size() > 0) {
+
+			addCourseMeetingSet(Main.active.getSelectedTerm(), course, type,
+					startTime, endTime, location, repeat, dates);
+		}
+	}
+
+	public static void editNonCourseMeetingSet(MeetingDescription editingFrom,
+			EditOption option, String name, String type, LocalDate startDate,
+			LocalDate endDate, LocalTime startTime, LocalTime endTime,
+			String location, String repeat, Color color)
+			throws SqliteWrapperException, SQLException, IOException {
+
+		Color previousColor = Color.web(MeetingSet.getColor(editingFrom.setID));
+
+		// delete all edited meetings from existing set
+		deleteMeetings(editingFrom, option);
+
+		// Construct list of dates based on repeat choice
+		ArrayList<LocalDate> meetingDates = MeetingSet
+				.generateMeetingDates(startDate, endDate, repeat);
+
+		ArrayList<MeetingDescription> conflicts = Meeting
+				.getConflicts(meetingDates, startTime, endTime);
+
+		String description = name;
+
+		MeetingSet.handleConflicts(meetingDates, conflicts, description);
+
+		if (meetingDates.size() > 0) {
+
+			MeetingSet.addNonCourseMeetingSet(Main.active.getSelectedTerm(),
+					name, type, startTime, endTime, location, repeat,
+					meetingDates, color);
+
+			// If the color has been changed, add it to the Recent
+			// Colors list.
+			if (!previousColor.equals(color)) {
+
+				CourseScheduleController.addRecentColor(color);
+			}
+		}
+	}
+
+	public static void deleteMeetings(MeetingDescription selected,
+			EditOption option) throws SQLException, SqliteWrapperException {
+
+		if (option.equals(EditOption.EDIT_THIS_INSTANCE)) {
+
+			Meeting.deleteMeeting(selected);
+
+		} else if (option.equals(EditOption.EDIT_THIS_AND_FUTURE_INSTANCES)) {
+
+			Meeting.deleteMeetingsFromSet(selected.setID, selected.date);
+
+		} else if (option.equals(EditOption.EDIT_ALL_INSTANCES)) {
+
+			MeetingSet.deleteMeetingSet(selected.setID);
+		}
 	}
 
 	/**
@@ -409,5 +498,49 @@ public class MeetingSet {
 		 * 
 		 * return lastMeeting;
 		 */
+	}
+
+	public static void handleConflicts(ArrayList<LocalDate> meetingDates,
+			ArrayList<MeetingDescription> conflicts, String description)
+			throws IOException {
+
+		if (conflicts.size() > 0) {
+
+			ConflictsController cc = new ConflictsController(conflicts,
+					meetingDates, description);
+
+			meetingDates = cc.getRemainingDates();
+		}
+	}
+
+	public static ArrayList<LocalDate> generateMeetingDates(LocalDate start,
+			LocalDate end, String repeat) {
+
+		ArrayList<LocalDate> meetingDates = new ArrayList<>();
+
+		if (repeat.equals("Never")) {
+
+			meetingDates.add(start);
+
+		} else {
+
+			int weeksBetweenMeetings = 1;
+
+			if (repeat.equals("Bi-Weekly")) {
+				weeksBetweenMeetings = 2;
+			} else if (repeat.equals("Monthly")) {
+				weeksBetweenMeetings = 4;
+			}
+
+			LocalDate current = start;
+
+			while (current.isBefore(end) || current.equals(end)) {
+
+				meetingDates.add(current);
+				current = current.plusDays(7 * weeksBetweenMeetings);
+			}
+		}
+
+		return meetingDates;
 	}
 }

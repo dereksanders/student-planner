@@ -61,19 +61,18 @@ public class MeetingDescription {
 
 		String description = "";
 
-		if (this.set.isCourseMeeting) {
+		if (this.set.isCourseMeeting()) {
 
-			description = this.set.course + " " + this.set.type + ": "
-					+ this.set.start + " - " + this.set.end + " (" + this.date
-					+ ")";
+			description = this.set.getCourse() + " " + this.set.getType() + ": "
+					+ this.set.getStart() + " - " + this.set.getEnd() + " ("
+					+ this.date + ")";
 		} else {
 
-			description = this.set.name + " " + this.set.type + ": "
-					+ this.set.start + " - " + this.set.end + " (" + this.date
-					+ ")";
+			description = this.set.getName() + " " + this.set.getType() + ": "
+					+ this.set.getStart() + " - " + this.set.getEnd() + " ("
+					+ this.date + ")";
 		}
 
 		return description;
 	}
-
 }

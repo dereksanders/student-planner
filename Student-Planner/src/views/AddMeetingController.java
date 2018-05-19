@@ -296,7 +296,7 @@ public class AddMeetingController {
 
 							Main.showAlert(AlertType.ERROR,
 									"Cannot select time",
-									"End time cannot be equal to or before start time.");
+									"Start time must be before end time.");
 
 							chooseEndTime.setValue(chooseEndTime.getItems()
 									.get(chooseEndTime.getItems().indexOf(
