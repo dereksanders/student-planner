@@ -80,7 +80,7 @@ public class CourseScheduleController implements Observer {
 	private static final int MAX_RECENT_COLORS = 5;
 
 	// Times for forms related to CourseSchedule.
-	public static String[] times = generateTimesAsStrings();
+	public static String[] times = DateTimeUtil.generateTimesAsStrings(2);
 
 	// Recent colors used for non-course meetings.
 	private static ArrayList<Color> recentColors = new ArrayList<>();
@@ -155,37 +155,6 @@ public class CourseScheduleController implements Observer {
 						}
 					}
 				});
-	}
-
-	/**
-	 * Generate times as strings.
-	 *
-	 * @return the string[]
-	 */
-	private static String[] generateTimesAsStrings() {
-
-		int timesPerHour = 2;
-		LocalTime[] times = new LocalTime[24 * timesPerHour];
-		String[] timesAsStrings = new String[times.length];
-
-		for (int i = 0; i < times.length; i++) {
-
-			for (int j = 0; j < 24; j++) {
-
-				for (int k = 0; k < timesPerHour; k++) {
-
-					times[i] = LocalTime.of(j, (60 / timesPerHour) * k);
-					i++;
-				}
-			}
-		}
-
-		for (int i = 0; i < times.length; i++) {
-
-			timesAsStrings[i] = DateTimeUtil.localTimeAsString(times[i]);
-		}
-
-		return timesAsStrings;
 	}
 
 	/**

@@ -247,6 +247,18 @@ public class DateTimeUtil {
 		return endMinutes - startMinutes;
 	}
 
+	public static int getMonthsBetween(LocalDate start, LocalDate end) {
+
+		int numMonths;
+
+		int yearsApart = end.getYear() - start.getYear();
+		int monthsApart = end.getMonthValue() - start.getMonthValue();
+
+		numMonths = (yearsApart * 12) + monthsApart;
+
+		return numMonths;
+	}
+
 	/**
 	 * Checks if is valid local time.
 	 *
@@ -326,6 +338,36 @@ public class DateTimeUtil {
 	}
 
 	/**
+	 * Generate times as strings.
+	 *
+	 * @return the string[]
+	 */
+	public static String[] generateTimesAsStrings(int timesPerHour) {
+
+		LocalTime[] times = new LocalTime[24 * timesPerHour];
+		String[] timesAsStrings = new String[times.length];
+
+		for (int i = 0; i < times.length; i++) {
+
+			for (int j = 0; j < 24; j++) {
+
+				for (int k = 0; k < timesPerHour; k++) {
+
+					times[i] = LocalTime.of(j, (60 / timesPerHour) * k);
+					i++;
+				}
+			}
+		}
+
+		for (int i = 0; i < times.length; i++) {
+
+			timesAsStrings[i] = DateTimeUtil.localTimeAsString(times[i]);
+		}
+
+		return timesAsStrings;
+	}
+
+	/**
 	 * Short pretty date.
 	 *
 	 * @param date
@@ -334,7 +376,7 @@ public class DateTimeUtil {
 	 */
 	public static String shortPrettyDate(LocalDate date) {
 
-		String monthAbbreviation = getMonthAbbreviation(date.getMonthValue());
+		String monthAbbreviation = getMonthShort(date.getMonthValue());
 		String dateWithEnding = date.getDayOfMonth()
 				+ getDateEnding(date.getDayOfMonth());
 
@@ -383,7 +425,7 @@ public class DateTimeUtil {
 	 *            the month value
 	 * @return the month abbreviation
 	 */
-	private static String getMonthAbbreviation(int monthValue) {
+	private static String getMonthShort(int monthValue) {
 
 		String abbreviation = "";
 
@@ -428,5 +470,52 @@ public class DateTimeUtil {
 		}
 
 		return abbreviation;
+	}
+
+	public static String getMonth(int monthValue) {
+
+		String month = "";
+
+		switch (monthValue) {
+
+		case 1:
+			month = "January";
+			break;
+		case 2:
+			month = "February";
+			break;
+		case 3:
+			month = "March";
+			break;
+		case 4:
+			month = "April";
+			break;
+		case 5:
+			month = "May";
+			break;
+		case 6:
+			month = "June";
+			break;
+		case 7:
+			month = "July";
+			break;
+		case 8:
+			month = "August";
+			break;
+		case 9:
+			month = "September";
+			break;
+		case 10:
+			month = "October";
+			break;
+		case 11:
+			month = "November";
+			break;
+		case 12:
+			month = "December";
+			break;
+		}
+
+		return month;
 	}
 }
