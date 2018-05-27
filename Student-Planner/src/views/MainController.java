@@ -11,6 +11,8 @@ import core.Main;
 import core.Profile;
 import core.Term;
 import core.TermDescription;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -103,6 +105,24 @@ public class MainController implements Observer {
 			Main.active.setSelectedDate(selected.getStart());
 			updateSelectedTermBox(selected);
 		}
+
+		selectTerm.getSelectionModel().selectedIndexProperty()
+				.addListener(new ChangeListener<Number>() {
+
+					@Override
+					public void changed(
+							ObservableValue<? extends Number> observable,
+							Number oldIndex, Number newIndex) {
+						try {
+
+							updateSelectedTermBox(selectTerm.getItems()
+									.get(newIndex.intValue()));
+
+						} catch (SqliteWrapperException | SQLException e) {
+							e.printStackTrace();
+						}
+					}
+				});
 
 		loadTabs();
 	}
@@ -221,6 +241,8 @@ public class MainController implements Observer {
 
 			selectedHeader.setFill(Color.web(Main.TEXT_DARK_COLOR));
 		}
-	}
 
+		Main.active.setSelectedDate(term.getStart());
+		Main.active.update();
+	}
 }

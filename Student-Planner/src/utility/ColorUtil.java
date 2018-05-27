@@ -108,7 +108,7 @@ public class ColorUtil {
 
 		// Colors with less brightness than this threshold are considered to be
 		// dark.
-		double brightnessThreshold = 0.7;
+		double brightnessThreshold = 0.75;
 
 		if (color.getBrightness() < brightnessThreshold) {
 

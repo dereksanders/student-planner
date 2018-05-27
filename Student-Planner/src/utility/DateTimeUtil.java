@@ -50,6 +50,38 @@ public class DateTimeUtil {
 		return day;
 	}
 
+	public static String intToDayShort(int dayAsInt) {
+
+		String day = "";
+
+		switch (dayAsInt) {
+
+		case 1:
+			day = "Mon";
+			break;
+		case 2:
+			day = "Tue";
+			break;
+		case 3:
+			day = "Wed";
+			break;
+		case 4:
+			day = "Thu";
+			break;
+		case 5:
+			day = "Fri";
+			break;
+		case 6:
+			day = "Sat";
+			break;
+		case 7:
+			day = "Sun";
+			break;
+		}
+
+		return day;
+	}
+
 	/**
 	 * Checks if the two dates belong to the same week. Weeks begin on Monday
 	 * according to the ISO-8601 standard.
